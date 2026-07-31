@@ -100,7 +100,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <body>
 
 <div id="appContent">
-<div class="header"><h1>🏠 出租房管理</h1><div class="subtitle" id="appSubtitle">云端同步 · 登录后数据安全保存 · v7</div></div>
+<div class="header"><h1>🏠 出租房管理</h1><div class="subtitle" id="appSubtitle">云端同步 · 登录后数据安全保存 · v8</div></div>
 <div class="login-bar" id="loginBar" style="display:none"><span id="loginUser"></span><button class="btn btn-outline btn-sm" onclick="doLogout()">退出</button></div>
 
 <!-- PAGE: Dashboard -->
@@ -291,7 +291,8 @@ var SB_URL='https://sjccrtdlsflszrfteejy.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqY2NydGRsc2Zsc3pyZnRlZWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0ODUyNDEsImV4cCI6MjEwMTA2MTI0MX0.AG3U87Lg_9eiaxYpI62xDWb1iPcwM55CIB5MjmxK9jc';
 var sbClient=null,currentUser=null,_syncTimer=null;
 function initSupabase(){try{if(typeof supabase==='undefined'||!supabase.createClient)return false;sbClient=supabase.createClient(SB_URL,SB_KEY);return true}catch(e){return false}}
-function scheduleSync(data){if(_syncTimer)clearTimeout(_syncTimer);_syncTimer=setTimeout(function(){if(!sbClient||!currentUser)return;sbClient.from('user_data').upsert({user_id:currentUser.id,data:data,updated_at:new Date().toISOString()}).then(function(){toast('\u5DF2\u540C\u6B65\u5230\u4E91\u7AEF')}).catch(function(e){console.log('sync err',e)})},800)}
+var _lastSyncData=null;
+function scheduleSync(data){_lastSyncData=data;if(_syncTimer)clearTimeout(_syncTimer);_syncTimer=setTimeout(function(){if(!sbClient||!currentUser||!_lastSyncData)return;var d=_lastSyncData;_lastSyncData=null;sbClient.from('user_data').upsert({user_id:currentUser.id,data:d,updated_at:new Date().toISOString()}).then(function(){toast('\u5DF2\u540C\u6B65\u5230\u4E91\u7AEF')}).catch(function(e){console.log('sync err',e)})},300)}
 function mergeData(local,cloud){
   function union(key){var map={},out=[],aL=local[key]||[],aC=cloud[key]||[],i,j,k;
     for(i=0;i<aC.length;i++){if(aC[i]&&aC[i].id)map[aC[i].id]=aC[i];}
@@ -299,7 +300,7 @@ function mergeData(local,cloud){
     for(k in map){if(map.hasOwnProperty(k))out.push(map[k]);}return out;}
   return {rooms:union('rooms'),bills:union('bills'),maint:union('maint'),payments:union('payments')};
 }
-function flushSync(){if(!sbClient||!currentUser)return Promise.resolve();var data={rooms:DB.rooms,bills:DB.bills,maint:DB.maint,payments:DB.payments};return sbClient.from('user_data').upsert({user_id:currentUser.id,data:data,updated_at:new Date().toISOString()}).then(function(){toast('\u5DF2\u540C\u6B65\u5230\u4E91\u7AEF')}).catch(function(e){console.log('sync err',e)})}
+function flushSync(){if(!sbClient||!currentUser)return Promise.resolve();var data=_lastSyncData||{rooms:DB.rooms,bills:DB.bills,maint:DB.maint,payments:DB.payments};_lastSyncData=null;var payload={user_id:currentUser.id,data:data,updated_at:new Date().toISOString()};var session=sbClient.auth.session();var token=session?session.access_token:SB_KEY;var url=SB_URL+'/rest/v1/user_data';return fetch(url,{method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json','Prefer':'return=representation,resolution=merge-duplicates'},body:JSON.stringify(payload),keepalive:true}).then(function(r){if(r.ok)toast('\u5DF2\u540C\u6B65\u5230\u4E91\u7AEF');else console.log('flushSync err status:',r.status);return r}).catch(function(e){console.log('flushSync err',e)})}
 function showLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='none';openModal('modalLogin')}catch(e){}}
 function hideLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='';closeModal('modalLogin');var lb=document.getElementById('loginBar');if(lb)lb.style.display='flex';var lu=document.getElementById('loginUser');if(lu&&currentUser)lu.textContent=currentUser.email}catch(e){}}
 async function doLogin(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}showLoginLoading(true);var r=await sbClient.auth.signInWithPassword({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u767B\u5F55\u5931\u8D25\uFF1A'+r.error.message);return}currentUser=r.data.user;await afterLogin()}catch(e){showLoginLoading(false);toast('\u767B\u5F55\u51FA\u9519')}}
