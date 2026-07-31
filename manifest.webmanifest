@@ -1,0 +1,17 @@
+{
+  "name":"出租房管理系统",
+  "short_name":"出租管理",
+  "description":"手机端出租房管理：房间、抄表结算、维修记录、费用统计",
+  "start_url":"./",
+  "scope":"./",
+  "display":"standalone",
+  "orientation":"portrait",
+  "background_color":"#F5F7FA",
+  "theme_color":"#1976D2",
+  "categories":["business","productivity","finance"],
+  "icons":[
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"icon-maskable.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}
