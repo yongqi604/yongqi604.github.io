@@ -270,7 +270,11 @@ var DB={rooms:[],bills:[],maint:[],payments:[],
    self._loadLocal();
    if(sbClient&&currentUser){
      sbClient.from('user_data').select('data').eq('user_id',currentUser.id).maybeSingle().then(function(r){
-       if(r.data&&r.data.data){var d=r.data.data;self.rooms=d.rooms||[];self.bills=d.bills||[];self.maint=d.maint||[];self.payments=d.payments||[]}
+       if(r.data&&r.data.data){var d=r.data.data;
+         var merged=mergeData({rooms:self.rooms,bills:self.bills,maint:self.maint,payments:self.payments},{rooms:d.rooms||[],bills:d.bills||[],maint:d.maint||[],payments:d.payments||[]});
+         self.rooms=merged.rooms;self.bills=merged.bills;self.maint=merged.maint;self.payments=merged.payments;
+         self.save();
+       }
        res();
      }).catch(function(){res()});
    }else{res()}
@@ -288,12 +292,20 @@ var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI
 var sbClient=null,currentUser=null,_syncTimer=null;
 function initSupabase(){try{if(typeof supabase==='undefined'||!supabase.createClient)return false;sbClient=supabase.createClient(SB_URL,SB_KEY);return true}catch(e){return false}}
 function scheduleSync(data){if(_syncTimer)clearTimeout(_syncTimer);_syncTimer=setTimeout(function(){if(!sbClient||!currentUser)return;sbClient.from('user_data').upsert({user_id:currentUser.id,data:data,updated_at:new Date().toISOString()}).then(function(){toast('\u5DF2\u540C\u6B65\u5230\u4E91\u7AEF')}).catch(function(e){console.log('sync err',e)})},800)}
+function mergeData(local,cloud){
+  function union(key){var map={},out=[],aL=local[key]||[],aC=cloud[key]||[],i,j,k;
+    for(i=0;i<aC.length;i++){if(aC[i]&&aC[i].id)map[aC[i].id]=aC[i];}
+    for(j=0;j<aL.length;j++){if(aL[j]&&aL[j].id)map[aL[j].id]=aL[j];}
+    for(k in map){if(map.hasOwnProperty(k))out.push(map[k]);}return out;}
+  return {rooms:union('rooms'),bills:union('bills'),maint:union('maint'),payments:union('payments')};
+}
+function flushSync(){if(!sbClient||!currentUser)return Promise.resolve();var data={rooms:DB.rooms,bills:DB.bills,maint:DB.maint,payments:DB.payments};return sbClient.from('user_data').upsert({user_id:currentUser.id,data:data,updated_at:new Date().toISOString()});}
 function showLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='none';openModal('modalLogin')}catch(e){}}
 function hideLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='';closeModal('modalLogin');var lb=document.getElementById('loginBar');if(lb)lb.style.display='flex';var lu=document.getElementById('loginUser');if(lu&&currentUser)lu.textContent=currentUser.email}catch(e){}}
 async function doLogin(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}showLoginLoading(true);var r=await sbClient.auth.signInWithPassword({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u767B\u5F55\u5931\u8D25\uFF1A'+r.error.message);return}currentUser=r.data.user;await afterLogin()}catch(e){showLoginLoading(false);toast('\u767B\u5F55\u51FA\u9519')}}
 async function doRegister(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}if(p.length<6){toast('\u5BC6\u7801\u81F3\u5C116\u4F4D');return}showLoginLoading(true);var r=await sbClient.auth.signUp({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u6CE8\u518C\u5931\u8D25\uFF1A'+r.error.message);return}if(r.data&&r.data.session){currentUser=r.data.user;await afterLogin()}else{toast('\u6CE8\u518C\u6210\u529F\uFF01\u8BF7\u67E5\u6536\u90AE\u7BB1\u9A8C\u8BC1\u90AE\u4EF6\u540E\u518D\u767B\u5F55')}}catch(e){showLoginLoading(false);toast('\u6CE8\u518C\u51FA\u9519')}}
 async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){}}
-function doLogout(){try{if(sbClient)sbClient.auth.signOut();currentUser=null;showLogin();toast('\u5DF2\u9000\u51FA\u767B\u5F55')}catch(e){}}
+function doLogout(){try{if(_syncTimer)clearTimeout(_syncTimer);if(sbClient&&currentUser)flushSync();if(sbClient)sbClient.auth.signOut();currentUser=null;showLogin();toast('\u5DF2\u9000\u51FA\u767B\u5F55')}catch(e){}}
 function forgotPwd(){try{var e=document.getElementById('loginEmail').value.trim();if(!e){toast('\u8BF7\u5148\u8F93\u5165\u90AE\u7BB1');return}sbClient.auth.resetPasswordForEmail(e).then(function(){toast('\u5DF2\u53D1\u9001\u91CD\u7F6E\u90AE\u4EF6\uFF0C\u8BF7\u67E5\u6536')}).catch(function(err){toast('\u53D1\u9001\u5931\u8D25\uFF1A'+(err.message||''))})}catch(e){}}
 function showLoginLoading(on){try{var b=document.getElementById('loginSubmit');if(b)b.disabled=on;var l=document.getElementById('loginLoading');if(l)l.style.display=on?'block':'none'}catch(e){}}
 
@@ -1010,6 +1022,11 @@ if('serviceWorker'in navigator && !(window.Capacitor&&Capacitor.isNativePlatform
     window.location.reload();
   });
 }
+
+// Flush pending cloud sync when leaving page (close / switch tab) so data is never lost
+function _flushOnExit(){try{if(sbClient&&currentUser&&_syncTimer){clearTimeout(_syncTimer);flushSync();}}catch(e){}}
+window.addEventListener('beforeunload',_flushOnExit);
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')_flushOnExit();});
 </script>
 </body>
 </html>
