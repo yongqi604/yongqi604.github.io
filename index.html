@@ -100,7 +100,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <body>
 
 <div id="appContent">
-<div class="header"><h1>🏠 出租房管理</h1><div class="subtitle" id="appSubtitle">云端同步 · 登录后数据安全保存 · v6</div></div>
+<div class="header"><h1>🏠 出租房管理</h1><div class="subtitle" id="appSubtitle">云端同步 · 登录后数据安全保存 · v7</div></div>
 <div class="login-bar" id="loginBar" style="display:none"><span id="loginUser"></span><button class="btn btn-outline btn-sm" onclick="doLogout()">退出</button></div>
 
 <!-- PAGE: Dashboard -->
@@ -299,13 +299,13 @@ function mergeData(local,cloud){
     for(k in map){if(map.hasOwnProperty(k))out.push(map[k]);}return out;}
   return {rooms:union('rooms'),bills:union('bills'),maint:union('maint'),payments:union('payments')};
 }
-function flushSync(){if(!sbClient||!currentUser)return Promise.resolve();var data={rooms:DB.rooms,bills:DB.bills,maint:DB.maint,payments:DB.payments};return sbClient.from('user_data').upsert({user_id:currentUser.id,data:data,updated_at:new Date().toISOString()});}
+function flushSync(){if(!sbClient||!currentUser)return Promise.resolve();var data={rooms:DB.rooms,bills:DB.bills,maint:DB.maint,payments:DB.payments};return sbClient.from('user_data').upsert({user_id:currentUser.id,data:data,updated_at:new Date().toISOString()}).then(function(){toast('\u5DF2\u540C\u6B65\u5230\u4E91\u7AEF')}).catch(function(e){console.log('sync err',e)})}
 function showLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='none';openModal('modalLogin')}catch(e){}}
 function hideLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='';closeModal('modalLogin');var lb=document.getElementById('loginBar');if(lb)lb.style.display='flex';var lu=document.getElementById('loginUser');if(lu&&currentUser)lu.textContent=currentUser.email}catch(e){}}
 async function doLogin(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}showLoginLoading(true);var r=await sbClient.auth.signInWithPassword({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u767B\u5F55\u5931\u8D25\uFF1A'+r.error.message);return}currentUser=r.data.user;await afterLogin()}catch(e){showLoginLoading(false);toast('\u767B\u5F55\u51FA\u9519')}}
 async function doRegister(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}if(p.length<6){toast('\u5BC6\u7801\u81F3\u5C116\u4F4D');return}showLoginLoading(true);var r=await sbClient.auth.signUp({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u6CE8\u518C\u5931\u8D25\uFF1A'+r.error.message);return}if(r.data&&r.data.session){currentUser=r.data.user;await afterLogin()}else{toast('\u6CE8\u518C\u6210\u529F\uFF01\u8BF7\u67E5\u6536\u90AE\u7BB1\u9A8C\u8BC1\u90AE\u4EF6\u540E\u518D\u767B\u5F55')}}catch(e){showLoginLoading(false);toast('\u6CE8\u518C\u51FA\u9519')}}
 async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){}}
-function doLogout(){try{if(_syncTimer)clearTimeout(_syncTimer);if(sbClient&&currentUser)flushSync();if(sbClient)sbClient.auth.signOut();currentUser=null;showLogin();toast('\u5DF2\u9000\u51FA\u767B\u5F55')}catch(e){}}
+async function doLogout(){try{if(_syncTimer)clearTimeout(_syncTimer);if(sbClient&&currentUser){try{await flushSync()}catch(e){}}if(sbClient){try{await sbClient.auth.signOut()}catch(e){}}currentUser=null;showLogin();toast('\u5DF2\u9000\u51FA\u767B\u5F55')}catch(e){}}
 function forgotPwd(){try{var e=document.getElementById('loginEmail').value.trim();if(!e){toast('\u8BF7\u5148\u8F93\u5165\u90AE\u7BB1');return}sbClient.auth.resetPasswordForEmail(e).then(function(){toast('\u5DF2\u53D1\u9001\u91CD\u7F6E\u90AE\u4EF6\uFF0C\u8BF7\u67E5\u6536')}).catch(function(err){toast('\u53D1\u9001\u5931\u8D25\uFF1A'+(err.message||''))})}catch(e){}}
 function showLoginLoading(on){try{var b=document.getElementById('loginSubmit');if(b)b.disabled=on;var l=document.getElementById('loginLoading');if(l)l.style.display=on?'block':'none'}catch(e){}}
 
