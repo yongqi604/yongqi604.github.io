@@ -1,0 +1,58 @@
+name: Build Android APK (Capacitor)
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept licenses and install SDK packages
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Prepare web assets (www/)
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+          cp -f manifest.webmanifest service-worker.js icon-192.png icon-512.png icon-maskable.png www/ 2>/dev/null || true
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Sync web assets into Android project
+        run: npx cap sync android
+
+      - name: Build debug APK
+        run: cd android && chmod +x gradlew && ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rental-manager-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
