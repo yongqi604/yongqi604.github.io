@@ -51,11 +51,14 @@ jobs:
       - name: Sync web assets into Android project
         run: npx cap sync android
 
+      - name: Write local.properties for Gradle
+        run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
+
       - name: Build debug APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --stacktrace
+          ./gradlew assembleDebug --stacktrace --info
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
