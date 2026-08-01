@@ -94,6 +94,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .backup-hint{font-size:11.5px;color:var(--text3);margin-top:8px;line-height:1.5}
 .login-bar{display:flex;align-items:center;justify-content:space-between;background:#E3F2FD;padding:8px 14px;font-size:13px;color:#1565C0;margin-bottom:8px}
 .login-bar button{margin-left:8px}
+/* ===== 年度结算明细打印（仿手工账本表格） ===== */
+.ledger-sheet{background:#fff;color:#000;padding:0;font-family:'SimSun','Songti SC',serif}
+.ls-head{text-align:center;padding:10px 0 4px;border-bottom:2px solid #333}
+.ls-head h1{font-size:24px;font-weight:700;letter-spacing:8px;margin:0}
+.ls-meta{display:flex;justify-content:center;gap:28px;font-size:14px;margin-top:8px;color:#000}
+.ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5}
+.ledger-table th,.ledger-table td{border:1.5px solid #333;padding:3px 5px;text-align:center;vertical-align:middle}
+.lt-blk-title td{background:#F5F5F5;font-weight:700;font-size:12px}
+.lt-blk-row td{height:26px}
+.lt-blk-label{font-weight:600;width:36px;background:#FAFAFA}
+.lt-date-cell{writing-mode:vertical-rl;text-orientation:mixed;font-size:13px;font-weight:600;letter-spacing:2px;width:38px;background:#F9F9F9}
+.lt-summary{font-weight:600}
+.lt-total-row td{font-weight:700;font-size:13px;background:#F0F0F0}
+.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:6px}
+.lt-grand td{font-weight:700;font-size:14px;background:#E8E8E8;border-width:2px 1.5px}
+.ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}
+@media print{
+  body *{visibility:hidden!important}
+  #printArea,#printArea *{visibility:visible!important}
+  #printArea{position:absolute;left:0;top:0;width:100%;padding:0}
+  @page{size:A4 landscape;margin:12mm}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -121,8 +143,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 
 <!-- PAGE: Billing -->
 <div class="page" id="pageBilling">
-  <div class="selector"><select id="billRoomSelect" onchange="onBillSelectChange()"><option value="">选择房号</option></select><select id="billYearSelect" onchange="onBillSelectChange()"></select><span style="font-size:12.5px;color:var(--text2)">年</span></div>
+  <div class="selector"><select id="billRoomSelect" onchange="onBillSelectChange()"><option value="">选择房号</option></select><select id="billYearSelect" onchange="onBillSelectChange()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printBillBtn" onclick="printBilling()" style="display:none">🖨 打印</button></div>
   <div id="billingContent"></div>
+  <div id="printArea"></div>
 </div>
 
 <!-- PAGE: Maintenance -->
@@ -634,7 +657,109 @@ function renderBilling(){
       }
     }
     $('billingContent').innerHTML=html;
+    // 选中房号+年份时显示打印按钮
+    try{
+      var hasRoom=!!roomId, hasData=!hasRoom||bills.length>0;
+      $('printBillBtn').style.display=(hasRoom&&hasData)?'inline-flex':'none';
+    }catch(e){}
   }catch(e){}
+}
+
+// ========== 打印年度结算明细（仿手工账本——按用户账本照片格式） ==========
+function printBilling(){
+  try{
+    var roomId=$('billRoomSelect').value;
+    var year=parseInt($('billYearSelect').value)||getYear();
+    if(!roomId){toast('请先选择房号');return}
+    var ro=findRoomById(roomId);
+    var bills=[];
+    for(var i=0;i<DB.bills.length;i++){var b=DB.bills[i];if(b.roomId===roomId&&new Date(b.date).getFullYear()===year)bills.push(b)}
+    bills.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
+    if(bills.length===0){toast(year+'年暂无结算记录');return}
+
+    function c(v){return (v==null||v===''||(typeof v==='number'&&isNaN(v)))?'':fmt(v)}
+    // 用量×单价格式
+    function up(u,p){if(u==null)return '';var s=fmt(u);if(p!=null&&p>0)s+='×'+fmt(p);return s}
+
+    var body='';
+    var grandTotal=0;
+    for(var bi=0;bi<bills.length;bi++){
+      var b=bills[bi];
+      var fee=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0);
+      var rent=b.rent||0;
+      var dep=b.depositChange||0;
+      var otherCost=b.otherCost||0;
+      var total=fee+rent+dep+otherCost;
+      grandTotal+=total;
+      var hasElec=(b.elecRead!=null),hasWater=(b.waterRead!=null),hasGas=(b.gasRead!=null);
+      // 固定5行：表头+电+水+燃气+其他(含共计)
+      var nRows=5;
+      var note=(b.note||'');
+      if(dep)note+=(note?'；':'')+'押金'+(dep>0?'+':'')+fmt(dep);
+
+      // 日期格式：2025-12-21 → 25年12月21 或 12月21
+      var d=new Date(b.date);
+      var dateStr=(d.getFullYear()%100)+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+
+      body+='<tr class="lt-blk-title">'
+        +'<td rowspan="'+nRows+'" class="lt-date-cell">'+dateStr+'</td>'
+        +'<td></td><td>读表</td><td>用量单价</td><td>金额</td>'
+        +'<td></td><td>汇总</td>'
+        +'<td rowspan="'+nRows+'" class="lt-note-col">'+note+'</td>'
+        +'</tr>';
+
+      // 电
+      body+='<tr class="lt-blk-row">'
+        +'<td class="lt-blk-label">电</td>'
+        +'<td>'+(hasElec?c(b.elecRead):'')+'</td>'
+        +'<td>'+(hasElec?up(b.elecUsage,ro.elecPrice):'')+'</td>'
+        +'<td>'+(hasElec?c(b.elecCost):'')+'</td>'
+        +'<td>费用</td><td>'+c(fee)+'</td>'
+        +'</tr>';
+      // 水
+      body+='<tr class="lt-blk-row">'
+        +'<td class="lt-blk-label">水</td>'
+        +'<td>'+(hasWater?c(b.waterRead):'')+'</td>'
+        +'<td>'+(hasWater?up(b.waterUsage,ro.waterPrice):'')+'</td>'
+        +'<td>'+(hasWater?c(b.waterCost):'')+'</td>'
+        +'<td>房租</td><td>'+c(rent)+'</td>'
+        +'</tr>';
+      if(hasGas){
+        body+='<tr class="lt-blk-row">'
+          +'<td class="lt-blk-label">燃气</td>'
+          +'<td>'+c(b.gasRead)+'</td>'
+          +'<td>'+up(b.gasUsage,ro.gasPrice)+'</td>'
+          +'<td>'+c(b.gasCost)+'</td>'
+          +'<td></td><td></td>'
+          +'</tr>';
+      }else{
+        body+='<tr class="lt-blk-row"><td class="lt-blk-label">燃气</td><td></td><td></td><td></td><td></td><td></td></tr>';
+      }
+      // 其他行（含共计）
+      var otherCost=b.otherCost||0;
+      body+='<tr class="lt-blk-row lt-total-row">'
+        +'<td class="lt-blk-label">其他</td>'
+        +'<td></td><td></td><td>'+(otherCost?c(otherCost):'')+'</td>'
+        +'<td class="lt-summary">共计</td><td class="lt-summary">'+fmt(total)+'元</td>'
+        +'</tr>';
+    }
+
+    var html='<div class="ledger-sheet">'
+      +'<div class="ls-head"><h1>出租管理</h1>'
+      +'<div class="ls-meta">'
+      +'<span>房号：'+(ro?ro.number:'')+'</span>'
+      +'<span>结算方式：'+(ro?ro.settleMethod||'—':'')+'</span>'
+      +'<span>年度：'+year+' 年</span>'
+      +'</div></div>'
+      +'<table class="ledger-table"><tbody>'+body
+      +'<tr class="lt-grand"><td colspan="6" style="text-align:right;padding-right:10px">当年合计（'+bills.length+' 笔）</td><td colspan="2">'+fmt(grandTotal)+' 元</td></tr>'
+      +'</tbody></table>'
+      +'<div class="ledger-foot"><span>房东签字：_______________</span><span>租户签字：_______________</span><span>打印日期：'+fmtDateFull(new Date())+'</span></div>'
+      +'</div>';
+
+    $('printArea').innerHTML=html;
+    setTimeout(function(){window.print();},80);
+  }catch(e){toast('生成打印页失败')}
 }
 
 // ========== MAINTENANCE ==========
