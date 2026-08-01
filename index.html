@@ -624,7 +624,7 @@ function renderBilling(){
           if(b.elecRead!=null)html+=bRow('electric','\u26A1','\u7535','('+fmt(ro.elecPrice)+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
           if(b.waterRead!=null)html+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(ro.waterPrice)+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
           if(b.gasRead!=null)html+=bRow('gas','\uD83D\uDD25','\u71C3\u6C14','('+fmt(ro.gasPrice)+'\u5143/m\xB3)',b.gasRead,b.gasUsage,b.gasCost);
-          html+=bRow('rent','\uD83C\uDFE0','\u623F\u79CD','','','',b.rent,'green');
+          html+=bRow('rent','\uD83C\uDFE0','\u623F\u79D1','','','',b.rent,'green');
           if(b.depositChange)html+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
           if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;color:var(--text3);font-size:10.5px">\uD83D\uDCDD '+b.note+'</div>';
           html+='<div class="billing-total">\u672C\u6708\u5408\u8BA1:\u00A5'+fmt(t)+'</div></div>';
