@@ -54,18 +54,14 @@ jobs:
       - name: Write local.properties for Gradle
         run: echo "sdk.dir=$ANDROID_HOME" > android/local.properties
 
-      - name: Set custom app icon
+      - name: Copy custom app icons
         run: |
           RES=android/app/src/main/res
-          for pair in "mdpi:48" "hdpi:72" "xhdpi:96" "xxhdpi:144" "xxxhdpi:192"; do
-            density="${pair%%:*}"
-            size="${pair##*:}"
-            convert app-icon.png -resize ${size}x${size} $RES/mipmap-$density/ic_launcher.png
-            convert app-icon.png -resize ${size}x${size} $RES/mipmap-$density/ic_launcher_round.png
-            convert app-icon.png -resize ${size}x${size} $RES/mipmap-$density/ic_launcher_foreground.png
-          done
-          for density in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
-            convert -size 108x108 xc:"#1E6F6B" $RES/mipmap-$density/ic_launcher_background.png
+          for f in android-icons/*.png; do
+            base=$(basename "$f" .png)
+            density=$(echo "$base" | sed 's/.*-//')
+            name=$(echo "$base" | sed "s/-${density}$//")
+            cp "$f" "$RES/mipmap-${density}/${name}.png"
           done
 
       - name: Build debug APK
