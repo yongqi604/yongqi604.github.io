@@ -8,8 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,12 +24,14 @@ jobs:
           java-version: '17'
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: reactivecircus/android-sdk-setup-action@v3
+        with:
+          api-level: 34
+          build-tools: 34.0.0
+          cmdline-tools-latest: true
 
-      - name: Accept licenses and install SDK packages
-        run: |
-          yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+      - name: Accept licenses
+        run: yes | sdkmanager --licenses
 
       - name: Install npm dependencies
         run: npm install
