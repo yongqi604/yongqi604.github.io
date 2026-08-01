@@ -1,0 +1,8 @@
+{
+  "appId": "com.rental.manager",
+  "appName": "出租管理",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

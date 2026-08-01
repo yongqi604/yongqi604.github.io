@@ -1,0 +1,17 @@
+{
+  "name": "rental-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "出租房管理系统 - Capacitor 安卓壳(Supabase 云端同步)",
+  "dependencies": {
+    "@capacitor/android": "^5.7.0",
+    "@capacitor/core": "^5.7.0",
+    "@capacitor/filesystem": "^5.2.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^5.7.0"
+  },
+  "scripts": {
+    "sync": "cap sync"
+  }
+}
