@@ -961,16 +961,10 @@ function printBilling(){
     // 检测是否在 Capacitor/APK 环境中
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
-      // APK 环境：写入文件后用系统浏览器打开（系统浏览器支持打印）
-      doCapacitorSave(content,filename,function(uri){
-        if(uri){
-          // 用系统浏览器打开，用户可在浏览器里打印/存PDF
-          window.open(uri,'_system');
-          toast('正在打开打印页…');
-        }else{
-          // Filesystem 不可用：降级为 data URL 新窗口
-          openPrintWindow(content);
-        }
+      // APK 环境：保存为HTML文件，提示用户用文件管理器打开打印
+      doCapacitorSave(content,filename,function(ok){
+        if(ok) toast('打印页已保存：'+filename+'\n请用文件管理器打开打印');
+        else toast('保存失败，请检查存储权限');
       });
     }else{
       // 浏览器环境：直接调起打印对话框
@@ -1041,59 +1035,25 @@ function buildPrintContent(d){
 }
 
 // ========== Capacitor 文件保存工具 ==========
+// 原生环境用 Filesystem 插件写入，web环境降级为Blob下载
 function doCapacitorSave(content,filename,callback){
   try{
-    // 原生 APK 标准引用：Capacitor.Plugins.Filesystem（兼容 web 桥接写法）
-    var fs=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem)||(window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem);
+    // 优先 Capacitor.Plugins（原生APK标准路径），兼容旧版 CapacitorPlugins
+    var fs=null;
+    if(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem) fs=Capacitor.Plugins.Filesystem;
+    else if(window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem) fs=window.CapacitorPlugins.Filesystem;
     if(!fs){callback(false);return}
-    // 转为 base64
     var b64=btoa(unescape(encodeURIComponent(content)));
-    // 策略1：先写 DOCUMENTS（App私有目录，无需额外权限，100%可用）
-    fs.writeFile({
-      path:filename,
-      data:b64,
-      directory:'DOCUMENTS',
-      encoding:'base64'
-    }).then(function(){
-      // 获取 URI 用于打开
-      fs.getUri({
-        directory:'DOCUMENTS',
-        path:filename
-      }).then(function(res){
-        callback(res.uri||true);
-      }).catch(function(){callback(true)});
-    }).catch(function(){
-      // 策略2：DOCUMENTS 失败，尝试 EXTERNAL_STORAGE/Download（需要存储权限）
-      fs.writeFile({
-        path:'Download/'+filename,
-        data:b64,
-        directory:'EXTERNAL_STORAGE',
-        encoding:'base64'
-      }).then(function(){
-        fs.getUri({
-          directory:'EXTERNAL_STORAGE',
-          path:'Download/'+filename
-        }).then(function(res){
-          callback(res.uri||true);
-        }).catch(function(){callback(true)});
-      }).catch(function(){
-        callback(false);
-      });
+    // 策略1：DOCUMENTS（App私有目录，无需权限）
+    fs.writeFile({path:filename,data:b64,directory:'DOCUMENTS',encoding:'base64'})
+    .then(function(){callback(true)})
+    .catch(function(){
+      // 策略2：EXTERNAL_STORAGE/Download（需要存储权限）
+      fs.writeFile({path:'Download/'+filename,data:b64,directory:'EXTERNAL_STORAGE',encoding:'base64'})
+      .then(function(){callback(true)})
+      .catch(function(){callback(false)});
     });
   }catch(e){callback(false)}
-}
-
-// ========== 降级方案：新窗口打开（Filesystem 不可用时） ==========
-function openPrintWindow(content){
-  var win=window.open('','_blank');
-  if(win){
-    win.document.write(content);
-    win.document.close();
-    // 新窗口里可以正常调起打印
-    setTimeout(function(){win.print();},500);
-  }else{
-    toast('无法打开窗口，请允许弹窗权限后重试');
-  }
 }
 
 // ========== MAINTENANCE ==========
@@ -1236,15 +1196,11 @@ function printMaint(){
         +'.mp-desc-cell{font-size:13px}.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px}'
         +'.mp-total-row td{font-weight:700;font-size:14px;background:#EDEDED;border-width:2px 1.5px}'
         +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
-        +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html';
+        +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html>';
       var fname=d.year+'_维修汇总表.html';
-      doCapacitorSave(fullHtml,fname,function(uri){
-        if(uri){
-          toast('已保存，正在打开…');
-          window.open(uri,'_system');
-        }else{
-          openPrintWindow(fullHtml);
-        }
+      doCapacitorSave(fullHtml,fname,function(ok){
+        if(ok) toast('打印页已保存：'+fname+'\n请用文件管理器打开打印');
+        else toast('保存失败，请检查存储权限');
       });
     }else{
       var win=window.open('','_blank');
