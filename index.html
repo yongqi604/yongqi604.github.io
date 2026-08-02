@@ -961,11 +961,13 @@ function printBilling(){
     // 检测是否在 Capacitor/APK 环境中
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
-      // APK 环境：保存为HTML文件，提示用户用文件管理器打开打印
-      doCapacitorSave(content,filename,function(ok,loc,reason){
-        if(ok) toast('打印页已保存：'+capSaveLocText(loc,filename)+'\n用浏览器打开后可打印/存PDF');
-        else toast(capSaveErrText(reason,'保存'));
-      });
+      // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
+      if(!doNativePrint(content,filename)){
+        doCapacitorSave(content,filename,function(ok,loc,reason){
+          if(ok) toast('打印页已保存：'+capSaveLocText(loc,filename)+'\n用文件管理器打开可打印');
+          else toast(capSaveErrText(reason,'保存'));
+        });
+      }
     }else{
       // 浏览器环境：直接调起打印对话框
       $('printArea').innerHTML=buildLedgerPages(d.roomId,d.year,d.bills,d.ro);
@@ -1071,6 +1073,19 @@ function capSaveLocText(loc,fname){
   if(loc==='download') return '下载/Download 目录：'+fname;
   if(loc==='documents') return 'App 私有目录（文件管理需授权才能查看）：'+fname;
   return fname;
+}
+
+// 原生打印：调用 @capacitor/print 弹出系统打印框（含"另存为PDF"），不依赖任何浏览器
+// 返回 true 表示已调起原生打印；false 表示插件不可用，调用方需降级为保存HTML文件
+function doNativePrint(html,name){
+  try{
+    var Print=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Print);
+    if(!Print){return false;}
+    Print.print({html:html,name:name||'出租房管理系统'})
+      .then(function(){toast('已调起系统打印');})
+      .catch(function(e){toast('打印失败：'+((e&&e.message)||e));});
+    return true;
+  }catch(e){return false;}
 }
 // 根据失败原因生成错误提示文案
 function capSaveErrText(reason,kind){
@@ -1220,10 +1235,13 @@ function printMaint(){
         +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
         +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html>';
       var fname=d.year+'_维修汇总表.html';
-      doCapacitorSave(fullHtml,fname,function(ok,loc,reason){
-        if(ok) toast('打印页已保存：'+capSaveLocText(loc,fname)+'\n用浏览器打开后可打印/存PDF');
-        else toast(capSaveErrText(reason,'保存'));
-      });
+      // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
+      if(!doNativePrint(fullHtml,fname)){
+        doCapacitorSave(fullHtml,fname,function(ok,loc,reason){
+          if(ok) toast('打印页已保存：'+capSaveLocText(loc,fname)+'\n用文件管理器打开可打印');
+          else toast(capSaveErrText(reason,'保存'));
+        });
+      }
     }else{
       var win=window.open('','_blank');
       if(win){
@@ -1393,7 +1411,10 @@ function printPay(){
       +'</body></html>';
     if(window.Capacitor&&Capacitor.isNativePlatform()){
       var pf=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
-      doCapacitorSave(content,pf,function(ok,loc,reason){if(ok)toast('打印页已保存：'+capSaveLocText(loc,pf)+'\n用浏览器打开后可打印/存PDF');else toast(capSaveErrText(reason,'保存'))});
+      // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
+      if(!doNativePrint(content,pf)){
+        doCapacitorSave(content,pf,function(ok,loc,reason){if(ok)toast('打印页已保存：'+capSaveLocText(loc,pf)+'\n用文件管理器打开可打印');else toast(capSaveErrText(reason,'保存'))});
+      }
     }else{
       var w=window.open('','','width=900,height=800');
       w.document.write(content);w.document.close();
