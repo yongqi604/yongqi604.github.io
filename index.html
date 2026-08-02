@@ -961,13 +961,8 @@ function printBilling(){
     // 检测是否在 Capacitor/APK 环境中
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
-      // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
-      if(!doNativePrint(content,filename)){
-        doCapacitorSave(content,filename,function(ok,loc,reason){
-          if(ok) toast('打印页已保存：'+capSaveLocText(loc,filename)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
-          else toast(capSaveErrText(reason,'保存'));
-        });
-      }
+      // APK 环境：保存文件 + 弹出分享面板（用户可选打印/PDF转换器等）
+      saveAndShare(content,filename,'结算明细打印');
     }else{
       // 浏览器环境：直接调起打印对话框
       $('printArea').innerHTML=buildLedgerPages(d.roomId,d.year,d.bills,d.ro);
@@ -985,11 +980,8 @@ function exportBilling(){
     var filename=(d.ro?d.ro.number:'结算')+'_'+d.year+'年度明细.html';
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
-      // APK 环境：通过 Capacitor Filesystem 写入文件
-      doCapacitorSave(content,filename,function(ok,loc,reason){
-        if(ok)toast('已导出！保存在 '+capSaveLocText(loc,filename)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
-        else toast(capSaveErrText(reason,'导出'));
-      });
+      // APK 环境：保存文件 + 弹出分享面板
+      saveAndShare(content,filename,'结算明细导出');
     }else{
       // 浏览器环境：Blob 下载
       var blob=new Blob([content],{type:'text/html;charset=utf-8'});
@@ -1075,17 +1067,25 @@ function capSaveLocText(loc,fname){
   return fname;
 }
 
-// 原生打印：调用自定义 @capacitor/printer 插件（Android WebView + 系统 PrintManager）弹出系统打印框（含"另存为PDF"），不依赖任何浏览器
-// 返回 true 表示已调起原生打印；false 表示插件不可用，调用方需降级为保存HTML文件
-function doNativePrint(html,name){
-  try{
-    var Printer=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Printer);
-    if(!Printer){return false;}
-    Printer.print({html:html,name:name||'出租房管理系统'})
-      .then(function(){toast('已调起系统打印');})
-      .catch(function(e){toast('打印失败：'+((e&&e.message)||e));});
-    return true;
-  }catch(e){return false;}
+// 保存文件后弹出系统分享面板（用户可选"打印服务"/"Chrome"/PDF转换器等）
+// 这是 Oppo 等无打印入口的手机的推荐方案
+function saveAndShare(content,filename,title){
+  doCapacitorSave(content,filename,function(ok,loc,reason){
+    if(!ok){toast(capSaveErrText(reason,'保存'));return}
+    // 文件已保存，尝试调起分享面板
+    try{
+      var Share=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share);
+      if(Share){
+        Share.share({title:title||filename,text:'请用浏览器打开此文件进行打印或另存为PDF',url:''})
+          .catch(function(){/* 用户取消分享，静默 */});
+        toast('已保存：'+capSaveLocText(loc,filename)+'\n已弹出分享面板');
+      }else{
+        toast('已保存：'+capSaveLocText(loc,filename)+'\n请用文件管理器打开，或安装Chrome后用浏览器打印/存PDF');
+      }
+    }catch(e){
+      toast('已保存：'+capSaveLocText(loc,filename));
+    }
+  });
 }
 // 根据失败原因生成错误提示文案
 function capSaveErrText(reason,kind){
@@ -1235,13 +1235,8 @@ function printMaint(){
         +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
         +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html>';
       var fname=d.year+'_维修汇总表.html';
-      // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
-      if(!doNativePrint(fullHtml,fname)){
-        doCapacitorSave(fullHtml,fname,function(ok,loc,reason){
-          if(ok) toast('打印页已保存：'+capSaveLocText(loc,fname)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
-          else toast(capSaveErrText(reason,'保存'));
-        });
-      }
+      // APK 环境：保存文件 + 弹出分享面板
+      saveAndShare(fullHtml,fname,'维修汇总打印');
     }else{
       var win=window.open('','_blank');
       if(win){
@@ -1284,10 +1279,8 @@ function exportMaint(){
     var fname=d.year+'_维修汇总表.html';
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
-      doCapacitorSave(content,fname,function(ok,loc,reason){
-        if(ok)toast('已导出！保存在 '+capSaveLocText(loc,fname)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
-        else toast(capSaveErrText(reason,'导出'));
-      });
+      // APK 环境：保存文件 + 弹出分享面板
+      saveAndShare(content,fname,'维修汇总导出');
     }else{
       var blob=new Blob([content],{type:'text/html;charset=utf-8'});
       var url=URL.createObjectURL(blob);
@@ -1411,10 +1404,8 @@ function printPay(){
       +'</body></html>';
     if(window.Capacitor&&Capacitor.isNativePlatform()){
       var pf=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
-      // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
-      if(!doNativePrint(content,pf)){
-        doCapacitorSave(content,pf,function(ok,loc,reason){if(ok)toast('打印页已保存：'+capSaveLocText(loc,pf)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');else toast(capSaveErrText(reason,'保存'))});
-      }
+      // APK 环境：保存文件 + 弹出分享面板
+      saveAndShare(content,pf,'代缴汇总打印');
     }else{
       var w=window.open('','','width=900,height=800');
       w.document.write(content);w.document.close();
@@ -1445,7 +1436,7 @@ function exportPay(){
       +'</body></html>';
     if(window.Capacitor&&Capacitor.isNativePlatform()){
       var ef=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
-      doCapacitorSave(content,ef,function(ok,loc,reason){if(ok)toast('已导出！保存在 '+capSaveLocText(loc,ef)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');else toast(capSaveErrText(reason,'导出'))});
+      saveAndShare(content,ef,'代缴汇总导出');
     }else{
       var blob=new Blob([content],{type:'text/html;charset=utf-8'});
       var url=URL.createObjectURL(blob);
