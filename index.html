@@ -990,9 +990,9 @@ function exportBilling(){
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
       // APK 环境：通过 Capacitor Filesystem 写入文件
-      doCapacitorSave(content,function(ok){
-        if(ok)toast('已保存到文件管理 > Documents > '+filename+'\n可用浏览器打开打印或存PDF');
-        else toast('保存失败，请检查存储权限');
+      doCapacitorSave(content,filename,function(ok){
+        if(ok)toast('已导出到文件管理 > Documents > '+filename+'\n可用浏览器打开打印或存PDF');
+        else toast('导出失败，请检查存储权限');
       });
     }else{
       // 浏览器环境：Blob 下载
@@ -1043,32 +1043,39 @@ function buildPrintContent(d){
 // ========== Capacitor 文件保存工具 ==========
 function doCapacitorSave(content,filename,callback){
   try{
-    var fs=window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem;
+    // 原生 APK 标准引用：Capacitor.Plugins.Filesystem（兼容 web 桥接写法）
+    var fs=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem)||(window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem);
     if(!fs){callback(false);return}
     // 转为 base64
     var b64=btoa(unescape(encodeURIComponent(content)));
+    // 策略1：先写 DOCUMENTS（App私有目录，无需额外权限，100%可用）
     fs.writeFile({
-      path:'Download/'+filename,
+      path:filename,
       data:b64,
-      directory:'EXTERNAL_STORAGE',
-      encoding:'utf-8'  // Capacitor v5 用这个或 'base64'
+      directory:'DOCUMENTS',
+      encoding:'base64'
     }).then(function(){
-      // 获取文件 URI 用于打开
+      // 获取 URI 用于打开
       fs.getUri({
-        directory:'EXTERNAL_STORAGE',
-        path:'Download/'+filename
+        directory:'DOCUMENTS',
+        path:filename
       }).then(function(res){
         callback(res.uri||true);
       }).catch(function(){callback(true)});
-    }).catch(function(err){
-      // EXTERNAL_STORAGE 可能不可用，退回 DOCUMENTS
+    }).catch(function(){
+      // 策略2：DOCUMENTS 失败，尝试 EXTERNAL_STORAGE/Download（需要存储权限）
       fs.writeFile({
-        path:filename,
+        path:'Download/'+filename,
         data:b64,
-        directory:'DOCUMENTS',
-        encoding:'utf-8'
+        directory:'EXTERNAL_STORAGE',
+        encoding:'base64'
       }).then(function(){
-        callback(true);
+        fs.getUri({
+          directory:'EXTERNAL_STORAGE',
+          path:'Download/'+filename
+        }).then(function(res){
+          callback(res.uri||true);
+        }).catch(function(){callback(true)});
       }).catch(function(){
         callback(false);
       });
@@ -1230,13 +1237,15 @@ function printMaint(){
         +'.mp-total-row td{font-weight:700;font-size:14px;background:#EDEDED;border-width:2px 1.5px}'
         +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
         +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html';
-      var {Filesystem}=Capacitor.Plugins;
-      Filesystem.writeFile({path:'Documents/'+d.year+'_维修汇总表.html',data:fullHtml,directory:'DOWNLOAD',encoding:'utf-8',recursive:true}).then(function(){
-        toast('\u5DF2\u4FDD\u5B58\uFF0C\u6B63\u5728\u6253\u5F00...');
-        Filesystem.getUri({path:'Documents/'+d.year+'_维修汇总表.html',directory:'DOWNLOAD'}).then(function(uri){
-          window.open(uri.uri,'_blank');
-        });
-      }).catch(function(){toast('\u4FDD\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u6743\u9650')});
+      var fname=d.year+'_维修汇总表.html';
+      doCapacitorSave(fullHtml,fname,function(uri){
+        if(uri){
+          toast('已保存，正在打开…');
+          window.open(uri,'_system');
+        }else{
+          openPrintWindow(fullHtml);
+        }
+      });
     }else{
       var win=window.open('','_blank');
       if(win){
@@ -1276,14 +1285,23 @@ function exportMaint(){
       +'</style></head><body>'
       +buildMaintPages(d.year,d.records)
       +'</body></html>';
-    var blob=new Blob([content],{type:'text/html;charset=utf-8'});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=url;
-    a.download=d.year+'\u51FA\u79DF\u7EF4\u4FEE\u6C47\u603B\u8868.html';
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('\u5BFC\u51FA\u6210\u529F\uFF01\u7528\u6D4F\u89C8\u5668\u6253\u5F00\u53EF\u6253\u5370\u6216\u53E6\u5B58\u4E3APDF');
+    var fname=d.year+'_维修汇总表.html';
+    var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
+    if(isCap){
+      doCapacitorSave(content,fname,function(ok){
+        if(ok)toast('已导出！文件：'+fname+'\n可用浏览器打开打印或另存PDF');
+        else toast('导出失败，请检查存储权限');
+      });
+    }else{
+      var blob=new Blob([content],{type:'text/html;charset=utf-8'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url;
+      a.download=fname;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('\u5BFC\u51FA\u6210\u529F\uFF01\u7528\u6D4F\u89C8\u5668\u6253\u5F00\u53EF\u6253\u5370\u6216\u53E6\u5B58\u4E3APDF');
+    }
   }catch(e){toast('\u5BFC\u51FA\u5931\u8D25:'+e.message)}
 }
 
