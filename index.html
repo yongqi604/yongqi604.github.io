@@ -11,16 +11,14 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>出租房管理系统</title>
+<title>出租房管理系统 v20260802-1535</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--primary:#1976D2;--primary-light:#42A5F5;--primary-dark:#1565C0;--danger:#E53935;--success:#43A047;--warning:#FB8C00;--bg:#F5F7FA;--card:#FFFFFF;--text:#333;--text2:#666;--text3:#999;--border:#E0E0E0;--shadow:0 2px 8px rgba(0,0,0,.08);--radius:12px}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px}
 .header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:18px 14px 14px;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.15)}
 .header h1{font-size:19px;font-weight:600}.header .subtitle{font-size:11px;opacity:.78;margin-top:3px}
-.install-guide{background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;display:flex;align-items:center;gap:10px;border-left:4px solid var(--primary)}
-.install-guide .ig-icon{font-size:28px;flex-shrink:0}.install-guide .ig-text{flex:1}.install-guide .ig-title{font-size:14px;font-weight:600;color:var(--primary-dark)}.install-guide .ig-desc{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.4}
-.install-guide .ig-close{width:26px;height:26px;border-radius:50%;border:none;background:rgba(25,118,210,.15);font-size:14px;color:var(--primary);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
 .tabs{display:flex;background:var(--card);position:fixed;bottom:0;left:0;right:0;z-index:50;border-top:1px solid var(--border);padding:5px 0;padding-bottom:max(5px,env(safe-area-inset-bottom))}
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:5px 0;font-size:10.5px;color:var(--text3);transition:.15s;border:none;background:none;cursor:pointer;outline:none}
 .tab.active{color:var(--primary)}.tab .icon{font-size:21px;line-height:1.2;margin-bottom:1px}
@@ -57,6 +55,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .maint-date{font-size:10.5px;color:var(--text3);width:56px;flex-shrink:0;padding-top:2px}
 .maint-content{flex:1;min-width:0}.maint-room{font-size:11.5px;color:var(--primary);font-weight:500}.maint-desc{font-size:12.5px;margin:2px 0}
 .maint-cost{font-size:14px;font-weight:700;color:var(--danger);flex-shrink:0}
+/* Toggle Switch */
+.switch{position:relative;display:inline-block;width:48px;height:26px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:26px;transition:.3s}.switch .slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.25)}.switch input:checked+.slider{background-color:var(--danger)}.switch input:checked+.slider:before{transform:translateX(22px)}
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end;justify-content:center}
 .modal-overlay.show{display:flex}
 .modal{background:var(--card);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;padding:18px}
@@ -83,8 +83,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .meter-form .meter-row{display:flex;align-items:center;gap:5px;margin-bottom:7px}.meter-form .meter-row:last-child{margin-bottom:0}
 .meter-form label{font-size:11.5px;color:var(--text2);width:22px;flex-shrink:0}
 .meter-form input{flex:1;padding:7px 9px;border:1px solid var(--border);border-radius:6px;font-size:14px;text-align:center}
-.meter-form .unit{font-size:10.5px;color:var(--text3);width:36px;flex-shrink:0}
-.meter-form .calc{font-size:11.5px;color:var(--primary);font-weight:600;width:48px;text-align:right;flex-shrink:0}
+.meter-form .unit{font-size:10.5px;color:var(--text3);width:28px;flex-shrink:0}
+.meter-form .calc{font-size:11.5px;color:var(--primary);font-weight:600;min-width:0;flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bill-total-row{text-align:right;padding:8px 4px 2px;border-top:1px dashed var(--border);margin-top:4px;font-size:14px;color:var(--text-primary)}
+#billTotalAmount{color:var(--danger);font-size:16px}
+/* 新表格式结算/代缴弹窗 */
+.meter-table-wrap{background:#FAFCFF;border-radius:10px;padding:8px;margin-bottom:9px;overflow-x:auto}
+.meter-th{display:flex;align-items:center;padding:4px 2px 6px;border-bottom:1px solid var(--border);margin-bottom:6px;font-size:11.5px;color:var(--text3);font-weight:600}
+.meter-th span{flex:1;text-align:center}.meter-th .mt-label{flex:.55;text-align:left;padding-left:2px}
+.meter-row-t{display:flex;align-items:center;gap:4px;margin-bottom:7px}.meter-row-t:last-of-type{margin-bottom:0}
+.meter-row-t label{font-size:12px;width:22px;flex-shrink:0;padding-left:2px}
+.meter-row-t input[type=number]{flex:1;padding:6px 4px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;min-width:0;-moz-appearance:textfield}
+.meter-row-t input[type=number]::-webkit-outer-spin-button,.meter-row-t input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.meter-row-t input:nth-child(2){flex:.85}.meter-row-t input:nth-child(3){flex:.65}.meter-row-t input:nth-child(4){flex:.7}.meter-row-t input:nth-child(5){flex:1}
+.bill-total-row-t{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:8px 4px 4px;border-top:1.5px dashed var(--primary);margin-top:6px;font-size:14px;color:var(--text-primary);font-weight:600}
 .fab{position:fixed;right:14px;bottom:76px;width:50px;height:50px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:25px;box-shadow:0 3px 10px rgba(25,118,210,.32);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:40;transition:.15s;outline:none}
 .fab:active{transform:scale(.9)}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(40,40,40,.92);color:#fff;padding:9px 18px;border-radius:8px;font-size:13.5px;z-index:999;transition:transform .3s;white-space:nowrap;pointer-events:none}
@@ -101,27 +113,58 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .ls-meta{display:flex;justify-content:center;gap:28px;font-size:14px;margin-top:8px;color:#000}
 .ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5;table-layout:fixed}
 .ledger-table th,.ledger-table td{border:1.5px solid #333;padding:3px 5px;text-align:center;vertical-align:middle}
-.lt-blk-title td{background:#F5F5F5;font-weight:700;font-size:12px}
+.lt-blk-title td{font-weight:700;font-size:12px}
 .lt-blk-row td{height:26px}
-.lt-blk-label{font-weight:600;width:32px;background:#FAFAFA}
-.lt-date-cell{writing-mode:vertical-rl;text-orientation:mixed;font-size:13px;font-weight:600;letter-spacing:2px;width:34px;background:#F9F9F9}
+.lt-blk-label{font-weight:600;width:32px}
+.lt-date-cell{font-size:13px;font-weight:700;letter-spacing:1px;width:70px;text-align:center}
 .lt-summary{font-weight:600}
-.lt-total-row td{font-weight:700;font-size:13px;background:#F0F0F0}
+.lt-total-row td{font-weight:700;font-size:13px}
 .lt-note-col{text-align:left!important;font-size:11.5px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}
-.lt-grand td{font-weight:700;font-size:14px;background:#E8E8E8;border-width:2px 1.5px}
+.lt-grand td{font-weight:700;font-size:14px;border-width:2px 1.5px}
 .ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}
 /* 分页：每页一个 ledger-sheet，page-break */
 .ledger-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 12mm;box-sizing:border-box;background:#fff}
-.ledger-page:last-child{page-break-after:auto}
+.ledger-page:last-child{page-break-after:auto;min-height:auto}
 /* 空行占位 */
 .lt-empty-row td{height:26px;border-color:#ddd;color:#ccc}
+/* ===== 维修汇总表打印 ===== */
+.maint-print-sheet{background:#fff;color:#000;padding:0;font-family:'SimSun','Songti SC',serif}
+.mp-head{text-align:center;padding:12px 0 6px;border-bottom:2px solid #333}
+.mp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}
+.mp-table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6}
+.mp-table th,.mp-table td{border:1.5px solid #333;padding:5px 8px;text-align:left;vertical-align:middle}
+.mp-table th{font-weight:700;text-align:center;font-size:14px}
+.mp-date-cell{font-size:12.5px;color:#333;width:85px}.mp-room-cell{font-size:12.5px;color:var(--primary);font-weight:600;width:65px}
+.mp-desc-cell{font-size:13px}
+.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px;color:#000}
+.mp-total-row td{font-weight:700;font-size:14px;background:#EDEDED;border-width:2px 1.5px}
+.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}
+.mp-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 14mm;box-sizing:border-box;background:#fff}
+.mp-page:last-child{page-break-after:auto;min-height:auto}
+/* Pay (代缴) Print */
+.pp-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 14mm;box-sizing:border-box;background:#fff}
+.pp-page:last-child{page-break-after:auto;min-height:auto}
+.pp-head{text-align:center;padding:8px 0 6px;border-bottom:2px solid #333}
+.pp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}
+.pp-meta{display:flex;justify-content:center;gap:20px;font-size:13px;margin-top:6px;color:#000}
+.pp-type-block{margin:16px 0;border:1.5px solid #333}
+.pp-type-title{background:#fff;font-weight:700;font-size:15px;text-align:center;padding:5px 0;border-bottom:1.5px solid #333}
+.pp-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.4;table-layout:fixed}
+.pp-table th,.pp-table td{border:1.5px solid #333;padding:3px 4px;text-align:center;vertical-align:middle}
+.pp-table th{font-weight:700;font-size:13px}
+.pp-room-cell{font-weight:600;width:60px}
+.pp-date-cell{width:80px}
+.pp-num-cell{width:70px}
+.pp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:75px}
+.pp-total-row td{font-weight:700;font-size:13px;border-width:2px 1.5px}
+.pp-note-row td{text-align:left;font-size:11.5px;padding:4px 8px;color:#555}
 @media print{
   body *{visibility:hidden!important}
   #printArea,#printArea *{visibility:visible!important}
   #printArea{position:absolute;left:0;top:0;width:100%;padding:0}
-  .ledger-page{width:100%;min-height:0;padding:10mm 8mm;margin:0;page-break-after:always}
-  .ledger-page:last-child{page-break-after:auto}
-  @page{size:A4 landscape;margin:8mm}
+  .ledger-page,.mp-page{width:100%;min-height:0;padding:10mm 8mm;margin:0;page-break-after:always}
+  .ledger-page:last-child,.mp-page:last-child{page-break-after:auto;min-height:auto}
+  @page{size:A4 portrait;margin:8mm}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -134,19 +177,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 
 <!-- PAGE: Dashboard -->
 <div class="page active" id="pageDashboard">
-  <div class="install-guide" id="installGuide">
-    <div class="ig-icon">📲</div>
-    <div class="ig-text"><div class="ig-title" id="igTitle">安装到手机桌面</div><div class="ig-desc" id="igDesc">安卓：点右上角 ⋮ → 添加到主屏幕 | 苹果：点底部分享 → 添加到主屏幕</div></div>
-    <button class="ig-close" onclick="document.getElementById('installGuide').style.display='none'">×</button>
-  </div>
   <div class="stats-grid" id="dashStats"></div>
   <div class="quick-actions" id="quickActions"></div>
   <div class="card"><div class="card-title">房间列表 <span class="action" onclick="showAddRoomModal()">+ 添加房间</span></div><div id="roomList"></div></div>
-  <div class="card"><div class="card-title">最近维修记录</div><div id="recentMaint"></div></div>
 </div>
 
-<!-- PAGE: Rooms -->
-<div class="page" id="pageRooms"><div class="card"><div class="card-title">全部房间 <span class="action" onclick="showAddRoomModal()">+ 添加</span></div><div id="allRoomList"></div></div></div>
 
 <!-- PAGE: Billing -->
 <div class="page" id="pageBilling">
@@ -157,14 +192,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 
 <!-- PAGE: Maintenance -->
 <div class="page" id="pageMaint">
-  <div class="selector"><select id="maintYearSelect" onchange="renderMaint()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" onclick="showAddMaintModal()">+ 记录维修</button></div>
+  <div class="selector"><select id="maintYearSelect" onchange="renderMaint()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printMaintBtn" onclick="printMaint()" style="display:none">📙 打印</button><button class="btn btn-primary btn-sm" id="exportMaintBtn" onclick="exportMaint()" style="display:none">📋 导出</button><button class="btn btn-primary btn-sm" onclick="showAddMaintModal()">+ 记录维修</button></div>
   <div class="card"><div class="card-title" id="maintSummaryTitle">年度汇总</div><div id="maintSummary"></div></div>
   <div id="maintList"></div>
 </div>
 
 <!-- PAGE: Pay (代缴水电费) -->
 <div class="page" id="pagePay">
-  <div class="selector"><select id="payYearSelect" onchange="renderPay()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" onclick="showAddPayModal()">+ 记录代缴</button></div>
+  <div class="selector"><select id="payYearSelect" onchange="renderPay()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printPayBtn" onclick="printPay()" style="display:none">📙 打印</button><button class="btn btn-primary btn-sm" id="exportPayBtn" onclick="exportPay()" style="display:none">📋 导出</button><button class="btn btn-primary btn-sm" onclick="showAddPayModal()">+ 记录代缴</button></div>
   <div class="card"><div class="card-title" id="paySummaryTitle">年度代缴汇总</div><div id="paySummary"></div></div>
   <div id="payList"></div>
 </div>
@@ -172,8 +207,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <!-- PAGE: Expenses -->
 <div class="page" id="pageExpenses">
   <div class="selector"><select id="expRoomSelect" onchange="renderExpenses()"><option value="">全部房间</option></select><select id="expYearSelect" onchange="renderExpenses()"></select><span style="font-size:12.5px;color:var(--text2)">年</span></div>
-  <div class="card"><div class="card-title">水费总表</div><div id="waterExpense"></div></div>
-  <div class="card"><div class="card-title">各房电表号</div><div id="meterNumbers"></div></div>
   <div class="card"><div class="card-title">费用统计</div><div id="expenseStats"></div></div>
   <div class="card">
     <div class="card-title">💾 数据备份与恢复</div>
@@ -188,7 +221,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <!-- Bottom Tabs -->
 <div class="tabs" id="tabBar">
   <button class="tab active" onclick="switchTab(this,'pageDashboard')"><span class="icon">🏠</span>首页</button>
-  <button class="tab" onclick="switchTab(this,'pageRooms')"><span class="icon">🚪</span>房间</button>
   <button class="tab" onclick="switchTab(this,'pageBilling')"><span class="icon">📋</span>结算</button>
   <button class="tab" onclick="switchTab(this,'pageMaint')"><span class="icon">🔧</span>维修</button>
   <button class="tab" onclick="switchTab(this,'pagePay')"><span class="icon">💡</span>代缴</button>
@@ -203,6 +235,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
   <input type="hidden" id="roomId">
   <div class="form-group"><label>房号 *</label><input id="roomNumber" placeholder="如：602A"></div>
   <div class="form-group"><label>租户姓名</label><input id="tenantName" placeholder="租户名字"></div>
+  <div class="form-group" style="display:flex;align-items:center;gap:10px;padding:8px 0"><span style="font-size:14px;color:var(--text2);white-space:nowrap">房间状态</span><label class="switch" for="roomVacant" style="margin:0"><input type="checkbox" id="roomVacant" onchange="updateVacantLabel()"><span class="slider"></span></label><span style="font-size:14px;color:var(--danger);font-weight:600" id="vacantLabel">空置中</span><span style="font-size:14px;color:var(--text2)" id="rentedLabel" style="display:none">已租</span></div>
   <div class="form-group"><label>联系电话</label><input id="tenantPhone" placeholder="手机号码"></div>
   <div class="form-row"><div class="form-group"><label>月租金 (元)</label><input id="rentAmount" type="number" placeholder="650"></div><div class="form-group"><label>保证金 (元)</label><input id="depositAmount" type="number" placeholder="650"></div></div>
   <div class="form-row"><div class="form-group"><label>电费单价 (元/度)</label><input id="elecPrice" type="number" step="0.01" value="1"></div><div class="form-group"><label>水费单价 (元/吨)</label><input id="waterPrice" type="number" step="0.01" value="5"></div></div>
@@ -216,14 +249,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <div class="modal-overlay" id="modalBilling"><div class="modal">
   <div class="modal-header"><span id="billingModalTitle">抄表结算</span><button class="modal-close" onclick="closeModal('modalBilling')">✕</button></div>
   <input type="hidden" id="billId"><input type="hidden" id="billRoomId">
-  <div class="form-group"><label>日期</label><input id="billDate" type="date"></div>
-  <div class="meter-form">
-    <div class="meter-row"><label>⚡电</label><input id="bElecRead" type="number" placeholder="读数" oninput="calcUsage('bElecRead','bElecCalc','elecRead','elecPrice')"><span class="unit">度</span><span class="calc" id="bElecCalc"></span></div>
-    <div class="meter-row"><label>💧水</label><input id="bWaterRead" type="number" placeholder="读数" oninput="calcUsage('bWaterRead','bWaterCalc','waterRead','waterPrice')"><span class="unit">吨</span><span class="calc" id="bWaterCalc"></span></div>
-    <div class="meter-row"><label>🔥气</label><input id="bGasRead" type="number" placeholder="读数" oninput="calcUsage('bGasRead','bGasCalc','gasRead','gasPrice')"><span class="unit">m³</span><span class="calc" id="bGasCalc"></span></div>
-    <div class="meter-row"><label>📦其他</label><input id="bOtherCost" type="number" placeholder="金额"><span class="unit">元</span><span class="calc"></span></div>
+  <div class="form-row"><div class="form-group"><label>日期</label><input id="billDate" type="date"></div><div class="form-group"><label>房号</label><input id="billRoomDisplay" type="text" readonly style="background:#f5f5f5;color:var(--text1);font-weight:600"></div></div>
+  <div class="meter-table-wrap">
+    <div class="meter-th"><span class="mt-label"></span><span>读数</span><span>用量</span><span>单价</span><span>金额(元)</span></div>
+    <div class="meter-row-t"><label>⚡电</label><input id="bElecRead" type="number" placeholder="读数" oninput="onBillReadChange('elec')"><input id="bElecUsage" type="number" placeholder="用量" oninput="onBillFieldChange('elec')"><input id="bElecPrice" type="number" placeholder="单价" oninput="onBillFieldChange('elec')"><input id="bElecCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
+    <div class="meter-row-t"><label>💧水</label><input id="bWaterRead" type="number" placeholder="读数" oninput="onBillReadChange('water')"><input id="bWaterUsage" type="number" placeholder="用量" oninput="onBillFieldChange('water')"><input id="bWaterPrice" type="number" placeholder="单价" oninput="onBillFieldChange('water')"><input id="bWaterCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
+    <div class="meter-row-t"><label>🔥气</label><input id="bGasRead" type="number" placeholder="读数" oninput="onBillReadChange('gas')"><input id="bGasUsage" type="number" placeholder="用量" oninput="onBillFieldChange('gas')"><input id="bGasPrice" type="number" placeholder="单价" oninput="onBillFieldChange('gas')"><input id="bGasCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
+    <div class="meter-row-t"><label>📦其他</label><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:55px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input id="bOtherCost" type="number" placeholder="金额" oninput="onBillCostChange()" style="min-width:70px"></div>
+    <div class="bill-total-row-t">本次合计：<input id="billTotalAmount" type="number" step="0.01" oninput="markManualTotal()" style="width:90px;text-align:right;font-weight:700;color:var(--danger);font-size:16px;border:none;background:transparent;padding:0"> 元</div>
   </div>
-  <div class="form-row"><div class="form-group"><label>房租 (元)</label><input id="bRent" type="number" placeholder="0"></div><div class="form-group"><label>保证金变动</label><input id="bDeposit" type="number" placeholder="0"></div></div>
+  <div class="form-row"><div class="form-group"><label>房租 (元)</label><input id="bRent" type="number" placeholder="0" oninput="onBillCostChange()"></div><div class="form-group"><label>保证金变动</label><input id="bDeposit" type="number" placeholder="0" oninput="onBillCostChange()"></div></div>
   <div class="form-group"><label>备注</label><textarea id="bNote" placeholder="备注信息..."></textarea></div>
   <div class="btn-group"><button class="btn btn-primary btn-block" onclick="saveBilling()">保存结算</button></div>
 </div></div>
@@ -243,12 +278,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <div class="modal-overlay" id="modalPay"><div class="modal">
   <div class="modal-header"><span>记录代缴水电费</span><button class="modal-close" onclick="closeModal('modalPay')">✕</button></div>
   <input type="hidden" id="payId">
-  <div class="form-group"><label>日期</label><input id="payDate" type="date"></div>
-  <div class="form-group"><label>房号</label><select id="payRoom"><option value="">选择房号</option></select></div>
-  <div class="form-group"><label>代缴类型</label><select id="payType"><option value="电">⚡ 电费</option><option value="水">💧 水费</option><option value="燃气">🔥 燃气费</option><option value="其他">📦 其他</option></select></div>
-  <div class="form-group"><label>代缴金额 (元) *</label><input id="payCost" type="number" placeholder="如：744" required></div>
-  <div class="form-group"><label>备注</label><textarea id="payNote" placeholder="如：本次代缴X月电费"></textarea></div>
-  <div class="btn-group"><button class="btn btn-primary btn-block" onclick="savePay()">保存</button></div>
+  <div class="form-row"><div class="form-group"><label>日期</label><input id="payDate" type="date"></div><div class="form-group"><label>房号 *</label><select id="payRoom"><option value="">选择房号</option></select></div></div>
+  <div class="meter-table-wrap">
+    <div class="meter-th"><span class="mt-label"></span><span>读数</span><span>用量</span><span>单价</span><span>金额(元)</span></div>
+    <div class="meter-row-t"><label>⚡电</label><input id="pElecRead" type="number" placeholder="读数" oninput="onPayReadChange('elec')"><input id="pElecUsage" type="number" placeholder="用量"><input id="pElecPrice" type="number" placeholder="单价"><input id="pElecCost" type="number" placeholder="金额"></div>
+    <div class="meter-row-t"><label>💧水</label><input id="pWaterRead" type="number" placeholder="读数" oninput="onPayReadChange('water')"><input id="pWaterUsage" type="number" placeholder="用量"><input id="pWaterPrice" type="number" placeholder="单价"><input id="pWaterCost" type="number" placeholder="金额"></div>
+    <div class="meter-row-t"><label>🔥气</label><input id="pGasRead" type="number" placeholder="读数" oninput="onPayReadChange('gas')"><input id="pGasUsage" type="number" placeholder="用量"><input id="pGasPrice" type="number" placeholder="单价"><input id="pGasCost" type="number" placeholder="金额"></div>
+    <div class="meter-row-t"><label>📦其他</label><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:55px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input id="pOtherCost" type="number" placeholder="金额" oninput="onPayCostInput('other')" style="min-width:70px"></div>
+    <div class="bill-total-row-t">本次合计：<input id="payTotalAmount" type="number" step="0.01" oninput="markManualPayTotal()" style="width:90px;text-align:right;font-weight:700;color:var(--danger);font-size:16px;border:none;background:transparent;padding:0"> 元</div>
+  </div>
+  <div class="form-group"><label>备注</label><textarea id="payNote" placeholder="备注信息..."></textarea></div>
+  <div class="btn-group"><button class="btn btn-primary btn-block" onclick="savePay()">保存代缴</button></div>
 </div></div>
 
 <!-- MODAL: Delete Confirm -->
@@ -270,6 +310,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
   <div class="form-group"><label>粘贴之前复制的备份文本（JSON）：</label><textarea class="monospace-textarea" id="pasteArea" placeholder='在此粘贴备份文本，内容以 {"rooms":... 开头'></textarea></div>
   <div class="form-group"><label>恢复模式：</label><select id="restoreMode"><option value="replace">覆盖（用备份完全替换当前数据）</option><option value="merge">合并（保留现有，补充备份中缺失的）</option></select></div>
   <div class="btn-group"><button class="btn btn-outline btn-block" onclick="closeModal('modalPasteRestore')">取消</button><button class="btn btn-success btn-block" onclick="confirmPasteRestore()">确认恢复</button></div>
+</div></div>
+
+<!-- MODAL: Backup Text (复制文本展示) -->
+<div class="modal-overlay" id="modalBackupText"><div class="modal" style="max-width:520px">
+  <div class="modal-header"><span>备份文本</span><button class="modal-close" onclick="closeModal('modalBackupText')">✕</button></div>
+  <div class="backup-hint" style="margin:0 0 8px">下方为完整备份文本。长按选中后可复制，或点下方按钮复制。</div>
+  <div class="form-group"><textarea id="backupTextShow" class="monospace-textarea" style="height:300px;font-size:11px" readonly></textarea></div>
+  <div class="btn-group"><button class="btn btn-outline btn-block" onclick="closeModal('modalBackupText')">关闭</button><button class="btn btn-success btn-block" onclick="copyBackupTextNow()">📋 复制文本</button></div>
 </div></div>
 
 </div>
@@ -366,7 +414,6 @@ function qaAddRoom(){showAddRoomModal()}
 function qaBill(){var v=$('billRoomSelect').value;if(v){showAddBillModal(v)}else{goPage('pageBilling')}}
 function qaMaint(){showAddMaintModal()}
 function qaReport(){goPage('pageExpenses')}
-function igClose(){$('installGuide').style.display='none'}
 
 // ========== Tabs ==========
 function switchTab(btn,pgId){
@@ -383,7 +430,6 @@ function switchTab(btn,pgId){
     if(pgId==='pageMaint')renderMaint();
     if(pgId==='pagePay')renderPay();
     if(pgId==='pageExpenses')renderExpenses();
-    if(pgId==='pageRooms')renderAllRooms();
   }catch(e){}
 }
 
@@ -410,6 +456,8 @@ function showAddRoomModal(room){
     $('roomId').value=room?room.id:'';
     $('roomNumber').value=room?room.number:'';
     $('tenantName').value=room?room.tenant:'';
+    $('roomVacant').checked=room?!!room.isVacant:false;
+    updateVacantLabel();
     $('tenantPhone').value=room?room.phone:'';
     $('rentAmount').value=room?room.rent:'';
     $('depositAmount').value=room?room.deposit:'';
@@ -422,12 +470,19 @@ function showAddRoomModal(room){
     openModal('modalRoom');
   }catch(e){}
 }
+function updateVacantLabel(){
+  try{
+    var v=$('roomVacant').checked;
+    $('vacantLabel').style.display=v?'inline':'none';
+    $('rentedLabel').style.display=v?'none':'inline';
+  }catch(e){}
+}
 
 function saveRoom(){
   try{
     var num=$('roomNumber').value.trim();
     if(!num){toast('请输入房号');return}
-    var data={id:$('roomId').value||genId(),number:num,tenant:$('tenantName').value.trim(),phone:$('tenantPhone').value.trim(),rent:Number($('rentAmount').value)||0,deposit:Number($('depositAmount').value)||0,elecPrice:Number($('elecPrice').value)||1,waterPrice:Number($('waterPrice').value)||5,gasPrice:Number($('gasPrice').value)||0,elecMeter:$('elecMeter').value.trim(),settleMethod:$('settleMethod').value,note:$('roomNote').value.trim()};
+    var data={id:$('roomId').value||genId(),number:num,tenant:$('tenantName').value.trim(),phone:$('tenantPhone').value.trim(),rent:Number($('rentAmount').value)||0,deposit:Number($('depositAmount').value)||0,elecPrice:Number($('elecPrice').value)||1,waterPrice:Number($('waterPrice').value)||5,gasPrice:Number($('gasPrice').value)||0,elecMeter:$('elecMeter').value.trim(),settleMethod:$('settleMethod').value,isVacant:$('roomVacant').checked,note:$('roomNote').value.trim()};
     var idx=-1;
     for(var i=0;i<DB.rooms.length;i++){if(DB.rooms[i].id===data.id){idx=i;break}}
     if(idx>=0)DB.rooms[idx]=data;else DB.rooms.push(data);
@@ -445,7 +500,7 @@ function renderRoomItem(r){
   try{
     var lastBill=null;
     for(var bi=DB.bills.length-1;bi>=0;bi--){if(DB.bills[bi].roomId===r.id){lastBill=DB.bills[bi];break}}
-    var status=r.tenant?'<span class="badge badge-success">已租</span>':'<span class="badge badge-warning">空置</span>';
+    var status=r.isVacant?'<span class="badge badge-warning">\u7A7A\u7F6E</span>':'<span class="badge badge-success">\u5DF2\u79DF</span>';
     return '<div class="room-item" onclick="showRoomDetail(\''+r.id+'\')">'+
       '<div class="room-badge">'+r.number+'</div>'+
       '<div class="room-info"><div class="room-name">'+(r.tenant||r.number)+' '+status+'</div>'+
@@ -459,7 +514,6 @@ function renderAllRooms(){
     var html='';
     if(DB.rooms.length>0){for(var i=0;i<DB.rooms.length;i++)html+=renderRoomItem(DB.rooms[i])}
     else html='<div class="empty-state"><div class="icon">🏠</div><p>暂无房间，点击上方添加</p></div>';
-    $('allRoomList').innerHTML=html;
     $('roomList').innerHTML=html;
   }catch(e){}
 }
@@ -477,7 +531,10 @@ function showRoomDetail(id){
     var totalRent=0,totalElec=0,totalWater=0,totalGas=0,totalDeposit=0;
     for(var i=0;i<roomBills.length;i++){var b=roomBills[i];totalRent+=(b.rent||0);totalElec+=(b.elecCost||0);totalWater+=(b.waterCost||0);totalGas+=(b.gasCost||0);totalDeposit+=(b.depositChange||0)}
     var grandTotal=totalRent+totalElec+totalWater+totalGas+totalDeposit;
-    var h='<div class="card">'+row('租户',r.tenant||'空置')+row('电话',r.phone||'\u2014')+row('月租金','\u00A5'+fmt(r.rent),'red')+row('保证金','\u00A5'+fmt(r.deposit))+row('结算方式',r.settleMethod||'月底')+row('电表号',r.elecMeter||'\u2014')+(r.note?row('备注',r.note):'')+'</div>';
+    var isV=!!r.isVacant;
+    var h='<div class="card">'+row('\u79DF\u6237',r.tenant||'\u2014')+
+      '<div class="summary-row" style="align-items:center"><span>\u72B6\u6001</span><span class="val" style="display:flex;align-items:center;gap:8px"><label class="switch" for="detailVacant_'+r.id+'" style="margin:0"><input type="checkbox" id="detailVacant_'+r.id+'" '+(isV?'checked':'')+' onchange="toggleVacant(\''+r.id+'\')"><span class="slider"></span></label><span id="detailVacantLbl_'+r.id+'" style="font-size:13px;color:'+(isV?'var(--danger)':'var(--text2)')+'">'+(isV?'\u7A7A\u7F6E\u4E2D':'\u5DF2\u79DF')+'</span></span></div>'+
+      row('\u7535\u8BDD',r.phone||'\u2014')+row('\u6708\u79DF\u91D1','\u00A5'+fmt(r.rent),'red')+row('\u4FDD\u8BC1\u91D1','\u00A5'+fmt(r.deposit))+row('\u7ED3\u7B97\u65B9\u5F0F',r.settleMethod||'\u6708\u5E95')+row('\u7535\u8868\u53F7',r.elecMeter||'\u2014')+(r.note?row('\u5907\u6CE8',r.note):'')+'</div>';
     h+='<div class="card"><div class="card-title">累计汇总（共'+roomBills.length+'笔）'+
       '<div style="display:flex;gap:6px"><button class="btn btn-sm btn-outline" onclick="rdEditRoom(\''+r.id+'\')">编辑</button>'+
       '<button class="btn btn-sm btn-danger" onclick="rdDelRoom(\''+r.id+'\')">删除</button></div></div>'+
@@ -515,6 +572,26 @@ function rdDelRoom(id){closeModal('modalRoomDetail');deleteRoom(id)}
 function rdGoBilling(id){closeModal('modalRoomDetail');goPage('pageBilling');setTimeout(function(){$('billRoomSelect').value=id;renderBilling()},100)}
 function rdAddBill(id){closeModal('modalRoomDetail');showAddBillModal(id)}
 
+function toggleVacant(roomId){
+  try{
+    for(var i=0;i<DB.rooms.length;i++){
+      if(DB.rooms[i].id===roomId){
+        DB.rooms[i].isVacant=!DB.rooms[i].isVacant;
+        DB.save();
+        var lbl=$('detailVacantLbl_'+roomId);
+        var chk=$('detailVacant_'+roomId);
+        if(lbl&&chk){
+          if(DB.rooms[i].isVacant){lbl.textContent='\u7A7A\u7F6E\u4E2D';lbl.style.color='var(--danger)'}
+          else{lbl.textContent='\u5DF2\u79DF';lbl.style.color='var(--text2)'}
+        }
+        renderAll();
+        toast(DB.rooms[i].isVacant?'\u623F\u95F4\u5DF2\u6807\u8BB0\u4E3A\u7A7A\u7F6E':'\u623F\u95F4\u5DF2\u6062\u590D\u5DF2\u79DF');
+        break;
+      }
+    }
+  }catch(e){toast('\u64CD\u4F5C\u5931\u8D25:'+e.message)}
+}
+
 function findRoomById(id){for(var i=0;i<DB.rooms.length;i++)if(DB.rooms[i].id===id)return DB.rooms[i];return null}
 
 function bRow(cls,ic,lbl,sub,rd,us,cst,extra,color){
@@ -524,7 +601,7 @@ function bRow(cls,ic,lbl,sub,rd,us,cst,extra,color){
   return '<div class="billing-row"><span class="type-icon type-'+cls+'">'+ic+'</span><span>'+lbl+(sub?' '+sub:'')+'</span><span>'+fmt(rd)+'</span><span>'+fmt(us)+'</span><span '+c+'">'+extraStr+'</span></div>';
 }
 
-function goPage(pg){var map={pageDashboard:0,pageRooms:1,pageBilling:2,pageMaint:3,pagePay:4,pageExpenses:5};var idx=map[pg];if(idx!=null){var tabs=document.querySelectorAll('.tab');if(tabs[idx])switchTab(tabs[idx],pg)}}
+function goPage(pg){var map={pageDashboard:0,pageBilling:1,pageMaint:2,pagePay:3,pageExpenses:4};var idx=map[pg];if(idx!=null){var tabs=document.querySelectorAll('.tab');if(tabs[idx])switchTab(tabs[idx],pg)}}
 
 // ========== BILLING ==========
 function initBillSelects(){
@@ -546,17 +623,27 @@ function onBillSelectChange(){renderBilling()}
 
 function showAddBillModal(roomId){
   try{
-    $('billingModalTitle').textContent='\u6284\u8868\u7ED3\u7B97';
+    $('billingModalTitle').textContent='抄表结算';
     $('billId').value='';
     $('billRoomId').value=roomId||$('billRoomSelect').value;
     $('billDate').value=fmtDateFull(new Date());
-    $('bElecRead').value='';$('bWaterRead').value='';$('bGasRead').value='';
-    $('bOtherCost').value='';
-    $('bRent').value='';$('bDeposit').value='';$('bNote').value='';
-    $('bElecCalc').textContent='';$('bWaterCalc').textContent='';$('bGasCalc').textContent='';
-    openModal('modalBilling');
+    // 显示房号
     var rid=$('billRoomId').value,ro=findRoomById(rid);
-    if(ro)$('bRent').value=ro.rent||'';
+    $('billRoomDisplay').value=ro?ro.number:'（未选择）';
+    // 清空所有字段
+    var allInputs=['bElecRead','bElecUsage','bElecPrice','bElecCost','bWaterRead','bWaterUsage','bWaterPrice','bWaterCost','bGasRead','bGasUsage','bGasPrice','bGasCost','bOtherCost','bRent','bDeposit'];
+    for(var i=0;i<allInputs.length;i++)$(allInputs[i]).value='';
+    $('bNote').value='';
+    $('billTotalAmount').value='0';
+    window._manualTotal=false;
+    openModal('modalBilling');
+    if(ro){
+      $('bRent').value=ro.rent||'';
+      // 预填默认单价
+      $('bElecPrice').value=ro.elecPrice||1;
+      $('bWaterPrice').value=ro.waterPrice||5;
+      $('bGasPrice').value=ro.gasPrice||0;
+    }
   }catch(e){}
 }
 
@@ -565,38 +652,103 @@ function editBill(id){
     var b=null;
     for(var i=0;i<DB.bills.length;i++){if(DB.bills[i].id===id){b=DB.bills[i];break}}
     if(!b)return;
-    $('billingModalTitle').textContent='\u7F16\u8F91\u7ED3\u7B97';
+    $('billingModalTitle').textContent='编辑结算';
     $('billId').value=b.id;$('billRoomId').value=b.roomId;
+    var ro=findRoomById(b.roomId);
+    $('billRoomDisplay').value=ro?ro.number:'（未知）';
     $('billDate').value=b.date||'';
     $('bElecRead').value=b.elecRead!=null?b.elecRead:'';
+    $('bElecUsage').value=b.elecUsage!=null?b.elecUsage:'';
     $('bWaterRead').value=b.waterRead!=null?b.waterRead:'';
+    $('bWaterUsage').value=b.waterUsage!=null?b.waterUsage:'';
     $('bGasRead').value=b.gasRead!=null?b.gasRead:'';
+    $('bGasUsage').value=b.gasUsage!=null?b.gasUsage:'';
+    $('bElecCost').value=b.elecCost!=null?b.elecCost:'';
+    $('bWaterCost').value=b.waterCost!=null?b.waterCost:'';
+    $('bGasCost').value=b.gasCost!=null?b.gasCost:'';
     $('bOtherCost').value=b.otherCost!=null?b.otherCost:'';
     $('bRent').value=b.rent!=null?b.rent:'';
     $('bDeposit').value=b.depositChange!=null?b.depositChange:'';
     $('bNote').value=b.note||'';
+    // 单价：优先用结算时记录的单价，否则取房间默认
+    $('bElecPrice').value=b.elecPrice!=null?b.elecPrice:(ro?ro.elecPrice||1:1);
+    $('bWaterPrice').value=b.waterPrice!=null?b.waterPrice:(ro?ro.waterPrice||5:5);
+    $('bGasPrice').value=b.gasPrice!=null?b.gasPrice:(ro?ro.gasPrice||0:0);
+    // 合计：优先用记录中的手动合计
+    window._manualTotal=false;
+    if(b.totalAmount!=null&&b.totalAmount!==''){$('billTotalAmount').value=b.totalAmount;window._manualTotal=true;}
+    else{onBillCostChange();}
     openModal('modalBilling');
   }catch(e){}
 }
 
 var _prevBillForCalc=null;
 
-function calcUsage(readField,calcField,prevKey,priceKey){
+// 获取该房间上一条结算记录
+function getPrevBill(roomId,excludeId){
+  var prev=null;
+  for(var i=DB.bills.length-1;i>=0;i--){
+    if(DB.bills[i].roomId===roomId&&DB.bills[i].id!==excludeId){prev=DB.bills[i];break}
+  }
+  return prev;
+}
+
+// 读数变化：自动算用量和金额
+// 四舍五入保留两位小数（解决浮点精度如 277.84000000000003）
+function round2(v){var n=Number(v)||0;return Math.round(n*100)/100}
+
+function onBillReadChange(type){
   try{
-    var el=$(readField);if(!el)return;
-    var cur=parseFloat(el.value)||0;
-    var rid=$('billRoomId').value;
+    var rid=$('billRoomId').value;if(!rid)return;
     var ro=findRoomById(rid);
-    var prev=null;
-    for(var i=DB.bills.length-1;i>=0;i--){
-      if(DB.bills[i].roomId===rid&&DB.bills[i].id!==$('billId').value){prev=DB.bills[i];break}
-    }
-    var pVal=prev?(prev[prevKey]||0):0;
+    var prev=getPrevBill(rid,$('billId').value);
+    var readMap={elec:'bElecRead',water:'bWaterRead',gas:'bGasRead'};
+    var usageMap={elec:'bElecUsage',water:'bWaterUsage',gas:'bGasUsage'};
+    var priceMap={elec:'bElecPrice',water:'bWaterPrice',gas:'bGasPrice'};
+    var costMap={elec:'bElecCost',water:'bWaterCost',gas:'bGasCost'};
+    var prevKeyMap={elec:'elecRead',water:'waterRead',gas:'gasRead'};
+    var priceKeyMap={elec:'elecPrice',water:'waterPrice',gas:'gasPrice'};
+    var cur=parseFloat($(readMap[type]).value)||0;
+    var pVal=prev?(prev[prevKeyMap[type]]||0):0;
     var usage=Math.max(0,cur-pVal);
-    var price=ro?(ro[priceKey]||1):1;
-    $(calcField).textContent=usage?'-'+(usage%1!==0?usage.toFixed(1):usage):'';
+    $(usageMap[type]).value=usage||(usage===0?'0':'');
+    // 单价默认从房间设置取
+    var defaultPrice=ro?(ro[priceKeyMap[type]]||1):1;
+    if(!$(priceMap[type]).value)$(priceMap[type]).value=defaultPrice;
+    var price=parseFloat($(priceMap[type]).value)||defaultPrice;
+    $(costMap[type]).value=round2(usage*price);if(usage*price===0)$(costMap[type]).value='0';
+    updateBillTotal();
   }catch(e){}
 }
+
+// 用量或单价变化：重算金额
+function onBillFieldChange(type){
+  try{
+    var usageMap={elec:'bElecUsage',water:'bWaterUsage',gas:'bGasUsage'};
+    var priceMap={elec:'bElecPrice',water:'bWaterPrice',gas:'bGasPrice'};
+    var costMap={elec:'bElecCost',water:'bWaterCost',gas:'bGasCost'};
+    var u=parseFloat($(usageMap[type]).value)||0;
+    var p=parseFloat($(priceMap[type]).value)||0;
+    $(costMap[type]).value=round2(u*p);if(u*p===0)$(costMap[type]).value='0';
+    updateBillTotal();
+  }catch(e){}
+}
+
+// 用户手动修改了合计，则不再自动覆盖
+function markManualTotal(){try{window._manualTotal=true}catch(e){}}
+
+// 金额/其他/房租/保证金变化：重算总合计（除非用户手动改过合计）
+function onBillCostChange(){
+  try{
+    if(window._manualTotal===true)return;
+    var total=0;
+    var costFields=['bElecCost','bWaterCost','bGasCost','bOtherCost','bRent','bDeposit'];
+    for(var i=0;i<costFields.length;i++)total+=Number($(costFields[i]).value)||0;
+    $('billTotalAmount').value=round2(total);
+  }catch(e){}
+}
+
+function updateBillTotal(){onBillCostChange()}
 
 function saveBilling(){
   try{
@@ -606,15 +758,22 @@ function saveBilling(){
     var prev=null;
     for(var i=DB.bills.length-1;i>=0;i--){if(DB.bills[i].roomId===roomId&&DB.bills[i].id!==$('billId').value){prev=DB.bills[i];break}}
     var eRead=parseFloat($('bElecRead').value),wRead=parseFloat($('bWaterRead').value),gRead=parseFloat($('bGasRead').value);
-    var eU=(eRead!=null&&!isNaN(eRead)&&prev&&prev.elecRead!=null)?Math.max(0,eRead-prev.elecRead):0;
-    var wU=(wRead!=null&&!isNaN(wRead)&&prev&&prev.waterRead!=null)?Math.max(0,wRead-prev.waterRead):0;
-    var gU=(gRead!=null&&!isNaN(gRead)&&prev&&prev.gasRead!=null)?Math.max(0,gRead-prev.gasRead):0;
+    var eU=Number($('bElecUsage').value)||0;
+    var wU=Number($('bWaterUsage').value)||0;
+    var gU=Number($('bGasUsage').value)||0;
+    var ePrice=Number($('bElecPrice').value)||0;
+    var wPrice=Number($('bWaterPrice').value)||0;
+    var gPrice=Number($('bGasPrice').value)||0;
+    var eCost=Number($('bElecCost').value)||0;
+    var wCost=Number($('bWaterCost').value)||0;
+    var gCost=Number($('bGasCost').value)||0;
     var data={id:$('billId').value||genId(),roomId:roomId,date:date,
-      elecRead:isNaN(eRead)?null:eRead,elecUsage:eU,elecCost:eU*(ro?(ro.elecPrice||1):1),
-      waterRead:isNaN(wRead)?null:wRead,waterUsage:wU,waterCost:wU*(ro?(ro.waterPrice||5):5),
-      gasRead:isNaN(gRead)?null:gRead,gasUsage:gU,gasCost:gU*(ro?(ro.gasPrice||0):0),
+      elecRead:isNaN(eRead)?null:eRead,elecUsage:eU,elecPrice:ePrice,elecCost:eCost,
+      waterRead:isNaN(wRead)?null:wRead,waterUsage:wU,waterPrice:wPrice,waterCost:wCost,
+      gasRead:isNaN(gRead)?null:gRead,gasUsage:gU,gasPrice:gPrice,gasCost:gCost,
       otherCost:Number($('bOtherCost').value)||0,
       rent:Number($('bRent').value)||0,depositChange:Number($('bDeposit').value)||0,
+      totalAmount:Number($('billTotalAmount').value)||0,
       note:$('bNote').value.trim()};
     var idx=-1;
     for(var i=0;i<DB.bills.length;i++){if(DB.bills[i].id===data.id){idx=i;break}}
@@ -645,17 +804,18 @@ function renderBilling(){
       }else{
         var totalAll=0;
         for(var bi=0;bi<bills.length;bi++){
-          var b=bills[bi],t=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.rent||0)+(b.depositChange||0);
+          var b=bills[bi],t=(b.totalAmount!=null&&b.totalAmount!=='')?b.totalAmount:(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.otherCost||0)+(b.rent||0)+(b.depositChange||0);
           totalAll+=t;
           html+='<div class="billing-month"><span>'+fmtDate(b.date)+' \u7ED3\u7B97</span><span>\u00A5'+fmt(t)+
             ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
             ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
           html+='<div class="billing-row header"><span></span><span>\u9879\u76EE</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
-          if(b.elecRead!=null)html+=bRow('electric','\u26A1','\u7535','('+fmt(ro.elecPrice)+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
-          if(b.waterRead!=null)html+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(ro.waterPrice)+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
-          if(b.gasRead!=null)html+=bRow('gas','\uD83D\uDD25','\u71C3\u6C14','('+fmt(ro.gasPrice)+'\u5143/m\xB3)',b.gasRead,b.gasUsage,b.gasCost);
+          if(b.elecRead!=null)html+=bRow('electric','\u26A1','\u7535','('+fmt(b.elecPrice!=null?b.elecPrice:ro.elecPrice)+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
+          if(b.waterRead!=null)html+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(b.waterPrice!=null?b.waterPrice:ro.waterPrice)+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
+          if(b.gasRead!=null)html+=bRow('gas','\uD83D\uDD25','\u71C3\u6C14','('+fmt(b.gasPrice!=null?b.gasPrice:ro.gasPrice)+'\u5143/m\xB3)',b.gasRead,b.gasUsage,b.gasCost);
           html+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
           if(b.depositChange)html+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
+          if(b.otherCost)html+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost);
           if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
           html+='<div class="billing-total">\u672C\u6708\u5408\u8BA1:\u00A5'+fmt(t)+'</div></div>';
         }
@@ -677,14 +837,14 @@ function renderBilling(){
 // ========== 打印/导出年度结算明细（仿手工账本——A4分页版） ==========
 
 // 每页最多放几个结算区块（5行/区块：表头+电+水+燃气+其他/共计）
-var BILLS_PER_PAGE=10;
+var BILLS_PER_PAGE=6; // 纵向A4每页约可放6条结算（每条5行≈34mm）
 
 function buildBillBlock(b,ro){
   var fee=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0);
   var rent=b.rent||0;
   var dep=b.depositChange||0;
   var otherCost=b.otherCost||0;
-  var total=fee+rent+dep+otherCost;
+  var total=(b.totalAmount!=null&&b.totalAmount!=='')?b.totalAmount:(fee+rent+dep+otherCost);
   function c(v){return(v==null||v===''||(typeof v==='number'&&isNaN(v)))?'':fmt(v)}
   function up(u,p){if(u==null)return'';var s=fmt(u);if(p!=null&&p>0)s+='×'+fmt(p);return s}
   var hasElec=(b.elecRead!=null),hasWater=(b.waterRead!=null),hasGas=(b.gasRead!=null);
@@ -695,7 +855,7 @@ function buildBillBlock(b,ro){
   var dateStr=(d.getFullYear()%100)+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
   var body='';
   body+='<tr class="lt-blk-title">'
-    +'<td rowspan="'+nRows+'" class="lt-date-cell">'+dateStr+'</td>'
+    +'<td rowspan="'+nRows+'" class="lt-date-cell"><div style="font-size:11px;font-weight:700;color:#333;margin-bottom:4px">日期</div>'+dateStr+'</td>'
     +'<td></td><td>读表</td><td>用量单价</td><td>金额</td>'
     +'<td></td><td>汇总</td>'
     +'<td rowspan="'+nRows+'" class="lt-note-col">'+(note||' ')+'</td>'
@@ -758,12 +918,13 @@ function buildLedgerPages(roomId,year,bills,ro){
       pageTotal+=blk.total;
     }
     grandTotal+=pageTotal;
-    var emptyCount=BILLS_PER_PAGE-pageBills.length;
-    for(var ei=0;ei<emptyCount;ei++)tbody+=buildEmptyBlock();
     var isLast=(pi+BILLS_PER_PAGE>=bills.length);
+    // 合计行紧跟实际数据（在空行填充之前），避免被推到下一页
+    tbody+='<tr class="lt-grand"><td colspan="6" style="text-align:right;padding-right:10px">本页合计（'+pageBills.length+' 笔）</td><td colspan="2">'+fmt(pageTotal)+' 元</td></tr>';
     if(isLast){
       tbody+='<tr class="lt-grand"><td colspan="6" style="text-align:right;padding-right:10px">当年合计（'+bills.length+' 笔）</td><td colspan="2">'+fmt(grandTotal)+' 元</td></tr>';
     }
+    // 不再填充空行块
     var pageHtml='<div class="ledger-page">'
       +'<div class="ls-head"><h1>出租管理</h1>'
       +'<div class="ls-meta">'
@@ -773,7 +934,6 @@ function buildLedgerPages(roomId,year,bills,ro){
       +(isLast?'':'<span style="margin-left:auto;color:#999;font-size:12px">第 '+Math.floor(pi/BILLS_PER_PAGE+1)+' 页</span>')
       +'</div></div>'
       +'<table class="ledger-table"><tbody>'+tbody+'</tbody></table>'
-      +'<div class="ledger-foot"><span>房东签字：_______________</span><span>租户签字：_______________</span><span>打印日期：'+fmtDateFull(new Date())+'</span></div>'
       +'</div>';
     pages.push(pageHtml);
   }
@@ -796,8 +956,27 @@ function printBilling(){
     var d=getBillData();
     if(!d){toast('请先选择房号');return}
     if(d.bills.length===0){toast(d.year+'年暂无结算记录');return}
-    $('printArea').innerHTML=buildLedgerPages(d.roomId,d.year,d.bills,d.ro);
-    setTimeout(function(){window.print();},100);
+    var content=buildPrintContent(d);
+    var filename=(d.ro?d.ro.number:'结算')+'_'+d.year+'年度明细.html';
+    // 检测是否在 Capacitor/APK 环境中
+    var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
+    if(isCap){
+      // APK 环境：写入文件后用系统浏览器打开（系统浏览器支持打印）
+      doCapacitorSave(content,filename,function(uri){
+        if(uri){
+          // 用系统浏览器打开，用户可在浏览器里打印/存PDF
+          window.open(uri,'_system');
+          toast('正在打开打印页…');
+        }else{
+          // Filesystem 不可用：降级为 data URL 新窗口
+          openPrintWindow(content);
+        }
+      });
+    }else{
+      // 浏览器环境：直接调起打印对话框
+      $('printArea').innerHTML=buildLedgerPages(d.roomId,d.year,d.bills,d.ro);
+      setTimeout(function(){window.print();},100);
+    }
   }catch(e){toast('生成打印页失败:'+e.message)}
 }
 
@@ -806,43 +985,108 @@ function exportBilling(){
     var d=getBillData();
     if(!d){toast('请先选择房号');return}
     if(d.bills.length===0){toast(d.year+'年暂无结算记录');return}
-    var content='<!DOCTYPE html><html><head><meta charset="utf-8">'
-      +'<title>'+(d.ro?d.ro.number:'')+'_'+d.year+'年度结算明细</title>'
-      +'<style>'
-      +'*{box-sizing:border-box}'
-      +'body{margin:0;padding:0;background:#f5f5f5}'
-      +'.ledger-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 12mm;box-sizing:border-box;background:#fff}'
-      +'.ledger-page:last-child{page-break-after:auto}'
-      +'.ls-head{text-align:center;padding:10px 0 4px;border-bottom:2px solid #333}'
-      +'.ls-head h1{font-size:24px;font-weight:700;letter-spacing:8px;margin:0}'
-      +'.ls-meta{display:flex;justify-content:center;gap:28px;font-size:14px;margin-top:8px;color:#000}'
-      +'.ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5;table-layout:fixed}'
-      +'.ledger-table th,.ledger-table td{border:1.5px solid #333;padding:3px 5px;text-align:center;vertical-align:middle}'
-      +'.lt-blk-title td{background:#F5F5F5;font-weight:700;font-size:12px}'
-      +'.lt-blk-row td{height:26px}'
-      +'.lt-blk-label{font-weight:600;width:32px;background:#FAFAFA}'
-      +'.lt-date-cell{writing-mode:vertical-rl;text-orientation:mixed;font-size:13px;font-weight:600;letter-spacing:2px;width:34px;background:#F9F9F9}'
-      +'.lt-summary{font-weight:600}'
-      +'.lt-total-row td{font-weight:700;font-size:13px;background:#F0F0F0}'
-      +'.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}'
-      +'.lt-grand td{font-weight:700;font-size:14px;background:#E8E8E8;border-width:2px 1.5px}'
-      +'.lt-empty-row td{height:26px;border-color:#ddd;color:#ccc}'
-      +'.ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}'
-      +'@media print{@page{size:A4 landscape;margin:8mm}.ledger-page{width:100%;min-height:0;padding:10mm 8mm}}'
-      +'</style></head><body>'
-      +buildLedgerPages(d.roomId,d.year,d.bills,d.ro)
-      +'</body></html>';
-    var blob=new Blob([content],{type:'text/html;charset=utf-8'});
-    var url=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=url;
-    a.download=(d.ro?d.ro.number:'结算')+'_'+d.year+'年度明细.html';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    toast('导出成功！用浏览器打开可打印或另存为PDF');
+    var content=buildPrintContent(d);
+    var filename=(d.ro?d.ro.number:'结算')+'_'+d.year+'年度明细.html';
+    var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
+    if(isCap){
+      // APK 环境：通过 Capacitor Filesystem 写入文件
+      doCapacitorSave(content,function(ok){
+        if(ok)toast('已保存到文件管理 > Documents > '+filename+'\n可用浏览器打开打印或存PDF');
+        else toast('保存失败，请检查存储权限');
+      });
+    }else{
+      // 浏览器环境：Blob 下载
+      var blob=new Blob([content],{type:'text/html;charset=utf-8'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url;
+      a.download=filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast('导出成功！文件：'+filename);
+    }
   }catch(e){toast('导出失败:'+e.message)}
+}
+
+// ========== 打印内容生成器（供 print/export 复用） ==========
+function buildPrintContent(d){
+  return '<!DOCTYPE html><html><head><meta charset="utf-8">'
+    +'<title>'+(d.ro?d.ro.number:'')+'_'+d.year+'年度结算明细</title>'
+    +'<style>'
+    +'*{box-sizing:border-box}'
+    +'body{margin:0;padding:0;background:#fff}'
+    +'.ledger-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 12mm;box-sizing:border-box;background:#fff}'
+    +'.ledger-page:last-child{page-break-after:auto;min-height:auto}'
+    +'.ls-head{text-align:center;padding:10px 0 4px;border-bottom:2px solid #333}'
+    +'.ls-head h1{font-size:24px;font-weight:700;letter-spacing:8px;margin:0}'
+    +'.ls-meta{display:flex;justify-content:center;gap:28px;font-size:14px;margin-top:8px;color:#000}'
+    +'.ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5;table-layout:fixed}'
+    +'.ledger-table th,.ledger-table td{border:1.5px solid #333;padding:3px 5px;text-align:center;vertical-align:middle}'
+    +'.lt-blk-title td{font-weight:700;font-size:12px}'
+    +'.lt-blk-row td{height:26px}'
+    +'.lt-blk-label{font-weight:600;width:32px}'
+    +'.lt-date-cell{font-size:13px;font-weight:700;letter-spacing:1px;width:70px;text-align:center}'
+    +'.lt-summary{font-weight:600}'
+    +'.lt-total-row td{font-weight:700;font-size:13px}'
+    +'.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}'
+    +'.lt-grand td{font-weight:700;font-size:14px;border-width:2px 1.5px}'
+    +'.lt-empty-row td{height:26px;border-color:#ddd;color:#ccc}'
+    +'.ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}'
+    +'@media print{@page{size:A4 portrait;margin:8mm}.ledger-page{width:100%;min-height:0;padding:10mm 8mm}}'
+    +'</style></head><body>'
+    +buildLedgerPages(d.roomId,d.year,d.bills,d.ro)
+    +'</body></html>';
+}
+
+// ========== Capacitor 文件保存工具 ==========
+function doCapacitorSave(content,filename,callback){
+  try{
+    var fs=window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem;
+    if(!fs){callback(false);return}
+    // 转为 base64
+    var b64=btoa(unescape(encodeURIComponent(content)));
+    fs.writeFile({
+      path:'Download/'+filename,
+      data:b64,
+      directory:'EXTERNAL_STORAGE',
+      encoding:'utf-8'  // Capacitor v5 用这个或 'base64'
+    }).then(function(){
+      // 获取文件 URI 用于打开
+      fs.getUri({
+        directory:'EXTERNAL_STORAGE',
+        path:'Download/'+filename
+      }).then(function(res){
+        callback(res.uri||true);
+      }).catch(function(){callback(true)});
+    }).catch(function(err){
+      // EXTERNAL_STORAGE 可能不可用，退回 DOCUMENTS
+      fs.writeFile({
+        path:filename,
+        data:b64,
+        directory:'DOCUMENTS',
+        encoding:'utf-8'
+      }).then(function(){
+        callback(true);
+      }).catch(function(){
+        callback(false);
+      });
+    });
+  }catch(e){callback(false)}
+}
+
+// ========== 降级方案：新窗口打开（Filesystem 不可用时） ==========
+function openPrintWindow(content){
+  var win=window.open('','_blank');
+  if(win){
+    win.document.write(content);
+    win.document.close();
+    // 新窗口里可以正常调起打印
+    setTimeout(function(){win.print();},500);
+  }else{
+    toast('无法打开窗口，请允许弹窗权限后重试');
+  }
 }
 
 // ========== MAINTENANCE ==========
@@ -860,7 +1104,7 @@ function showAddMaintModal(record){
 
 function fillMaintRoomOptions(){
   try{
-    var opts='<option value="">\u9009\u62E9\u623F\u53F7</option>';
+    var opts='<option value="">\u516C\u5171/\u603B\u8868</option>';
     for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
     $('maintRoom').innerHTML=opts;
   }catch(e){}
@@ -893,7 +1137,7 @@ function renderMaint(){
     var year=parseInt(s.value)||getYear();
     var records=[];
     for(var i=0;i<DB.maint.length;i++){if(new Date(DB.maint[i].date).getFullYear()===year)records.push(DB.maint[i])}
-    records.sort(function(a,b){return new Date(b.date)-new Date(a.date)});
+    records.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
     var total=0;
     for(var i=0;i<records.length;i++)total+=records[i].cost;
     $('maintSummary').innerHTML=row('\u672C\u5E74\u7EF4\u4FEE\u6B21\u6570',records.length+' \u6B21')+row('\u672C\u5E74\u652F\u51FA\u603B\u8BA1','\u00A5'+fmt(total),'red')+row('\u5E73\u5747\u6BCF\u6B21',records.length?'\u00A5'+fmt(total/records.length):'\u00A50');
@@ -902,23 +1146,357 @@ function renderMaint(){
     var mh='';
     for(var mi=0;mi<records.length;mi++){
       var m=records[mi],mr=findRoomById(m.roomId);
-      mh+='<div class="maint-item"><div class="maint-date">'+fmtDate(m.date)+'</div><div class="maint-content"><div class="maint-room">'+(mr?mr.number:'\u516C\u5171\u533A\u57DF')+'</div><div class="maint-desc">'+m.desc+'</div></div><div class="maint-cost">-\u00A5'+fmt(m.cost)+'</div><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:3px 7px" onclick="deleteMaint(\''+m.id+'\')">\u2715</button></div>';
+      mh+='<div class="billing-month"><span>'+fmtDate(m.date)+' \u7EF4\u4FEE</span><span>\u00A5'+fmt(m.cost)+
+        ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="showAddMaintModal(DB.maint.find(function(x){return x.id===\''+m.id+'\'}))">\u7F16\u8F91</button>'+
+        ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteMaint(\''+m.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
+      mh+='<div class="billing-row header" style="grid-template-columns:26px 60px 1fr 70px"><span></span><span>\u623F\u53F7</span><span>\u7EF4\u4FEE\u9879\u76EE</span><span>\u91D1\u989D</span></div>';
+      mh+='<div class="billing-row" style="grid-template-columns:26px 60px 1fr 70px"><span class="type-icon type-rent">\uD83C\uDFE0</span><span>'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+(m.desc||'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(m.cost)+'</span></div>';
+      if(m.note)mh+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+m.note+'</span></div>';
+      mh+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(m.cost)+'</div></div>';
     }
     $('maintList').innerHTML='<div class="card"><div class="card-title">\u7EF4\u4FEE\u660E\u7EC6</div>'+mh+'</div>';
+    // 显示/隐藏打印导出按钮
+    try{$('printMaintBtn').style.display=records.length>0?'inline-flex':'none';$('exportMaintBtn').style.display=records.length>0?'inline-flex':'none'}catch(e){}
   }catch(e){}
+}
+
+// ========== 维修汇总表打印/导出 ==========
+function getMaintPrintData(){
+  var year=parseInt($('maintYearSelect').value)||getYear();
+  var records=[];
+  for(var i=0;i<DB.maint.length;i++){if(new Date(DB.maint[i].date).getFullYear()===year)records.push(DB.maint[i])}
+  records.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
+  if(records.length===0){toast(year+'\u5E74\u6682\u65E0\u7EF4\u4FEE\u8BB0\u5F55');return null}
+  return {year:year,records:records};
+}
+
+function buildMaintPages(year,records){
+  var PER_PAGE=24; // 纵向A4每页约可放24条维修（每条1行≈9mm）
+  var pages='';
+  var grandTotal=0;
+  for(var pi=0;pi<records.length;pi++)grandTotal+=records[pi].cost;
+  for(var p=0;p<Math.ceil(records.length/PER_PAGE);p++){
+    var start=p*PER_PAGE;
+    var end=Math.min(start+PER_PAGE,records.length);
+    var pageRecords=records.slice(start,end);
+    var rows='';
+    for(var ri=0;ri<pageRecords.length;ri++){
+      var m=pageRecords[ri],mr=findRoomById(m.roomId);
+      var d=new Date(m.date);
+      var dateStr=(d.getFullYear()%100)+'\u5E74'+(d.getMonth()+1)+'\u6708'+d.getDate()+'\u65E5';
+      rows+='<tr>'
+        +'<td class="mp-date-cell">'+dateStr+'</td>'
+        +'<td class="mp-room-cell">'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</td>'
+        +'<td class="mp-desc-cell">'+m.desc+'</td>'
+        +'<td class="mp-cost-cell">-'+fmt(m.cost)+'\u5143</td>'
+        +'</tr>';
+    }
+    // 合计行紧跟实际数据（在空行填充之前）
+    var pageTotal=0;
+    for(var ti=0;ti<pageRecords.length;ti++)pageTotal+=pageRecords[ti].cost;
+    var isLastPage_m=(p+1)*PER_PAGE>=records.length;
+    rows+='<tr class="mp-total-row"><td colspan="3" style="text-align:right;padding-right:16px">\u672C\u9875\u5408\u8BA1('+pageRecords.length+' \u6B21)</td><td class="mp-cost-cell">'+fmt(pageTotal)+' \u5143</td></tr>';
+    if(isLastPage_m){
+      rows+='<tr class="mp-total-row"><td colspan="3" style="text-align:right;padding-right:16px">\u5F53\u5E74\u5408\u8BA1('+records.length+' \u6B21)</td><td class="mp-cost-cell">'+fmt(grandTotal)+' \u5143</td></tr>';
+    }
+    // 不再填充空行
+    pages+='<div class="mp-page"><div class="maint-print-sheet">'
+      +'<div class="mp-head"><h1>'+year+' \u51FA\u79DF\u7EF4\u4FEE\u6C47\u603B\u8868</h1></div>'
+      +'<table class="mp-table"><thead><tr><th style="width:18%">\u65E5\u671F</th><th style="width:14%">\u623F\u53F7</th><th>\u7EF4\u4FEE\u9879\u76EE</th><th style="width:16%">\u652F\u51FA\u91D1\u989D</th></tr></thead>'
+      +'<tbody>'+rows+'</tbody></table>'
+      +'</div></div>';
+  }
+  return pages;
+}
+
+function printMaint(){
+  try{
+    var d=getMaintPrintData();if(!d)return;
+    $('printArea').innerHTML=buildMaintPages(d.year,d.records);
+    if(typeof Capacitor!=='undefined'&&Capacitor.isNativePlatform()){
+      var html=$('printArea').innerHTML;
+      var fullHtml='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+d.year+'\u7EF4\u4FEE\u6C47\u603B</title>'
+        +'<style>body{margin:0;padding:0;background:#fff}'
+        +'.mp-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 14mm;box-sizing:border-box;background:#fff}'
+        +'.mp-page:last-child{page-break-after:auto;min-height:auto}'
+        +'.maint-print-sheet{background:#fff;color:#000;font-family:SimSun,"Songti SC",serif}'
+        +'.mp-head{text-align:center;padding:12px 0 6px;border-bottom:2px solid #333}'
+        +'.mp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
+        +'.mp-table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6}'
+        +'.mp-table th,.mp-table td{border:1.5px solid #333;padding:5px 8px;text-align:left;vertical-align:middle}'
+        +'.mp-table th{font-weight:700;text-align:center;font-size:14px}'
+        +'.mp-date-cell{font-size:12.5px;width:85px}.mp-room-cell{font-size:12.5px;font-weight:600;width:65px}'
+        +'.mp-desc-cell{font-size:13px}.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px}'
+        +'.mp-total-row td{font-weight:700;font-size:14px;background:#EDEDED;border-width:2px 1.5px}'
+        +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
+        +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html';
+      var {Filesystem}=Capacitor.Plugins;
+      Filesystem.writeFile({path:'Documents/'+d.year+'_维修汇总表.html',data:fullHtml,directory:'DOWNLOAD',encoding:'utf-8',recursive:true}).then(function(){
+        toast('\u5DF2\u4FDD\u5B58\uFF0C\u6B63\u5728\u6253\u5F00...');
+        Filesystem.getUri({path:'Documents/'+d.year+'_维修汇总表.html',directory:'DOWNLOAD'}).then(function(uri){
+          window.open(uri.uri,'_blank');
+        });
+      }).catch(function(){toast('\u4FDD\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u6743\u9650')});
+    }else{
+      var win=window.open('','_blank');
+      if(win){
+        win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+d.year+'\u7EF4\u4FEE\u6C47\u603B</title>');
+        var ss=document.querySelectorAll('style');
+        for(var si=0;si<ss.length;si++)win.document.write(ss[si].outerHTML);
+        win.document.write('</head><body>'+$('printArea').innerHTML+'</body></html>');
+        win.document.close();
+        setTimeout(function(){win.print();},500);
+      }else{
+        toast('\u65E0\u6CD5\u6253\u5F00\u7A97\u53E3');
+      }
+    }
+  }catch(e){toast('\u751F\u6210\u6253\u5370\u9875\u5931\u8D25:'+e.message)}
+}
+
+function exportMaint(){
+  try{
+    var d=getMaintPrintData();if(!d)return;
+    var content='<!DOCTYPE html><html><head><meta charset="utf-8">'
+      +'<title>'+d.year+'\u51FA\u79DF\u7EF4\u4FEE\u6C47\u603B\u8868</title>'
+      +'<style>'
+      +'*{box-sizing:border-box}body{margin:0;padding:0;background:#fff}'
+      +'.mp-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 14mm;box-sizing:border-box;background:#fff}'
+      +'.mp-page:last-child{page-break-after:auto;min-height:auto}'
+      +'.maint-print-sheet{background:#fff;color:#000;font-family:SimSun,"Songti SC",serif}'
+      +'.mp-head{text-align:center;padding:12px 0 6px;border-bottom:2px solid #333}'
+      +'.mp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
+      +'.mp-table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6}'
+      +'.mp-table th,.mp-table td{border:1.5px solid #333;padding:5px 8px;text-align:left;vertical-align:middle}'
+      +'.mp-table th{font-weight:700;text-align:center;font-size:14px}'
+      +'.mp-date-cell{font-size:12.5px;width:85px}.mp-room-cell{font-size:12.5px;font-weight:600;width:65px}'
+      +'.mp-desc-cell{font-size:13px}.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px}'
+      +'.mp-total-row td{font-weight:700;font-size:14px;background:#EDEDED;border-width:2px 1.5px}'
+      +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
+      +'@media print{@page{size:A4 portrait;margin:8mm}}'
+      +'</style></head><body>'
+      +buildMaintPages(d.year,d.records)
+      +'</body></html>';
+    var blob=new Blob([content],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=d.year+'\u51FA\u79DF\u7EF4\u4FEE\u6C47\u603B\u8868.html';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('\u5BFC\u51FA\u6210\u529F\uFF01\u7528\u6D4F\u89C8\u5668\u6253\u5F00\u53EF\u6253\u5370\u6216\u53E6\u5B58\u4E3APDF');
+  }catch(e){toast('\u5BFC\u51FA\u5931\u8D25:'+e.message)}
+}
+
+// ========== PAY PRINT (代缴打印) ==========
+function getPayPrintData(){
+  try{
+    var year=parseInt($('payYearSelect').value)||getYear();
+    var records=[];
+    for(var i=0;i<DB.payments.length;i++){if(new Date(DB.payments[i].date).getFullYear()===year)records.push(DB.payments[i])}
+    records.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
+    if(records.length===0){toast('该年暂无代缴记录');return null}
+    return {year:year,records:records};
+  }catch(e){return null}
+}
+
+function buildPayPages(year,records){
+  var pages='';
+  // 按类型分组
+  var typeOrder=['\u6C34','\u71C3\u6C14','\u7535','\u5176\u4ED6'];
+  var typeNames={'\u6C34':'\u6C34\u8868\u7F34\u8D39','\u71C3\u6C14':'\u71C3\u6C14\u7F34\u8D39','\u7535':'\u7535\u8868\u7F34\u8D39','\u5176\u4ED6':'\u5176\u4ED6\u7F34\u8D39'};
+  var groups={};
+  for(var t=0;t<typeOrder.length;t++)groups[typeOrder[t]]=[];
+  for(var i=0;i<records.length;i++){
+    var tp=records[i].type;
+    if(!groups[tp])groups[tp]=[];
+    groups[tp].push(records[i]);
+  }
+  // 构建所有类型的HTML块
+  var allBlocks=[];
+  for(var ti=0;ti<typeOrder.length;ti++){
+    var tp=typeOrder[ti];
+    var g=groups[tp];
+    if(!g||g.length===0)continue;
+    var typeName=typeNames[tp]||tp;
+    var typeTotalCost=0,typeTotalUsage=0;
+    var tbl='<table class="pp-table"><thead><tr><th style="width:55px">\u623F\u53F7</th><th style="width:80px">\u65E5\u671F</th><th style="width:70px">\u8BFB\u6570</th><th style="width:60px">\u7528\u91CF</th><th style="width:70px">\u91D1\u989D</th></tr></thead><tbody>';
+    for(var gi=0;gi<g.length;gi++){
+      var p=g[gi],mr=findRoomById(p.roomId);
+      var d=new Date(p.date);
+      var dateStr=(d.getFullYear()%100)+'\u5E74'+(d.getMonth()+1)+'\u6708'+d.getDate()+'\u65E5';
+      typeTotalCost+=p.cost;
+      typeTotalUsage+=(p.usage||0);
+      tbl+='<tr>'
+        +'<td class="pp-room-cell">'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</td>'
+        +'<td class="pp-date-cell">'+dateStr+'</td>'
+        +'<td class="pp-num-cell">'+(p.reading?p.reading:'')+'</td>'
+        +'<td class="pp-num-cell">'+(p.usage?p.usage:'')+'</td>'
+        +'<td class="pp-cost-cell">'+fmt(p.cost)+' \u5143</td>'
+        +'</tr>';
+    }
+    // 合计行
+    tbl+='<tr class="pp-total-row"><td colspan="2" style="text-align:right;padding-right:12px">\u5408\u8BA1('+g.length+' \u7B14)</td>'
+      +'<td></td><td>'+(typeTotalUsage>0?fmt(typeTotalUsage):'')+'</td>'
+      +'<td class="pp-cost-cell">'+fmt(typeTotalCost)+' \u5143</td></tr>';
+    tbl+='</tbody></table>';
+    allBlocks.push({name:typeName,html:tbl,cost:typeTotalCost});
+  }
+  if(allBlocks.length===0)return '';
+  // 分页：每页放约 20 条记录（估算）
+  var PP_PER_PAGE=20;
+  var totalRecs=records.length;
+  var totalPages=Math.ceil(totalRecs/PP_PER_PAGE)||1;
+  var recIdx=0;
+  for(var pi=0;pi<totalPages;pi++){
+    var pageHtml='<div class="pp-page"><div class="pp-head"><h1>'+year+' \u652F\u51FA\u8D39\u7528\u7BA1\u7406\u5E74\u8868</h1></div>';
+    // 本页记录计数
+    var pageRecCount=0;
+    var pageMax=PP_PER_PAGE;
+    // 遍历类型块，拆分到各页
+    for(var bi=0;bi<allBlocks.length&&pageRecCount<pageMax;bi++){
+      var block=allBlocks[bi];
+      // 简化：每个类型块整体放入，不跨页拆分类型
+      if(pageRecCount>0 && pageRecCount+groups[typeOrder[bi]].length>pageMax) continue; // 留给下一页
+      pageHtml+='<div class="pp-type-block"><div class="pp-type-title">'+block.name+'</div>'+block.html+'</div>';
+      pageRecCount+=groups[typeOrder[bi]]?groups[typeOrder[bi]].length:0;
+    }
+    // 当年总计（只在最后一页显示）
+    if(pi===totalPages-1){
+      var grandTotal=0;
+      for(var i=0;i<records.length;i++)grandTotal+=records[i].cost;
+      pageHtml+='<div style="margin-top:14px;text-align:right;font-size:15px;font-weight:700;padding:8px 12px;border-top:2px solid #333">'
+        +'\u5F53\u5E74\u603B\u8BA1 ('+totalRecs+' \u7BFF) <span style="color:#000;margin-left:16px">'+fmt(grandTotal)+' \u5143</span></div>';
+    }
+    pageHtml+='</div>';
+    pages+=pageHtml;
+  }
+  return pages;
+}
+
+function printPay(){
+  try{
+    var d=getPayPrintData();if(!d)return;
+    var content='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+d.year+'\u4EE3\u7F34\u6C47\u603B</title>'
+      +'<style>'
+      +'body{margin:0;padding:0;background:#fff}'
+      +'.pp-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 14mm;box-sizing:border-box;background:#fff}'
+      +'.pp-page:last-child{page-break-after:auto;min-height:auto}'
+      +'.pp-head{text-align:center;padding:8px 0 6px;border-bottom:2px solid #333}'
+      +'.pp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
+      +'.pp-type-block{margin:14px 0;border:1.5px solid #333}'
+      +'.pp-type-title{background:#fff;font-weight:700;font-size:15px;text-align:center;padding:5px 0;border-bottom:1.5px solid #333}'
+      +'.pp-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.4;table-layout:fixed}'
+      +'.pp-table th,.pp-table td{border:1.5px solid #333;padding:3px 4px;text-align:center;vertical-align:middle}'
+      +'.pp-table th{font-weight:700;font-size:13px}'
+      +'.pp-room-cell{font-weight:600;width:60px}.pp-date-cell{width:80px}.pp-num-cell{width:70px}'
+      +'.pp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:75px}'
+      +'.pp-total-row td{font-weight:700;font-size:13px;border-width:2px 1.5px}'
+      +'@media print{@page{size:A4 portrait;margin:8mm}}'
+      +'</style></head><body>'
+      +buildPayPages(d.year,d.records)
+      +'</body></html>';
+    if(window.Capacitor&&Capacitor.isNativePlatform()){
+      doCapacitorSave(content,d.year+'\u4EE3\u7F34\u6C47\u603B.html',function(){toast('\u5DF2\u4FDD\u5B58\uFF0C\u7528\u6D4F\u89C8\u5668\u6253\u5F00\u53EF\u6253\u5370')});
+    }else{
+      var w=window.open('','','width=900,height=800');
+      w.document.write(content);w.document.close();
+      setTimeout(function(){w.print()},500);
+    }
+  }catch(e){toast('\u6253\u5370\u5931\u8D25:'+e.message)}
+}
+
+function exportPay(){
+  try{
+    var d=getPayPrintData();if(!d)return;
+    var content='<!DOCTYPE html><html><head><meta charset="utf-8"><title>'+d.year+'\u4EE3\u7F34\u6C47\u603B</title>'
+      +'<style>*{box-sizing:border-box}body{margin:0;padding:0;background:#fff}'
+      +'.pp-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 14mm;box-sizing:border-box;background:#fff}'
+      +'.pp-page:last-child{page-break-after:auto;min-height:auto}'
+      +'.pp-head{text-align:center;padding:8px 0 6px;border-bottom:2px solid #333}'
+      +'.pp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
+      +'.pp-type-block{margin:14px 0;border:1.5px solid #333}'
+      +'.pp-type-title{background:#fff;font-weight:700;font-size:15px;text-align:center;padding:5px 0;border-bottom:1.5px solid #333}'
+      +'.pp-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.4;table-layout:fixed}'
+      +'.pp-table th,.pp-table td{border:1.5px solid #333;padding:3px 4px;text-align:center;vertical-align:middle}'
+      +'.pp-table th{font-weight:700;font-size:13px}'
+      +'.pp-room-cell{font-weight:600;width:60px}.pp-date-cell{width:80px}.pp-num-cell{width:70px}'
+      +'.pp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:75px}'
+      +'.pp-total-row td{font-weight:700;font-size:13px;border-width:2px 1.5px}'
+      +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'
+      +buildPayPages(d.year,d.records)
+      +'</body></html>';
+    if(window.Capacitor&&Capacitor.isNativePlatform()){
+      doCapacitorSave(content,d.year+'\u4EE3\u7F34\u6C47\u603B.html',function(){toast('\u5DF2\u5BFC\u51FA\uFF01')});
+    }else{
+      var blob=new Blob([content],{type:'text/html;charset=utf-8'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
+      document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+      toast('\u5BFC\u51FA\u6210\u529F\uFF01');
+    }
+  }catch(e){toast('\u5BFC\u51FA\u5931\u8D25:'+e.message)}
 }
 
 // ========== PAY (代缴水电费) ==========
 function showAddPayModal(record){
   try{
     $('payId').value=record?record.id:'';
-    $('payDate').value=record?record.date:fmtDateFull(new Date());
+    var date=record?record.date:fmtDateFull(new Date());
+    var roomId=record?record.roomId:'';
+    $('payDate').value=date;
     fillPayRoomOptions();
-    $('payRoom').value=record?record.roomId:'';
-    $('payType').value=record?record.type:'\u7535';
-    $('payCost').value=record?record.cost:'';
-    $('payNote').value=record?record.note:'';
+    $('payRoom').value=roomId;
+    // 房号变化时也触发重算
+    $('payRoom').onchange=function(){
+      onPayReadChange('water');onPayReadChange('elec');onPayReadChange('gas');
+    };
+    var all=['pElecRead','pElecUsage','pElecPrice','pElecCost','pWaterRead','pWaterUsage','pWaterPrice','pWaterCost','pGasRead','pGasUsage','pGasPrice','pGasCost','pOtherCost'];
+    for(var i=0;i<all.length;i++)$(all[i]).value='';
+    $('payNote').value='';
+    $('payTotalAmount').value='0';
+    window._manualPayTotal=false;window._payCostManual={elec:false,water:false,gas:false,other:false};
+    // 动态绑定事件（比HTML内联oninput更可靠）
+    function bind(id,handler){var el=$(id);if(el){el.oninput=handler;el.onchange=handler;el.onblur=handler}}
+    bind('pElecRead',function(){onPayReadChange('elec')});
+    bind('pWaterRead',function(){onPayReadChange('water')});
+    bind('pGasRead',function(){onPayReadChange('gas')});
+    bind('pElecUsage',function(){onPayFieldChange('elec')});
+    bind('pWaterUsage',function(){onPayFieldChange('water')});
+    bind('pGasUsage',function(){onPayFieldChange('gas')});
+    bind('pElecPrice',function(){onPayFieldChange('elec')});
+    bind('pWaterPrice',function(){onPayFieldChange('water')});
+    bind('pGasPrice',function(){onPayFieldChange('gas')});
+    bind('pElecCost',function(){onPayCostInput('elec')});
+    bind('pWaterCost',function(){onPayCostInput('water')});
+    bind('pGasCost',function(){onPayCostInput('gas')});
+    bind('pOtherCost',function(){onPayCostInput('other')});
+    var ro=findRoomById(roomId);
+    if(record){
+      for(var i=0;i<DB.payments.length;i++){
+        var p=DB.payments[i];
+        if(p.roomId===roomId&&p.date===date){
+          if(p.type==='\u7535')setPayRow('pElec',p);
+          else if(p.type==='\u6C34')setPayRow('pWater',p);
+          else if(p.type==='\u71C3\u6C14')setPayRow('pGas',p);
+          else if(p.type==='\u5176\u4ED6'){if(p.cost!=null)$('pOtherCost').value=p.cost;if(p.note)$('payNote').value=p.note;}
+        }
+      }
+    }
+    if(ro){
+      if(!$('pElecPrice').value)$('pElecPrice').value=ro.elecPrice||1;
+      if(!$('pWaterPrice').value)$('pWaterPrice').value=ro.waterPrice||5;
+      if(!$('pGasPrice').value)$('pGasPrice').value=ro.gasPrice||0;
+    }
+    if(record)recalcPayTotal();
     openModal('modalPay');
+  }catch(e){}
+}
+function setPayRow(prefix,p){
+  try{
+    if(p.reading!=null)$(prefix+'Read').value=p.reading;
+    if(p.usage!=null)$(prefix+'Usage').value=p.usage;
+    if(p.price!=null)$(prefix+'Price').value=p.price;
+    if(p.cost!=null)$(prefix+'Cost').value=p.cost;
   }catch(e){}
 }
 
@@ -932,14 +1510,92 @@ function fillPayRoomOptions(){
 
 function savePay(){
   try{
-    var cost=parseFloat($('payCost').value);if(isNaN(cost)){toast('\u8BF7\u586B\u5199\u91D1\u989D');return}
-    var data={id:$('payId').value||genId(),date:$('payDate').value,roomId:$('payRoom').value,type:$('payType').value,cost:cost,note:$('payNote').value.trim()};
-    var idx=-1;
-    for(var i=0;i<DB.payments.length;i++){if(DB.payments[i].id===data.id){idx=i;break}}
-    if(idx>=0)DB.payments[idx]=data;else DB.payments.push(data);
+    var roomId=$('payRoom').value;if(!roomId){toast('\u8BF7\u9009\u62E9\u623F\u53F7');return}
+    var date=$('payDate').value;if(!date){toast('\u8BF7\u9009\u62E9\u65E5\u671F');return}
+    var remain=[];
+    for(var i=0;i<DB.payments.length;i++){var p=DB.payments[i];if(!(p.roomId===roomId&&p.date===date))remain.push(p);}
+    var note=$('payNote').value.trim();
+    var rows=[
+      {type:'\u7535',read:'pElecRead',u:'pElecUsage',pr:'pElecPrice',c:'pElecCost'},
+      {type:'\u6C34',read:'pWaterRead',u:'pWaterUsage',pr:'pWaterPrice',c:'pWaterCost'},
+      {type:'\u71C3\u6C14',read:'pGasRead',u:'pGasUsage',pr:'pGasPrice',c:'pGasCost'}
+    ];
+    for(var i=0;i<rows.length;i++){
+      var r=rows[i];
+      var cost=Number($(r.c).value)||0,reading=Number($(r.read).value)||0,usage=Number($(r.u).value)||0,price=Number($(r.pr).value)||0;
+      if(cost>0||reading>0||usage>0)remain.push({id:genId(),date:date,roomId:roomId,type:r.type,cost:cost,reading:reading,usage:usage,price:price,note:note});
+    }
+    var otherCost=Number($('pOtherCost').value)||0;
+    if(otherCost>0)remain.push({id:genId(),date:date,roomId:roomId,type:'\u5176\u4ED6',cost:otherCost,reading:0,usage:0,price:0,note:note});
+    DB.payments=remain;
     DB.save();closeModal('modalPay');toast('\u5DF2\u4FDD\u5B58');renderPay();renderAll();
   }catch(e){toast('\u4FDD\u5B58\u5931\u8D25')}
 }
+// 代缴：读数变化 → 查找同房号上一次同类型读数，自动算用量和金额
+function onPayReadChange(type){
+  try{
+    var roomId=$('payRoom').value;if(!roomId)return;
+    var ro=findRoomById(roomId);
+    var readMap={elec:'pElecRead',water:'pWaterRead',gas:'pGasRead'};
+    var usageMap={elec:'pElecUsage',water:'pWaterUsage',gas:'pGasUsage'};
+    var priceMap={elec:'pElecPrice',water:'pWaterPrice',gas:'pGasPrice'};
+    var costMap={elec:'pElecCost',water:'pWaterCost',gas:'pGasCost'};
+    // 关键词匹配，兼容 '水'/'水费'/'💧 水费' 等各种存储格式
+    var typeKw={elec:'电',water:'水',gas:'燃气'};
+    var kw=typeKw[type];
+    var cur=parseFloat($(readMap[type]).value)||0;
+    // 查找同房号、同类型、最近一笔有读数的代缴（排除当前编辑的记录）
+    var prevReading=0;
+    var curId=$('payId').value||'';
+    for(var i=DB.payments.length-1;i>=0;i--){
+      var p=DB.payments[i];
+      var pt=String(p.type||'').replace(/[\s💧⚡🔥📦]/g,''); // 去掉图标/空格
+      if(p.roomId===roomId&&pt.indexOf(kw)>=0&&p.reading>0&&p.id!==curId){
+        prevReading=p.reading;break;
+      }
+    }
+    var usage=Math.max(0,cur-prevReading);
+    $(usageMap[type]).value=usage||(usage===0?'0':'');
+    // 单价默认从房间设置取
+    var priceKeyMap={elec:'elecPrice',water:'waterPrice',gas:'gasPrice'};
+    var defaultPrice=ro?(ro[priceKeyMap[type]]||1):1;
+    if(!$(priceMap[type]).value)$(priceMap[type]).value=defaultPrice;
+    var price=parseFloat($(priceMap[type]).value)||defaultPrice;
+    // 若金额未被手动改过则自动算
+    if(!(window._payCostManual&&window._payCostManual[type])){
+      $(costMap[type]).value=round2(usage*price);if(usage*price===0)$(costMap[type]).value='0';
+    }
+    recalcPayTotal();
+  }catch(e){console.error('onPayReadChange err:',e)}
+}
+// 用量或单价变化：自动算金额（若该金额未被手动改过）
+function onPayFieldChange(type){
+  try{
+    if(window._payCostManual&&window._payCostManual[type])return;
+    var map={elec:{u:'pElecUsage',pr:'pElecPrice',c:'pElecCost'},water:{u:'pWaterUsage',pr:'pWaterPrice',c:'pWaterCost'},gas:{u:'pGasUsage',pr:'pGasPrice',c:'pGasCost'}};
+    var m=map[type];if(!m)return;
+    var u=Number($(m.u).value)||0,p=Number($(m.pr).value)||0;
+    $(m.c).value=round2(u*p);
+    recalcPayTotal();
+  }catch(e){}
+}
+// 金额被手动修改：标记并同步合计
+function onPayCostInput(type){
+  try{
+    if(!window._payCostManual)window._payCostManual={};
+    window._payCostManual[type]=true;
+    recalcPayTotal();
+  }catch(e){}
+}
+// 重算代缴总合计（除非用户手动改过合计）
+function recalcPayTotal(){
+  try{
+    if(window._manualPayTotal===true)return;
+    var total=(Number($('pElecCost').value)||0)+(Number($('pWaterCost').value)||0)+(Number($('pGasCost').value)||0)+(Number($('pOtherCost').value)||0);
+    $('payTotalAmount').value=round2(total);
+  }catch(e){}
+}
+function markManualPayTotal(){try{window._manualPayTotal=true}catch(e){}}
 
 function deletePay(id){
   try{$('deleteMsg').textContent='\u786E\u5B9A\u5220\u9664\u8BE5\u6761\u4EE3\u7F34\u8BB0\u5F55\uFF1F';window._deleteCallback=function(){var arr=[];for(var i=0;i<DB.payments.length;i++){if(DB.payments[i].id!==id)arr.push(DB.payments[i])}DB.payments=arr;DB.save();closeModal('modalDelete');toast('\u5DF2\u5220\u9664');renderPay();renderAll()};openModal('modalDelete')}catch(e){}
@@ -957,7 +1613,7 @@ function renderPay(){
     var typeIcon={'\u7535':'\u26A1','\u6C34':'\uD83D\uDCA7','\u71C3\u6C14':'\uD83D\uDD25','\u5176\u4ED6':'\uD83D\uDCE6'};
     var records=[];
     for(var i=0;i<DB.payments.length;i++){if(new Date(DB.payments[i].date).getFullYear()===year)records.push(DB.payments[i])}
-    records.sort(function(a,b){return new Date(b.date)-new Date(a.date)});
+    records.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
     var total=0,byType={'\u7535':0,'\u6C34':0,'\u71C3\u6C14':0,'\u5176\u4ED6':0};
     for(var i=0;i<records.length;i++){total+=records[i].cost;byType[records[i].type]=(byType[records[i].type]||0)+records[i].cost}
     $('paySummary').innerHTML=
@@ -968,11 +1624,22 @@ function renderPay(){
       (byType['\u5176\u4ED6']?row('\uD83D\uDCE6 \u5176\u4ED6','\u00A5'+fmt(byType['\u5176\u4ED6']),'red'):'')+
       row('\u4EE3\u7F34\u7B14\u6570',records.length+' \u7B14');
     $('paySummaryTitle').textContent=year+'\u5E74 \u4EE3\u7F34\u6C47\u603B';
+    // 打印/导出按钮：有数据时显示
+    var showBtns=records.length>0;
+    $('printPayBtn').style.display=showBtns?'inline-block':'none';
+    $('exportPayBtn').style.display=showBtns?'inline-block':'none';
     if(records.length===0){$('payList').innerHTML='<div class="empty-state"><div class="icon">\uD83D\uDCA1</div><p>\u672C\u5E74\u6682\u65E0\u4EE3\u7F34\u8BB0\u5F55</p></div>';return}
     var ph='';
     for(var mi=0;mi<records.length;mi++){
       var p=records[mi],mr=findRoomById(p.roomId);
-      ph+='<div class="maint-item"><div class="maint-date">'+fmtDate(p.date)+'</div><div class="maint-content"><div class="maint-room">'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</div><div class="maint-desc">'+p.type+(p.note?' \u00B7 '+p.note:'')+'</div></div><div class="maint-cost">-\u00A5'+fmt(p.cost)+'</div><button class="btn btn-sm btn-outline" style="margin-left:auto;padding:3px 7px" onclick="deletePay(\''+p.id+'\')">\u2715</button></div>';
+      ph+='<div class="billing-month"><span>'+fmtDate(p.date)+' \u4EE3\u7F34</span><span>\u00A5'+fmt(p.cost)+
+        ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="showAddPayModal(DB.payments.find(function(x){return x.id===\''+p.id+'\'}))">\u7F16\u8F91</button>'+
+        ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deletePay(\''+p.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
+      ph+='<div class="billing-row header" style="grid-template-columns:26px 55px 50px 60px 50px 65px"><span></span><span>\u623F\u53F7</span><span>\u7C7B\u578B</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
+      var typeIcon={'\u7535':'\u26A1','\u6C34':'\uD83D\uDCA7','\u71C3\u6C14':'\uD83D\uDD25','\u5176\u4ED6':'\uD83D\uDCE6'};
+      ph+='<div class="billing-row" style="grid-template-columns:26px 55px 50px 60px 50px 65px"><span class="type-icon type-electric">'+(typeIcon[p.type]||'\uD83D\uDCE6')+'</span><span>'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+p.type+'</span><span>'+(p.reading?fmt(p.reading):'\u2014')+'</span><span>'+(p.usage?fmt(p.usage):'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(p.cost)+'</span></div>';
+      if(p.note)ph+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+p.note+'</span></div>';
+      ph+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(p.cost)+'</div></div>';
     }
     $('payList').innerHTML='<div class="card"><div class="card-title">\u4EE3\u7F34\u660E\u7EC6</div>'+ph+'</div>';
   }catch(e){}
@@ -993,12 +1660,6 @@ function renderExpenses(){
     renderBackupStat();
     var year=parseInt(s.value)||getYear();
     var filterRoomId=rs?rs.value:'';
-    $('waterExpense').innerHTML=row('\u603B\u6C34\u8868\u53F7','0213000522')+row('\u63A5\u6C34\u70B9','000235433')+row('\u6C34\u4EF7','3.56 \u5143/\u5428')+row('\u63D0\u793A','\u53EF\u5728\u7ED3\u7B97\u4E2D\u6309\u623F\u95F4\u81EA\u52A8\u8BA1\u7B97\u6C34\u8D39');
-    var mh='<table class="expense-table"><tr><th>\u623F\u53F7</th><th>\u7535\u8868\u53F7</th><th>\u64CD\u4F5C</th></tr>';
-    for(var i=0;i<DB.rooms.length;i++){var r=DB.rooms[i];mh+='<tr><td><strong>'+r.number+'</strong></td><td>'+(r.elecMeter||'<span style="color:var(--text3)">\u672A\u8BBE\u7F6E</span>')+'</td><td><button class="btn btn-sm btn-outline" style="padding:2px 7px" onclick="showAddRoomModal(findRoomById(\''+r.id+'\'))">\u8BBE\u7F6E</button></td></tr>'}
-    mh+='</table>';
-    $('meterNumbers').innerHTML=DB.rooms.length?mh:'<div class="empty-state"><p>\u8BF7\u5148\u6DFB\u52A0\u623F\u95F4</p></div>';
-
     // Filter helpers
     var fb=[],fm=[],fp=[];
     for(var i=0;i<DB.bills.length;i++){
@@ -1075,19 +1736,42 @@ function backupDownload(){
   try{
     var data=collectBackupData(),json=JSON.stringify(data);
     var ts=new Date(),fname='\u51FA\u79DF\u7BA1\u7406\u5907\u4EFD_'+ts.getFullYear()+pad(ts.getMonth()+1)+pad(ts.getDate())+'.json';
-    var blob=new Blob([json],{type:'application/json'}),url=URL.createObjectURL(blob);
-    var a=document.createElement('a');a.href=url;a.download=fname;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(function(){URL.revokeObjectURL(url)},2000);toast('\u5907\u4EFD\u5DF2\u4E0B\u8F7D');
-  }catch(e){toast('\u4E0B\u8F7D\u5931\u8D25')}
+    var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
+    if(isCap){
+      // APK 环境：写入手机存储，并明确告知存放路径
+      doCapacitorSave(json,fname,function(uri){
+        if(uri){
+          toast('\u2705 \u5DF2\u4FDD\u5B58\uFF1A\u6587\u4EF6\u7BA1\u7406 > Download > '+fname+'\n\u53EF\u7528\u6587\u4EF6\u7BA1\u7406\u67E5\u627E');
+        }else{
+          toast('\u4FDD\u5B58\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u5B58\u50A8\u6743\u9650');
+        }
+      });
+    }else{
+      // 浏览器环境：Blob 下载
+      var blob=new Blob([json],{type:'application/json'}),url=URL.createObjectURL(blob);
+      var a=document.createElement('a');a.href=url;a.download=fname;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(function(){URL.revokeObjectURL(url)},2000);
+      toast('\u2705 \u5907\u4EFD\u5DF2\u4E0B\u8F7D\uFF1A'+fname);
+    }
+  }catch(e){toast('\u4E0B\u8F7D\u5931\u8D25:'+e.message)}
 }
 
 function backupText(){
   try{
     var json=JSON.stringify(collectBackupData());
+    $('backupTextShow').value=json;
+    openModal('modalBackupText');
+  }catch(e){toast('\u751F\u6210\u5931\u8D25')}
+}
+
+function copyBackupTextNow(){
+  try{
+    var ta=$('backupTextShow');ta.focus();ta.select();
+    var text=ta.value;
     if(navigator.clipboard&&navigator.clipboard.writeText){
-      navigator.clipboard.writeText(json).then(function(){toast('\u5907\u4EFD\u6587\u672C\u5DF2\u590D\u5236')}).catch(function(){fallbackCopy(json)});
-    }else{fallbackCopy(json)}
+      navigator.clipboard.writeText(text).then(function(){toast('\u2705 \u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F')}).catch(function(){fallbackCopy(text)});
+    }else{fallbackCopy(text)}
   }catch(e){toast('\u590D\u5236\u5931\u8D25')}
 }
 
@@ -1096,7 +1780,7 @@ function fallbackCopy(text){
     var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.top='-1000px';ta.style.fontSize='12px';
     document.body.appendChild(ta);ta.focus();ta.select();
     var ok=document.execCommand('copy');document.body.removeChild(ta);
-    toast(ok?'\u5907\u4EFD\u6587\u672C\u5DF2\u590D\u5236':'\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u624B\u52A8\u957F\u6309\u9009\u62E9\u6587\u672C\u590D\u5236');
+    toast(ok?'\u2705 \u5DF2\u590D\u5236\u5230\u526A\u8D34\u677F':'\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u957F\u6309\u9009\u4E2D\u6587\u672C\u624B\u52A8\u590D\u5236');
   }catch(e){alert('\u590D\u5236\u5931\u8D25\uFF0C\u8BF7\u6539\u7528\u4E0B\u8F7D\u5907\u4EFD\u6587\u4EF6')}
 }
 
@@ -1146,21 +1830,21 @@ function renderBackupStat(){
 }
 
 // ========== DASHBOARD ==========
-function renderAll(){try{renderAllRooms();renderDashStats();renderQuickActions();renderRecentMaint()}catch(e){}}
+function renderAll(){try{renderAllRooms();renderDashStats();renderQuickActions()}catch(e){}}
 
 function renderDashStats(){
   try{
     var totalRooms=DB.rooms.length,rented=0;
-    for(var i=0;i<DB.rooms.length;i++){if(DB.rooms[i].tenant)rented++}
+    for(var i=0;i<DB.rooms.length;i++){if(!DB.rooms[i].isVacant)rented++}
     var monthRent=0;
-    for(var i=0;i<DB.rooms.length;i++)monthRent+=(DB.rooms[i].rent||0);
+    for(var i=0;i<DB.rooms.length;i++){if(!DB.rooms[i].isVacant)monthRent+=(DB.rooms[i].rent||0)}
     var thisMonth=getYear()+'-'+pad(getMonth()),mIncome=0,mMaintCost=0,mPayCost=0;
     for(var i=0;i<DB.bills.length;i++){var b=DB.bills[i];if(b.date&&b.date.indexOf(thisMonth)===0)mIncome+=(b.rent||0)+(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.otherCost||0)+(b.depositChange||0)}
     for(var i=0;i<DB.maint.length;i++){if(DB.maint[i].date&&DB.maint[i].date.indexOf(thisMonth)===0)mMaintCost+=DB.maint[i].cost}
     for(var i=0;i<DB.payments.length;i++){if(DB.payments[i].date&&DB.payments[i].date.indexOf(thisMonth)===0)mPayCost+=DB.payments[i].cost}
     $('dashStats').innerHTML=
       '<div class="stat-card"><div class="num">'+totalRooms+'</div><div class="label">\u603B\u623F\u95F4\u6570 ('+rented+'\u5DF2\u79DF)</div></div>'+
-      '<div class="stat-card success"><div class="num">\u00A5'+fmt(monthRent)+'</div><div class="label">\u6708\u623F\u91D1\u603B\u989D</div></div>'+
+      '<div class="stat-card success"><div class="num">\u00A5'+fmt(monthRent)+'</div><div class="label">\u6708\u623F\u79DF\u603B\u989D</div></div>'+
       '<div class="stat-card"><div class="num">\u00A5'+fmt(mIncome)+'</div><div class="label">\u672C\u6708\u51C0\u6536\u5165</div></div>'+
       '<div class="stat-card danger"><div class="num">\u00A5'+fmt(mMaintCost+mPayCost)+'</div><div class="label">\u672C\u6708\u652F\u51FA</div></div>';
   }catch(e){}
@@ -1176,18 +1860,6 @@ function renderQuickActions(){
   }catch(e){}
 }
 
-function renderRecentMaint(){
-  try{
-    var list=[];
-    for(var i=0;i<DB.maint.length;i++)list.push(DB.maint[i]);
-    list.sort(function(a,b){return new Date(b.date)-new Date(a.date)});
-    var recent=list.slice(0,5);
-    if(recent.length===0){$('recentMaint').innerHTML='<div class="empty-state" style="padding:20px"><p style="font-size:12.5px">\u6682\u65E0\u7EF4\u4FEE\u8BB0\u5F55</p></div>';return}
-    var h='';
-    for(var i=0;i<recent.length;i++){var m=recent[i];h+='<div class="maint-item"><div class="maint-date">'+fmtDate(m.date)+'</div><div class="maint-content"><div class="maint-desc">'+m.desc+'</div></div><div class="maint-cost">-\u00A5'+fmt(m.cost)+'</div></div>'}
-    $('recentMaint').innerHTML=h;
-  }catch(e){}
-}
 
 // ========== INIT ==========
 function initData(){
@@ -1207,17 +1879,7 @@ function initData(){
   }
 }
 
-function detectPlatform(){
-  try{
-    if(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()){var ig=$('installGuide');if(ig)ig.style.display='none';return;}
-    var ua=navigator.userAgent||'',isIOS=/iPad|iPhone|iPod/.test(ua)&&!/Windows/.test(ua),isAndroid=/Android/.test(ua),isWeChat=/MicroMessenger/i.test(ua);
-    var t=$('igTitle'),d=$('igDesc');if(!t||!d)return;
-    if(isWeChat){t.textContent='\u26A0\uFE0F \u8BF7\u5728\u7CFB\u7EDF\u6D4F\u89C8\u5668\u4E2D\u5B89\u88C5';d.textContent='\u5F53\u524D\u5728\u5FAE\u4FE1\u4E2D\u6253\u5F00\u3002\u8BF7\u70B9\u53F3\u4E0A\u89D2 \u22EF \u2192 \u5728\u6D4F\u89C8\u5668\u4E2D\u6253\u5F00 \u2192 \u518D\u6309\u5B89\u535C/\u82F9\u679C\u6B65\u9AA4\u64CD\u4F5C'}
-    else if(isIOS){t.textContent='\u6DFB\u52A0\u5230 iPhone \u4E3B\u5C4F\u5E55';d.textContent='\u70B9\u5E95\u90E8\u7684 \uD83D\uCEEF \u5206\u4EAB\u6309\u94AE \u2192 \u627E\u5230"\u6DFB\u52A0\u5230\u4E3B\u5C4F\u5E55" \u2192 \u70B9\u6DFB\u52A0'}
-    else if(isAndroid){t.textContent='\u6DFB\u52A0\u5230\u624B\u673A\u4E3B\u5C4F\u5E55';d.textContent='\u70B9\u53F3\u4E0A\u89D2 \u22EF\uFF08\u4E09\u4E2A\u70B9\uFF09\u2192 "\u6DFB\u52A0\u5230\u4E3B\u5C4F\u5E55" \u6216 "\u5B89\u88C5\u5E94\u7528" \u2192 \u786E\u8BA4'}
-    else{t.textContent='\u5B89\u88C5\u5230\u7535\u8111/\u624B\u673A';d.textContent='Chrome/Edge: \u70B9\u5730\u5740\u680F\u53F4\u4FA7 \u2B07 \u6216\u83DC\u5355 \u2192 \u5B89\u88C5\u6B64\u7AD9\u70B9\u4E3A\u5E94\u7528'}
-  }catch(e){}
-}
+function detectPlatform(){}
 
 // ===== BOOTSTRAP ===== //
 function startApp(){try{detectPlatform();DB.load().then(function(){try{initData();renderAll();}catch(e){console.error('Init error:',e);alert('\u521D\u59CB\u5316\u51FA\u9519\uFF0C\u8BF7\u91CD\u8BD5')}})}catch(e){}}
