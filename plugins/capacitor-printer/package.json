@@ -1,0 +1,18 @@
+{
+  "name": "@capacitor/printer",
+  "version": "1.0.0",
+  "description": "Native HTML printing via Android WebView PrintManager",
+  "main": "dist/plugin.js",
+  "types": "dist/plugin.d.ts",
+  "capacitor": {
+    "android": {
+      "src": "android"
+    },
+    "web": {
+      "src": "dist"
+    }
+  },
+  "peerDependencies": {
+    "@capacitor/core": "^5.0.0"
+  }
+}

@@ -964,7 +964,7 @@ function printBilling(){
       // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
       if(!doNativePrint(content,filename)){
         doCapacitorSave(content,filename,function(ok,loc,reason){
-          if(ok) toast('打印页已保存：'+capSaveLocText(loc,filename)+'\n用文件管理器打开可打印');
+          if(ok) toast('打印页已保存：'+capSaveLocText(loc,filename)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
           else toast(capSaveErrText(reason,'保存'));
         });
       }
@@ -987,7 +987,7 @@ function exportBilling(){
     if(isCap){
       // APK 环境：通过 Capacitor Filesystem 写入文件
       doCapacitorSave(content,filename,function(ok,loc,reason){
-        if(ok)toast('已导出！保存在 '+capSaveLocText(loc,filename)+'\n用浏览器打开后可打印/存PDF');
+        if(ok)toast('已导出！保存在 '+capSaveLocText(loc,filename)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
         else toast(capSaveErrText(reason,'导出'));
       });
     }else{
@@ -1075,13 +1075,13 @@ function capSaveLocText(loc,fname){
   return fname;
 }
 
-// 原生打印：调用 @capacitor/print 弹出系统打印框（含"另存为PDF"），不依赖任何浏览器
+// 原生打印：调用自定义 @capacitor/printer 插件（Android WebView + 系统 PrintManager）弹出系统打印框（含"另存为PDF"），不依赖任何浏览器
 // 返回 true 表示已调起原生打印；false 表示插件不可用，调用方需降级为保存HTML文件
 function doNativePrint(html,name){
   try{
-    var Print=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Print);
-    if(!Print){return false;}
-    Print.print({html:html,name:name||'出租房管理系统'})
+    var Printer=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Printer);
+    if(!Printer){return false;}
+    Printer.print({html:html,name:name||'出租房管理系统'})
       .then(function(){toast('已调起系统打印');})
       .catch(function(e){toast('打印失败：'+((e&&e.message)||e));});
     return true;
@@ -1238,7 +1238,7 @@ function printMaint(){
       // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
       if(!doNativePrint(fullHtml,fname)){
         doCapacitorSave(fullHtml,fname,function(ok,loc,reason){
-          if(ok) toast('打印页已保存：'+capSaveLocText(loc,fname)+'\n用文件管理器打开可打印');
+          if(ok) toast('打印页已保存：'+capSaveLocText(loc,fname)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
           else toast(capSaveErrText(reason,'保存'));
         });
       }
@@ -1285,7 +1285,7 @@ function exportMaint(){
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
       doCapacitorSave(content,fname,function(ok,loc,reason){
-        if(ok)toast('已导出！保存在 '+capSaveLocText(loc,fname)+'\n用浏览器打开后可打印/存PDF');
+        if(ok)toast('已导出！保存在 '+capSaveLocText(loc,fname)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');
         else toast(capSaveErrText(reason,'导出'));
       });
     }else{
@@ -1413,7 +1413,7 @@ function printPay(){
       var pf=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
       // APK 环境：调起系统打印框（含"另存为PDF"），不依赖浏览器
       if(!doNativePrint(content,pf)){
-        doCapacitorSave(content,pf,function(ok,loc,reason){if(ok)toast('打印页已保存：'+capSaveLocText(loc,pf)+'\n用文件管理器打开可打印');else toast(capSaveErrText(reason,'保存'))});
+        doCapacitorSave(content,pf,function(ok,loc,reason){if(ok)toast('打印页已保存：'+capSaveLocText(loc,pf)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');else toast(capSaveErrText(reason,'保存'))});
       }
     }else{
       var w=window.open('','','width=900,height=800');
@@ -1445,7 +1445,7 @@ function exportPay(){
       +'</body></html>';
     if(window.Capacitor&&Capacitor.isNativePlatform()){
       var ef=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
-      doCapacitorSave(content,ef,function(ok,loc,reason){if(ok)toast('已导出！保存在 '+capSaveLocText(loc,ef)+'\n用浏览器打开后可打印/存PDF');else toast(capSaveErrText(reason,'导出'))});
+      doCapacitorSave(content,ef,function(ok,loc,reason){if(ok)toast('已导出！保存在 '+capSaveLocText(loc,ef)+'\n用Chrome浏览器打开→菜单→打印→另存为PDF');else toast(capSaveErrText(reason,'导出'))});
     }else{
       var blob=new Blob([content],{type:'text/html;charset=utf-8'});
       var url=URL.createObjectURL(blob);
