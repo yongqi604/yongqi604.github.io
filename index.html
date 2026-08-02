@@ -199,6 +199,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 
 <!-- PAGE: Pay (代缴水电费) -->
 <div class="page" id="pagePay">
+  <div class="card">
+    <div class="card-title">⚙️ 公共/总表单价设置</div>
+    <div class="backup-hint">代缴选择"公共/总表"时没有对应房间，单价在此统一设置（例如公共水费 3.56 元/吨）。</div>
+    <div class="form-row"><div class="form-group"><label>电费单价 (元/度)</label><input id="pubElecPrice" type="number" step="0.01"></div><div class="form-group"><label>水费单价 (元/吨)</label><input id="pubWaterPrice" type="number" step="0.01"></div></div>
+    <div class="form-row"><div class="form-group"><label>燃气单价 (元/m³)</label><input id="pubGasPrice" type="number" step="0.01"></div><div class="form-group"></div></div>
+    <div class="btn-group"><button class="btn btn-primary btn-sm" onclick="savePublicPrices()">保存设置</button></div>
+  </div>
   <div class="selector"><select id="payYearSelect" onchange="renderPay()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printPayBtn" onclick="printPay()" style="display:none">📙 打印</button><button class="btn btn-primary btn-sm" id="exportPayBtn" onclick="exportPay()" style="display:none">📋 导出</button><button class="btn btn-primary btn-sm" onclick="showAddPayModal()">+ 记录代缴</button></div>
   <div class="card"><div class="card-title" id="paySummaryTitle">年度代缴汇总</div><div id="paySummary"></div></div>
   <div id="payList"></div>
@@ -278,7 +285,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <div class="modal-overlay" id="modalPay"><div class="modal">
   <div class="modal-header"><span>记录代缴水电费</span><button class="modal-close" onclick="closeModal('modalPay')">✕</button></div>
   <input type="hidden" id="payId">
-  <div class="form-row"><div class="form-group"><label>日期</label><input id="payDate" type="date"></div><div class="form-group"><label>房号 *</label><select id="payRoom"><option value="">选择房号</option></select></div></div>
+  <div class="form-row"><div class="form-group"><label>日期</label><input id="payDate" type="date"></div><div class="form-group"><label>房号（公共选第一项）</label><select id="payRoom"><option value="">公共/总表</option></select></div></div>
   <div class="meter-table-wrap">
     <div class="meter-th"><span class="mt-label"></span><span>读数</span><span>用量</span><span>单价</span><span>金额(元)</span></div>
     <div class="meter-row-t"><label>⚡电</label><input id="pElecRead" type="number" placeholder="读数" oninput="onPayReadChange('elec')"><input id="pElecUsage" type="number" placeholder="用量"><input id="pElecPrice" type="number" placeholder="单价"><input id="pElecCost" type="number" placeholder="金额"></div>
@@ -341,9 +348,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <script>
 window.onerror=function(m){try{var t=document.getElementById('toast');if(t){t.textContent='⚠️ 出错:'+m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4000);}}catch(e){}return false;};
 // ========== Data Store ==========
-var DB={rooms:[],bills:[],maint:[],payments:[],
+var DB={rooms:[],bills:[],maint:[],payments:[],publicPrices:{elec:1,water:5,gas:0},
  _useFile:function(){try{return !!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem)}catch(e){return false}},
- _loadLocal:function(){try{this.rooms=JSON.parse(localStorage.getItem('cz_rooms')||'[]');this.bills=JSON.parse(localStorage.getItem('cz_bills')||'[]');this.maint=JSON.parse(localStorage.getItem('cz_maint')||'[]');this.payments=JSON.parse(localStorage.getItem('cz_payments')||'[]')}catch(e){this.rooms=[];this.bills=[];this.maint=[];this.payments=[]}},
+ _loadLocal:function(){try{this.rooms=JSON.parse(localStorage.getItem('cz_rooms')||'[]');this.bills=JSON.parse(localStorage.getItem('cz_bills')||'[]');this.maint=JSON.parse(localStorage.getItem('cz_maint')||'[]');this.payments=JSON.parse(localStorage.getItem('cz_payments')||'[]');var pp=JSON.parse(localStorage.getItem('cz_publicPrices')||'null');this.publicPrices=(pp&&typeof pp==='object')?pp:{elec:1,water:5,gas:0}}catch(e){this.rooms=[];this.bills=[];this.maint=[];this.payments=[];this.publicPrices={elec:1,water:5,gas:0}}},
  load:function(){var self=this;return new Promise(function(res){try{
    self._loadLocal();
    if(sbClient&&currentUser){
@@ -351,15 +358,16 @@ var DB={rooms:[],bills:[],maint:[],payments:[],
        if(r.data&&r.data.data){var d=r.data.data;
          var merged=mergeData({rooms:self.rooms,bills:self.bills,maint:self.maint,payments:self.payments},{rooms:d.rooms||[],bills:d.bills||[],maint:d.maint||[],payments:d.payments||[]});
          self.rooms=merged.rooms;self.bills=merged.bills;self.maint=merged.maint;self.payments=merged.payments;
+         if(d.publicPrices&&typeof d.publicPrices==='object')self.publicPrices=d.publicPrices;
          self.save();
        }
        res();
      }).catch(function(){res()});
    }else{res()}
  }catch(e){res()}})},
- save:function(){try{var data={rooms:this.rooms,bills:this.bills,maint:this.maint,payments:this.payments};
+ save:function(){try{var data={rooms:this.rooms,bills:this.bills,maint:this.maint,payments:this.payments,publicPrices:this.publicPrices};
    if(this._useFile()){Capacitor.Plugins.Filesystem.writeFile({path:'rental-data.json',data:JSON.stringify(data),directory:'DOCUMENTS',encoding:'utf8'}).catch(function(e){console.log('save file err',e)})}
-   else{localStorage.setItem('cz_rooms',JSON.stringify(this.rooms));localStorage.setItem('cz_bills',JSON.stringify(this.bills));localStorage.setItem('cz_maint',JSON.stringify(this.maint));localStorage.setItem('cz_payments',JSON.stringify(this.payments))}
+   else{localStorage.setItem('cz_rooms',JSON.stringify(this.rooms));localStorage.setItem('cz_bills',JSON.stringify(this.bills));localStorage.setItem('cz_maint',JSON.stringify(this.maint));localStorage.setItem('cz_payments',JSON.stringify(this.payments));localStorage.setItem('cz_publicPrices',JSON.stringify(this.publicPrices))}
    if(sbClient&&currentUser)scheduleSync();
  }catch(e){}}
 };
@@ -1496,6 +1504,11 @@ function showAddPayModal(record){
       if(!$('pElecPrice').value)$('pElecPrice').value=ro.elecPrice||1;
       if(!$('pWaterPrice').value)$('pWaterPrice').value=ro.waterPrice||5;
       if(!$('pGasPrice').value)$('pGasPrice').value=ro.gasPrice||0;
+    }else{
+      // 公共/总表：单价取全局 publicPrices
+      if(!$('pElecPrice').value)$('pElecPrice').value=DB.publicPrices.elec!=null?DB.publicPrices.elec:1;
+      if(!$('pWaterPrice').value)$('pWaterPrice').value=DB.publicPrices.water!=null?DB.publicPrices.water:5;
+      if(!$('pGasPrice').value)$('pGasPrice').value=DB.publicPrices.gas!=null?DB.publicPrices.gas:0;
     }
     if(record)recalcPayTotal();
     openModal('modalPay');
@@ -1520,7 +1533,7 @@ function fillPayRoomOptions(){
 
 function savePay(){
   try{
-    var roomId=$('payRoom').value;if(!roomId){toast('\u8BF7\u9009\u62E9\u623F\u53F7');return}
+    var roomId=$('payRoom').value;
     var date=$('payDate').value;if(!date){toast('\u8BF7\u9009\u62E9\u65E5\u671F');return}
     var remain=[];
     for(var i=0;i<DB.payments.length;i++){var p=DB.payments[i];if(!(p.roomId===roomId&&p.date===date))remain.push(p);}
@@ -1544,7 +1557,7 @@ function savePay(){
 // 代缴：读数变化 → 查找同房号上一次同类型读数，自动算用量和金额
 function onPayReadChange(type){
   try{
-    var roomId=$('payRoom').value;if(!roomId)return;
+    var roomId=$('payRoom').value;
     var ro=findRoomById(roomId);
     var readMap={elec:'pElecRead',water:'pWaterRead',gas:'pGasRead'};
     var usageMap={elec:'pElecUsage',water:'pWaterUsage',gas:'pGasUsage'};
@@ -1554,21 +1567,26 @@ function onPayReadChange(type){
     var typeKw={elec:'电',water:'水',gas:'燃气'};
     var kw=typeKw[type];
     var cur=parseFloat($(readMap[type]).value)||0;
-    // 查找同房号、同类型、最近一笔有读数的代缴（排除当前编辑的记录）
+    // 查找同房号、同类型、最近一笔（按日期）有读数的代缴作为"上一次读数"（排除当前编辑的记录）
     var prevReading=0;
     var curId=$('payId').value||'';
-    for(var i=DB.payments.length-1;i>=0;i--){
+    var curDate=$('payDate').value||'';
+    var bestDate=null;
+    for(var i=0;i<DB.payments.length;i++){
       var p=DB.payments[i];
       var pt=String(p.type||'').replace(/[\s💧⚡🔥📦]/g,''); // 去掉图标/空格
       if(p.roomId===roomId&&pt.indexOf(kw)>=0&&p.reading>0&&p.id!==curId){
-        prevReading=p.reading;break;
+        var pd=p.date||'';
+        // 跳过晚于当前记录日期的（避免选到"之后"的记录）；其余取日期最大者为上一次
+        if(curDate&&pd>curDate)continue;
+        if(bestDate===null||pd>bestDate){bestDate=pd;prevReading=p.reading;}
       }
     }
     var usage=Math.max(0,cur-prevReading);
     $(usageMap[type]).value=usage||(usage===0?'0':'');
-    // 单价默认从房间设置取
+    // 单价默认：有房间的取房间设置；公共/总表取全局 publicPrices
     var priceKeyMap={elec:'elecPrice',water:'waterPrice',gas:'gasPrice'};
-    var defaultPrice=ro?(ro[priceKeyMap[type]]||1):1;
+    var defaultPrice=ro?(ro[priceKeyMap[type]]||1):(DB.publicPrices[priceKeyMap[type]]!=null?DB.publicPrices[priceKeyMap[type]]:1);
     if(!$(priceMap[type]).value)$(priceMap[type]).value=defaultPrice;
     var price=parseFloat($(priceMap[type]).value)||defaultPrice;
     // 若金额未被手动改过则自动算
@@ -1613,6 +1631,12 @@ function deletePay(id){
 
 function renderPay(){
   try{
+    // 填充公共/总表单价设置输入框
+    try{
+      if($('pubElecPrice'))$('pubElecPrice').value=DB.publicPrices.elec!=null?DB.publicPrices.elec:'';
+      if($('pubWaterPrice'))$('pubWaterPrice').value=DB.publicPrices.water!=null?DB.publicPrices.water:'';
+      if($('pubGasPrice'))$('pubGasPrice').value=DB.publicPrices.gas!=null?DB.publicPrices.gas:'';
+    }catch(e){}
     var s=$('payYearSelect'),y=getYear(),h='';
     var cur=s?s.value:'';
     for(var i=y-2;i<=y+1;i++)h+='<option value="'+i+'"'+(i===y?' selected':'')+'>'+i+'</option>';
@@ -1739,8 +1763,21 @@ function renderExpenses(){
   }catch(e){}
 }
 
+// 公共/总表单价设置保存
+function savePublicPrices(){
+  try{
+    DB.publicPrices={
+      elec:Number($('pubElecPrice').value)||0,
+      water:Number($('pubWaterPrice').value)||0,
+      gas:Number($('pubGasPrice').value)||0
+    };
+    DB.save();
+    toast('\u5DF2\u4FDD\u5B58\u516C\u5171\u5355\u4EF7\u8BBE\u7F6E');
+  }catch(e){toast('\u4FDD\u5B58\u5931\u8D25')}
+}
+
 // ========== BACKUP / RESTORE ==========
-function collectBackupData(){return{version:2,exportTime:fmtDateFull(new Date()),rooms:DB.rooms,bills:DB.bills,maint:DB.maint,payments:DB.payments}}
+function collectBackupData(){return{version:2,exportTime:fmtDateFull(new Date()),rooms:DB.rooms,bills:DB.bills,maint:DB.maint,payments:DB.payments,publicPrices:DB.publicPrices}}
 
 function backupDownload(){
   try{
@@ -1831,6 +1868,7 @@ function applyRestore(text,mode){
       for(var i=0;i<DB.payments.length;i++)cp[DB.payments[i].id]=true;
       for(var i=0;i<np.length;i++){if(!cp[np[i].id])DB.payments.push(np[i])}
     }else{DB.rooms=nr;DB.bills=nb;DB.maint=nm;DB.payments=np}
+    if(parsed.publicPrices&&typeof parsed.publicPrices==='object')DB.publicPrices=parsed.publicPrices;
     DB.save();closeModal('modalPasteRestore');renderAll();renderExpenses();toast('\u6062\u590D\u6210\u529F');
   }catch(e){toast('\u6062\u590D\u5931\u8D25\uFF1A\u6587\u672C\u683C\u5F0F\u9519\u8BEF')}
 }
