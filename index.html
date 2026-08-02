@@ -1036,29 +1036,27 @@ function buildPrintContent(d){
 
 // ========== Capacitor 文件保存工具 ==========
 // 原生环境用 Filesystem 插件写入，web环境降级为Blob下载
+// 注意：必须与 DB.save() 保持一致的调用方式（encoding:'utf8'+纯字符串），该方式已验证可用
 function doCapacitorSave(content,filename,callback){
   try{
-    // 优先 Capacitor.Plugins（原生APK标准路径），兼容旧版 CapacitorPlugins
     var fs=null;
     if(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem) fs=Capacitor.Plugins.Filesystem;
     else if(window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem) fs=window.CapacitorPlugins.Filesystem;
     if(!fs){
-      // 插件未注入：通常是装了不含 Filesystem 的旧版/错误 APK
-      console.error('doCapacitorSave: Filesystem 插件不可用（Capacitor.Plugins.Filesystem 为 undefined）');
+      console.error('doCapacitorSave: Filesystem 插件不可用');
       callback(false,'','filesystem_unavailable');
       return;
     }
-    var b64=btoa(unescape(encodeURIComponent(content)));
-    // 策略1：EXTERNAL_STORAGE/Download（公共下载目录，文件管理器可见，用户可打开转PDF）
-    fs.writeFile({path:'Download/'+filename,data:b64,directory:'EXTERNAL_STORAGE',encoding:'base64'})
+    // 策略1：EXTERNAL_STORAGE/Download（公共下载目录）
+    fs.writeFile({path:'Download/'+filename,data:content,directory:'EXTERNAL_STORAGE',encoding:'utf8'})
     .then(function(){callback(true,'download','')})
     .catch(function(e1){
-      console.error('doCapacitorSave: EXTERNAL_STORAGE 写入失败',e1);
-      // 策略2：DOCUMENTS（App私有目录，兜底保证不报错，但文件管理器可能看不到）
-      fs.writeFile({path:filename,data:b64,directory:'DOCUMENTS',encoding:'base64'})
+      console.error('doCapacitorSave: EXTERNAL_STORAGE 失败',e1);
+      // 策略2：DOCUMENTS（App私有目录，与 DB.save() 相同的已验证路径）
+      fs.writeFile({path:filename,data:content,directory:'DOCUMENTS',encoding:'utf8'})
       .then(function(){callback(true,'documents','')})
       .catch(function(e2){
-        console.error('doCapacitorSave: DOCUMENTS 也写入失败',e2);
+        console.error('doCapacitorSave: DOCUMENTS 也失败',e2);
         callback(false,'','write_failed');
       });
     });
