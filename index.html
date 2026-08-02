@@ -94,27 +94,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .backup-hint{font-size:11.5px;color:var(--text3);margin-top:8px;line-height:1.5}
 .login-bar{display:flex;align-items:center;justify-content:space-between;background:#E3F2FD;padding:8px 14px;font-size:13px;color:#1565C0;margin-bottom:8px}
 .login-bar button{margin-left:8px}
-/* ===== 年度结算明细打印（仿手工账本表格） ===== */
-.ledger-sheet{background:#fff;color:#000;padding:0;font-family:'SimSun','Songti SC',serif}
+/* ===== 年度结算明细打印/导出（仿手工账本——A4分页） ===== */
+.ledger-sheet{background:#fff;color:#000;padding:0;font-family:'SimSun','Songti SC',serif;width:210mm;min-height:297mm;margin:0 auto;box-sizing:border-box}
 .ls-head{text-align:center;padding:10px 0 4px;border-bottom:2px solid #333}
 .ls-head h1{font-size:24px;font-weight:700;letter-spacing:8px;margin:0}
 .ls-meta{display:flex;justify-content:center;gap:28px;font-size:14px;margin-top:8px;color:#000}
-.ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5}
+.ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5;table-layout:fixed}
 .ledger-table th,.ledger-table td{border:1.5px solid #333;padding:3px 5px;text-align:center;vertical-align:middle}
 .lt-blk-title td{background:#F5F5F5;font-weight:700;font-size:12px}
 .lt-blk-row td{height:26px}
-.lt-blk-label{font-weight:600;width:36px;background:#FAFAFA}
-.lt-date-cell{writing-mode:vertical-rl;text-orientation:mixed;font-size:13px;font-weight:600;letter-spacing:2px;width:38px;background:#F9F9F9}
+.lt-blk-label{font-weight:600;width:32px;background:#FAFAFA}
+.lt-date-cell{writing-mode:vertical-rl;text-orientation:mixed;font-size:13px;font-weight:600;letter-spacing:2px;width:34px;background:#F9F9F9}
 .lt-summary{font-weight:600}
 .lt-total-row td{font-weight:700;font-size:13px;background:#F0F0F0}
-.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:6px}
+.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}
 .lt-grand td{font-weight:700;font-size:14px;background:#E8E8E8;border-width:2px 1.5px}
 .ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}
+/* 分页：每页一个 ledger-sheet，page-break */
+.ledger-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 12mm;box-sizing:border-box;background:#fff}
+.ledger-page:last-child{page-break-after:auto}
+/* 空行占位 */
+.lt-empty-row td{height:26px;border-color:#ddd;color:#ccc}
 @media print{
   body *{visibility:hidden!important}
   #printArea,#printArea *{visibility:visible!important}
   #printArea{position:absolute;left:0;top:0;width:100%;padding:0}
-  @page{size:A4 landscape;margin:12mm}
+  .ledger-page{width:100%;min-height:0;padding:10mm 8mm;margin:0;page-break-after:always}
+  .ledger-page:last-child{page-break-after:auto}
+  @page{size:A4 landscape;margin:8mm}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -143,7 +150,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 
 <!-- PAGE: Billing -->
 <div class="page" id="pageBilling">
-  <div class="selector"><select id="billRoomSelect" onchange="onBillSelectChange()"><option value="">选择房号</option></select><select id="billYearSelect" onchange="onBillSelectChange()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printBillBtn" onclick="printBilling()" style="display:none">🖨 打印</button></div>
+  <div class="selector"><select id="billRoomSelect" onchange="onBillSelectChange()"><option value="">选择房号</option></select><select id="billYearSelect" onchange="onBillSelectChange()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="exportBillBtn" onclick="exportBilling()" style="display:none;margin-right:6px">📄 导出</button><button class="btn btn-primary btn-sm" id="printBillBtn" onclick="printBilling()" style="display:none">🖨 打印</button></div>
   <div id="billingContent"></div>
   <div id="printArea"></div>
 </div>
@@ -481,16 +488,16 @@ function showRoomDetail(id){
       for(var si=Math.max(0,roomBills.length-5);si<roomBills.length;si++){
         var b=roomBills[si],bt=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.rent||0)+(b.depositChange||0);
         h+='<div class="billing-month"><span>'+fmtDate(b.date)+'</span><span>\u00A5'+fmt(bt)+
-          ' <button class="btn btn-sm btn-outline" style="padding:2px 7px;margin-left:4px" onclick="editBill(\''+b.id+'\')">\u270E</button>'+
-          ' <button class="btn btn-sm btn-danger" style="padding:2px 7px" onclick="deleteBill(\''+b.id+'\')">\u2715</button></span></div><div class="billing-body">';
+          ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
+          ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
         h+='<div class="billing-row header"><span></span><span>\u9879\u76EE</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
         if(b.elecRead!=null)h+=bRow('electric','\u26A1','\u7535','('+fmt(r.elecPrice)+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
         if(b.waterRead!=null)h+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(r.waterPrice)+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
         if(b.gasRead!=null)h+=bRow('gas','\uD83D\uDD25','\u71C3\u6C14','('+fmt(r.gasPrice)+'\u5143/m\xB3)',b.gasRead,b.gasUsage,b.gasCost);
-        if(b.otherCost)h+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost,'green');
-        h+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,'green');
+        if(b.otherCost)h+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost,null,'green');
+        h+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
         if(b.depositChange)h+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
-        if(b.note)h+='<div class="billing-row" style="grid-column:1/-1;color:var(--text3);font-size:10.5px">\uD83D\uDCDD '+b.note+'</div>';
+        if(b.note)h+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
         h+='<div class="billing-total">\u672C\u6708\u5408\u8BA1:\u00A5'+fmt(bt)+'</div></div>';
       }
       h+='</div>';
@@ -513,7 +520,7 @@ function findRoomById(id){for(var i=0;i<DB.rooms.length;i++)if(DB.rooms[i].id===
 function bRow(cls,ic,lbl,sub,rd,us,cst,extra,color){
   var c=color?'class="'+color+'"':'';
   var sign=extra>0?'+':'';
-  var extraStr=extra?(sign+fmt(extra)):(cst!=null?fmt(cst):'');
+  var extraStr=(extra!=null)?(sign+fmt(extra)):((cst!=null)?fmt(cst):'');
   return '<div class="billing-row"><span class="type-icon type-'+cls+'">'+ic+'</span><span>'+lbl+(sub?' '+sub:'')+'</span><span>'+fmt(rd)+'</span><span>'+fmt(us)+'</span><span '+c+'">'+extraStr+'</span></div>';
 }
 
@@ -641,125 +648,201 @@ function renderBilling(){
           var b=bills[bi],t=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.rent||0)+(b.depositChange||0);
           totalAll+=t;
           html+='<div class="billing-month"><span>'+fmtDate(b.date)+' \u7ED3\u7B97</span><span>\u00A5'+fmt(t)+
-            ' <button class="btn btn-sm btn-outline" style="padding:2px 7px;margin-left:4px" onclick="editBill(\''+b.id+'\')">\u270E</button>'+
-            ' <button class="btn btn-sm btn-danger" style="padding:2px 7px" onclick="deleteBill(\''+b.id+'\')">\u2715</button></span></div><div class="billing-body">';
+            ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
+            ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
           html+='<div class="billing-row header"><span></span><span>\u9879\u76EE</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
           if(b.elecRead!=null)html+=bRow('electric','\u26A1','\u7535','('+fmt(ro.elecPrice)+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
           if(b.waterRead!=null)html+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(ro.waterPrice)+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
           if(b.gasRead!=null)html+=bRow('gas','\uD83D\uDD25','\u71C3\u6C14','('+fmt(ro.gasPrice)+'\u5143/m\xB3)',b.gasRead,b.gasUsage,b.gasCost);
-          html+=bRow('rent','\uD83C\uDFE0','\u623F\u79D1','','','',b.rent,'green');
+          html+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
           if(b.depositChange)html+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
-          if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;color:var(--text3);font-size:10.5px">\uD83D\uDCDD '+b.note+'</div>';
+          if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
           html+='<div class="billing-total">\u672C\u6708\u5408\u8BA1:\u00A5'+fmt(t)+'</div></div>';
         }
-        html='<div class="card" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border:none"><div style="text-align:center;padding:8px"><div style="font-size:12.5px;color:var(--text2)">'+year+'\u5E7C '+(ro?ro.number:'')+' \u7D2F\u8BA1</div><div style="font-size:27px;font-weight:700;color:var(--primary-dark)">\u00A5'+fmt(totalAll)+'</div></div></div>'+html;
+        html='<div class="card" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border:none"><div style="text-align:center;padding:8px"><div style="font-size:12.5px;color:var(--text2)">'+year+'\u5E74 '+(ro?ro.number:'')+' \u7D2F\u8BA1</div><div style="font-size:27px;font-weight:700;color:var(--primary-dark)">\u00A5'+fmt(totalAll)+'</div></div></div>'+html;
         html+='<div style="text-align:center;margin-top:8px"><button class="btn btn-primary" onclick="showAddBillModal(\''+roomId+'\')">+ \u65B0\u5EFA\u7ED3\u7B97</button></div>';
       }
     }
     $('billingContent').innerHTML=html;
-    // 选中房号+年份时显示打印按钮
+    // 选中房号+年份时显示打印/导出按钮
     try{
       var hasRoom=!!roomId, hasData=!hasRoom||bills.length>0;
-      $('printBillBtn').style.display=(hasRoom&&hasData)?'inline-flex':'none';
+      var show=(hasRoom&&hasData)?'inline-flex':'none';
+      $('printBillBtn').style.display=show;
+      $('exportBillBtn').style.display=show;
     }catch(e){}
   }catch(e){}
 }
 
-// ========== 打印年度结算明细（仿手工账本——按用户账本照片格式） ==========
-function printBilling(){
-  try{
-    var roomId=$('billRoomSelect').value;
-    var year=parseInt($('billYearSelect').value)||getYear();
-    if(!roomId){toast('请先选择房号');return}
-    var ro=findRoomById(roomId);
-    var bills=[];
-    for(var i=0;i<DB.bills.length;i++){var b=DB.bills[i];if(b.roomId===roomId&&new Date(b.date).getFullYear()===year)bills.push(b)}
-    bills.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
-    if(bills.length===0){toast(year+'年暂无结算记录');return}
+// ========== 打印/导出年度结算明细（仿手工账本——A4分页版） ==========
 
-    function c(v){return (v==null||v===''||(typeof v==='number'&&isNaN(v)))?'':fmt(v)}
-    // 用量×单价格式
-    function up(u,p){if(u==null)return '';var s=fmt(u);if(p!=null&&p>0)s+='×'+fmt(p);return s}
+// 每页最多放几个结算区块（5行/区块：表头+电+水+燃气+其他/共计）
+var BILLS_PER_PAGE=10;
 
-    var body='';
-    var grandTotal=0;
-    for(var bi=0;bi<bills.length;bi++){
-      var b=bills[bi];
-      var fee=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0);
-      var rent=b.rent||0;
-      var dep=b.depositChange||0;
-      var otherCost=b.otherCost||0;
-      var total=fee+rent+dep+otherCost;
-      grandTotal+=total;
-      var hasElec=(b.elecRead!=null),hasWater=(b.waterRead!=null),hasGas=(b.gasRead!=null);
-      // 固定5行：表头+电+水+燃气+其他(含共计)
-      var nRows=5;
-      var note=(b.note||'');
-      if(dep)note+=(note?'；':'')+'押金'+(dep>0?'+':'')+fmt(dep);
+function buildBillBlock(b,ro){
+  var fee=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0);
+  var rent=b.rent||0;
+  var dep=b.depositChange||0;
+  var otherCost=b.otherCost||0;
+  var total=fee+rent+dep+otherCost;
+  function c(v){return(v==null||v===''||(typeof v==='number'&&isNaN(v)))?'':fmt(v)}
+  function up(u,p){if(u==null)return'';var s=fmt(u);if(p!=null&&p>0)s+='×'+fmt(p);return s}
+  var hasElec=(b.elecRead!=null),hasWater=(b.waterRead!=null),hasGas=(b.gasRead!=null);
+  var nRows=5;
+  var note=(b.note||'');
+  if(dep)note+=(note?'；':'')+'押金'+(dep>0?'+':'')+fmt(dep);
+  var d=new Date(b.date);
+  var dateStr=(d.getFullYear()%100)+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+  var body='';
+  body+='<tr class="lt-blk-title">'
+    +'<td rowspan="'+nRows+'" class="lt-date-cell">'+dateStr+'</td>'
+    +'<td></td><td>读表</td><td>用量单价</td><td>金额</td>'
+    +'<td></td><td>汇总</td>'
+    +'<td rowspan="'+nRows+'" class="lt-note-col">'+(note||' ')+'</td>'
+    +'</tr>';
+  body+='<tr class="lt-blk-row">'
+    +'<td class="lt-blk-label">电</td>'
+    +'<td>'+(hasElec?c(b.elecRead):'')+'</td>'
+    +'<td>'+(hasElec?up(b.elecUsage,ro.elecPrice):'')+'</td>'
+    +'<td>'+(hasElec?c(b.elecCost):'')+'</td>'
+    +'<td>费用</td><td>'+c(fee)+'</td>'
+    +'</tr>';
+  body+='<tr class="lt-blk-row">'
+    +'<td class="lt-blk-label">水</td>'
+    +'<td>'+(hasWater?c(b.waterRead):'')+'</td>'
+    +'<td>'+(hasWater?up(b.waterUsage,ro.waterPrice):'')+'</td>'
+    +'<td>'+(hasWater?c(b.waterCost):'')+'</td>'
+    +'<td>房租</td><td>'+c(rent)+'</td>'
+    +'</tr>';
+  if(hasGas){
+    body+='<tr class="lt-blk-row">'
+      +'<td class="lt-blk-label">燃气</td>'
+      +'<td>'+c(b.gasRead)+'</td><td>'+up(b.gasUsage,ro.gasPrice)+'</td>'
+      +'<td>'+c(b.gasCost)+'</td>'
+      +'<td></td><td></td>'
+      +'</tr>';
+  }else{
+    body+='<tr class="lt-blk-row"><td class="lt-blk-label">燃气</td><td></td><td></td><td></td><td></td><td></td></tr>';
+  }
+  body+='<tr class="lt-blk-row lt-total-row">'
+    +'<td class="lt-blk-label">其他</td>'
+    +'<td></td><td></td><td>'+(otherCost?c(otherCost):'')+'</td>'
+    +'<td class="lt-summary">共计</td><td class="lt-summary">'+fmt(total)+'元</td>'
+    +'</tr>';
+  return{html:body,total:total};
+}
 
-      // 日期格式：2025-12-21 → 25年12月21 或 12月21
-      var d=new Date(b.date);
-      var dateStr=(d.getFullYear()%100)+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
+function buildEmptyBlock(){
+  var nRows=5;
+  var s='<tr class="lt-empty-row">'
+    +'<td rowspan="'+nRows+'" class="lt-date-cell">&nbsp;</td>'
+    +'<td></td><td></td><td></td><td></td>'
+    +'<td></td><td></td>'
+    +'<td rowspan="'+nRows+'" class="lt-note-col">&nbsp;</td>'
+    +'</tr>';
+  for(var i=0;i<4;i++)s+='<tr class="lt-empty-row"><td class="lt-blk-label">&nbsp;</td><td></td><td></td><td></td><td></td><td></td></tr>';
+  s+='<tr class="lt-empty-row"><td class="lt-blk-label">&nbsp;</td><td></td><td></td><td></td><td class="lt-summary"></td><td class="lt-summary"></td></tr>';
+  return s;
+}
 
-      body+='<tr class="lt-blk-title">'
-        +'<td rowspan="'+nRows+'" class="lt-date-cell">'+dateStr+'</td>'
-        +'<td></td><td>读表</td><td>用量单价</td><td>金额</td>'
-        +'<td></td><td>汇总</td>'
-        +'<td rowspan="'+nRows+'" class="lt-note-col">'+note+'</td>'
-        +'</tr>';
-
-      // 电
-      body+='<tr class="lt-blk-row">'
-        +'<td class="lt-blk-label">电</td>'
-        +'<td>'+(hasElec?c(b.elecRead):'')+'</td>'
-        +'<td>'+(hasElec?up(b.elecUsage,ro.elecPrice):'')+'</td>'
-        +'<td>'+(hasElec?c(b.elecCost):'')+'</td>'
-        +'<td>费用</td><td>'+c(fee)+'</td>'
-        +'</tr>';
-      // 水
-      body+='<tr class="lt-blk-row">'
-        +'<td class="lt-blk-label">水</td>'
-        +'<td>'+(hasWater?c(b.waterRead):'')+'</td>'
-        +'<td>'+(hasWater?up(b.waterUsage,ro.waterPrice):'')+'</td>'
-        +'<td>'+(hasWater?c(b.waterCost):'')+'</td>'
-        +'<td>房租</td><td>'+c(rent)+'</td>'
-        +'</tr>';
-      if(hasGas){
-        body+='<tr class="lt-blk-row">'
-          +'<td class="lt-blk-label">燃气</td>'
-          +'<td>'+c(b.gasRead)+'</td>'
-          +'<td>'+up(b.gasUsage,ro.gasPrice)+'</td>'
-          +'<td>'+c(b.gasCost)+'</td>'
-          +'<td></td><td></td>'
-          +'</tr>';
-      }else{
-        body+='<tr class="lt-blk-row"><td class="lt-blk-label">燃气</td><td></td><td></td><td></td><td></td><td></td></tr>';
-      }
-      // 其他行（含共计）
-      var otherCost=b.otherCost||0;
-      body+='<tr class="lt-blk-row lt-total-row">'
-        +'<td class="lt-blk-label">其他</td>'
-        +'<td></td><td></td><td>'+(otherCost?c(otherCost):'')+'</td>'
-        +'<td class="lt-summary">共计</td><td class="lt-summary">'+fmt(total)+'元</td>'
-        +'</tr>';
+function buildLedgerPages(roomId,year,bills,ro){
+  var pages=[];
+  var grandTotal=0;
+  for(var pi=0;pi<bills.length;pi+=BILLS_PER_PAGE){
+    var pageBills=bills.slice(pi,pi+BILLS_PER_PAGE);
+    var tbody='';
+    var pageTotal=0;
+    for(var bi=0;bi<pageBills.length;bi++){
+      var blk=buildBillBlock(pageBills[bi],ro);
+      tbody+=blk.html;
+      pageTotal+=blk.total;
     }
-
-    var html='<div class="ledger-sheet">'
+    grandTotal+=pageTotal;
+    var emptyCount=BILLS_PER_PAGE-pageBills.length;
+    for(var ei=0;ei<emptyCount;ei++)tbody+=buildEmptyBlock();
+    var isLast=(pi+BILLS_PER_PAGE>=bills.length);
+    if(isLast){
+      tbody+='<tr class="lt-grand"><td colspan="6" style="text-align:right;padding-right:10px">当年合计（'+bills.length+' 笔）</td><td colspan="2">'+fmt(grandTotal)+' 元</td></tr>';
+    }
+    var pageHtml='<div class="ledger-page">'
       +'<div class="ls-head"><h1>出租管理</h1>'
       +'<div class="ls-meta">'
       +'<span>房号：'+(ro?ro.number:'')+'</span>'
       +'<span>结算方式：'+(ro?ro.settleMethod||'—':'')+'</span>'
       +'<span>年度：'+year+' 年</span>'
+      +(isLast?'':'<span style="margin-left:auto;color:#999;font-size:12px">第 '+Math.floor(pi/BILLS_PER_PAGE+1)+' 页</span>')
       +'</div></div>'
-      +'<table class="ledger-table"><tbody>'+body
-      +'<tr class="lt-grand"><td colspan="6" style="text-align:right;padding-right:10px">当年合计（'+bills.length+' 笔）</td><td colspan="2">'+fmt(grandTotal)+' 元</td></tr>'
-      +'</tbody></table>'
+      +'<table class="ledger-table"><tbody>'+tbody+'</tbody></table>'
       +'<div class="ledger-foot"><span>房东签字：_______________</span><span>租户签字：_______________</span><span>打印日期：'+fmtDateFull(new Date())+'</span></div>'
       +'</div>';
+    pages.push(pageHtml);
+  }
+  return pages.join('');
+}
 
-    $('printArea').innerHTML=html;
-    setTimeout(function(){window.print();},80);
-  }catch(e){toast('生成打印页失败')}
+function getBillData(){
+  var roomId=$('billRoomSelect').value;
+  var year=parseInt($('billYearSelect').value)||getYear();
+  if(!roomId)return null;
+  var ro=findRoomById(roomId);
+  var bills=[];
+  for(var i=0;i<DB.bills.length;i++){var b=DB.bills[i];if(b.roomId===roomId&&new Date(b.date).getFullYear()===year)bills.push(b)}
+  bills.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
+  return{roomId:roomId,year:year,ro:ro,bills:bills};
+}
+
+function printBilling(){
+  try{
+    var d=getBillData();
+    if(!d){toast('请先选择房号');return}
+    if(d.bills.length===0){toast(d.year+'年暂无结算记录');return}
+    $('printArea').innerHTML=buildLedgerPages(d.roomId,d.year,d.bills,d.ro);
+    setTimeout(function(){window.print();},100);
+  }catch(e){toast('生成打印页失败:'+e.message)}
+}
+
+function exportBilling(){
+  try{
+    var d=getBillData();
+    if(!d){toast('请先选择房号');return}
+    if(d.bills.length===0){toast(d.year+'年暂无结算记录');return}
+    var content='<!DOCTYPE html><html><head><meta charset="utf-8">'
+      +'<title>'+(d.ro?d.ro.number:'')+'_'+d.year+'年度结算明细</title>'
+      +'<style>'
+      +'*{box-sizing:border-box}'
+      +'body{margin:0;padding:0;background:#f5f5f5}'
+      +'.ledger-page{page-break-after:always;width:210mm;min-height:297mm;margin:0 auto;padding:15mm 12mm;box-sizing:border-box;background:#fff}'
+      +'.ledger-page:last-child{page-break-after:auto}'
+      +'.ls-head{text-align:center;padding:10px 0 4px;border-bottom:2px solid #333}'
+      +'.ls-head h1{font-size:24px;font-weight:700;letter-spacing:8px;margin:0}'
+      +'.ls-meta{display:flex;justify-content:center;gap:28px;font-size:14px;margin-top:8px;color:#000}'
+      +'.ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5;table-layout:fixed}'
+      +'.ledger-table th,.ledger-table td{border:1.5px solid #333;padding:3px 5px;text-align:center;vertical-align:middle}'
+      +'.lt-blk-title td{background:#F5F5F5;font-weight:700;font-size:12px}'
+      +'.lt-blk-row td{height:26px}'
+      +'.lt-blk-label{font-weight:600;width:32px;background:#FAFAFA}'
+      +'.lt-date-cell{writing-mode:vertical-rl;text-orientation:mixed;font-size:13px;font-weight:600;letter-spacing:2px;width:34px;background:#F9F9F9}'
+      +'.lt-summary{font-weight:600}'
+      +'.lt-total-row td{font-weight:700;font-size:13px;background:#F0F0F0}'
+      +'.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}'
+      +'.lt-grand td{font-weight:700;font-size:14px;background:#E8E8E8;border-width:2px 1.5px}'
+      +'.lt-empty-row td{height:26px;border-color:#ddd;color:#ccc}'
+      +'.ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}'
+      +'@media print{@page{size:A4 landscape;margin:8mm}.ledger-page{width:100%;min-height:0;padding:10mm 8mm}}'
+      +'</style></head><body>'
+      +buildLedgerPages(d.roomId,d.year,d.bills,d.ro)
+      +'</body></html>';
+    var blob=new Blob([content],{type:'text/html;charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    a.download=(d.ro?d.ro.number:'结算')+'_'+d.year+'年度明细.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast('导出成功！用浏览器打开可打印或另存为PDF');
+  }catch(e){toast('导出失败:'+e.message)}
 }
 
 // ========== MAINTENANCE ==========
