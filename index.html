@@ -962,9 +962,9 @@ function printBilling(){
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
       // APK 环境：保存为HTML文件，提示用户用文件管理器打开打印
-      doCapacitorSave(content,filename,function(ok,loc){
+      doCapacitorSave(content,filename,function(ok,loc,reason){
         if(ok) toast('打印页已保存：'+capSaveLocText(loc,filename)+'\n用浏览器打开后可打印/存PDF');
-        else toast('保存失败，请检查存储权限');
+        else toast(capSaveErrText(reason,'保存'));
       });
     }else{
       // 浏览器环境：直接调起打印对话框
@@ -984,9 +984,9 @@ function exportBilling(){
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
       // APK 环境：通过 Capacitor Filesystem 写入文件
-      doCapacitorSave(content,filename,function(ok,loc){
+      doCapacitorSave(content,filename,function(ok,loc,reason){
         if(ok)toast('已导出！保存在 '+capSaveLocText(loc,filename)+'\n用浏览器打开后可打印/存PDF');
-        else toast('导出失败，请检查存储权限');
+        else toast(capSaveErrText(reason,'导出'));
       });
     }else{
       // 浏览器环境：Blob 下载
@@ -1042,18 +1042,30 @@ function doCapacitorSave(content,filename,callback){
     var fs=null;
     if(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem) fs=Capacitor.Plugins.Filesystem;
     else if(window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem) fs=window.CapacitorPlugins.Filesystem;
-    if(!fs){callback(false);return}
+    if(!fs){
+      // 插件未注入：通常是装了不含 Filesystem 的旧版/错误 APK
+      console.error('doCapacitorSave: Filesystem 插件不可用（Capacitor.Plugins.Filesystem 为 undefined）');
+      callback(false,'','filesystem_unavailable');
+      return;
+    }
     var b64=btoa(unescape(encodeURIComponent(content)));
     // 策略1：EXTERNAL_STORAGE/Download（公共下载目录，文件管理器可见，用户可打开转PDF）
     fs.writeFile({path:'Download/'+filename,data:b64,directory:'EXTERNAL_STORAGE',encoding:'base64'})
-    .then(function(){callback(true,'download')})
-    .catch(function(){
+    .then(function(){callback(true,'download','')})
+    .catch(function(e1){
+      console.error('doCapacitorSave: EXTERNAL_STORAGE 写入失败',e1);
       // 策略2：DOCUMENTS（App私有目录，兜底保证不报错，但文件管理器可能看不到）
       fs.writeFile({path:filename,data:b64,directory:'DOCUMENTS',encoding:'base64'})
-      .then(function(){callback(true,'documents')})
-      .catch(function(){callback(false)});
+      .then(function(){callback(true,'documents','')})
+      .catch(function(e2){
+        console.error('doCapacitorSave: DOCUMENTS 也写入失败',e2);
+        callback(false,'','write_failed');
+      });
     });
-  }catch(e){callback(false)}
+  }catch(e){
+    console.error('doCapacitorSave 异常',e);
+    callback(false,'','exception:'+e.message);
+  }
 }
 
 // 根据保存位置生成路径提示文案
@@ -1061,6 +1073,11 @@ function capSaveLocText(loc,fname){
   if(loc==='download') return '下载/Download 目录：'+fname;
   if(loc==='documents') return 'App 私有目录（文件管理需授权才能查看）：'+fname;
   return fname;
+}
+// 根据失败原因生成错误提示文案
+function capSaveErrText(reason,kind){
+  if(reason==='filesystem_unavailable') return '⚠️ 文件系统不可用，请确认安装的是最新版APK（含Filesystem插件）';
+  return (kind||'导出')+'失败，请检查存储权限';
 }
 
 // ========== MAINTENANCE ==========
@@ -1205,9 +1222,9 @@ function printMaint(){
         +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
         +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html>';
       var fname=d.year+'_维修汇总表.html';
-      doCapacitorSave(fullHtml,fname,function(ok,loc){
+      doCapacitorSave(fullHtml,fname,function(ok,loc,reason){
         if(ok) toast('打印页已保存：'+capSaveLocText(loc,fname)+'\n用浏览器打开后可打印/存PDF');
-        else toast('保存失败，请检查存储权限');
+        else toast(capSaveErrText(reason,'保存'));
       });
     }else{
       var win=window.open('','_blank');
@@ -1251,9 +1268,9 @@ function exportMaint(){
     var fname=d.year+'_维修汇总表.html';
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
-      doCapacitorSave(content,fname,function(ok,loc){
+      doCapacitorSave(content,fname,function(ok,loc,reason){
         if(ok)toast('已导出！保存在 '+capSaveLocText(loc,fname)+'\n用浏览器打开后可打印/存PDF');
-        else toast('导出失败，请检查存储权限');
+        else toast(capSaveErrText(reason,'导出'));
       });
     }else{
       var blob=new Blob([content],{type:'text/html;charset=utf-8'});
@@ -1378,7 +1395,7 @@ function printPay(){
       +'</body></html>';
     if(window.Capacitor&&Capacitor.isNativePlatform()){
       var pf=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
-      doCapacitorSave(content,pf,function(ok,loc){if(ok)toast('打印页已保存：'+capSaveLocText(loc,pf)+'\n用浏览器打开后可打印/存PDF');else toast('保存失败，请检查存储权限')});
+      doCapacitorSave(content,pf,function(ok,loc,reason){if(ok)toast('打印页已保存：'+capSaveLocText(loc,pf)+'\n用浏览器打开后可打印/存PDF');else toast(capSaveErrText(reason,'保存'))});
     }else{
       var w=window.open('','','width=900,height=800');
       w.document.write(content);w.document.close();
@@ -1409,7 +1426,7 @@ function exportPay(){
       +'</body></html>';
     if(window.Capacitor&&Capacitor.isNativePlatform()){
       var ef=d.year+'\u4EE3\u7F34\u6C47\u603B.html';
-      doCapacitorSave(content,ef,function(ok,loc){if(ok)toast('已导出！保存在 '+capSaveLocText(loc,ef)+'\n用浏览器打开后可打印/存PDF');else toast('导出失败，请检查存储权限')});
+      doCapacitorSave(content,ef,function(ok,loc,reason){if(ok)toast('已导出！保存在 '+capSaveLocText(loc,ef)+'\n用浏览器打开后可打印/存PDF');else toast(capSaveErrText(reason,'导出'))});
     }else{
       var blob=new Blob([content],{type:'text/html;charset=utf-8'});
       var url=URL.createObjectURL(blob);
@@ -1722,11 +1739,11 @@ function backupDownload(){
     var isCap=!!window.Capacitor&&!!Capacitor.isNativePlatform&&Capacitor.isNativePlatform();
     if(isCap){
       // APK 环境：写入手机存储，并明确告知存放路径
-      doCapacitorSave(json,fname,function(ok,loc){
+      doCapacitorSave(json,fname,function(ok,loc,reason){
         if(ok){
           toast('\u2705 \u5DF2\u4FDD\u5B58\uFF1A'+capSaveLocText(loc,fname)+'\n\u53EF\u7528\u6587\u4EF6\u7BA1\u7406\u67E5\u627E');
         }else{
-          toast('\u4FDD\u5B58\u5931\u8D25\uFF0C\u8BF7\u68C0\u67E5\u5B58\u50A8\u6743\u9650');
+          toast(capSaveErrText(reason,'\u4FDD\u5B58'));
         }
       });
     }else{
