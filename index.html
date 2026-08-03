@@ -15,46 +15,46 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--primary:#1976D2;--primary-light:#42A5F5;--primary-dark:#1565C0;--danger:#E53935;--success:#43A047;--warning:#FB8C00;--bg:#F5F7FA;--card:#FFFFFF;--text:#333;--text2:#666;--text3:#999;--border:#E0E0E0;--shadow:0 2px 8px rgba(0,0,0,.08);--radius:12px}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;background:var(--bg);color:var(--text);padding-bottom:70px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif;background:var(--bg);color:var(--text);font-size:15px;padding-bottom:70px}
 .header{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:18px 14px 14px;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px rgba(0,0,0,.15)}
-.header h1{font-size:19px;font-weight:600}.header .subtitle{font-size:11px;opacity:.78;margin-top:3px}
+.header h1{font-size:20px;font-weight:600}.header .subtitle{font-size:12.5px;opacity:.78;margin-top:3px}
 
 .tabs{display:flex;background:var(--card);position:fixed;bottom:0;left:0;right:0;z-index:50;border-top:1px solid var(--border);padding:5px 0;padding-bottom:max(5px,env(safe-area-inset-bottom))}
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:5px 0;font-size:10.5px;color:var(--text3);transition:.15s;border:none;background:none;cursor:pointer;outline:none}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;padding:5px 0;font-size:12px;color:var(--text3);transition:.15s;border:none;background:none;cursor:pointer;outline:none}
 .tab.active{color:var(--primary)}.tab .icon{font-size:21px;line-height:1.2;margin-bottom:1px}
 .page{display:none;padding:12px}.page.active{display:block}
 .card{background:var(--card);border-radius:var(--radius);padding:13px;margin-bottom:10px;box-shadow:var(--shadow)}
-.card-title{font-size:14.5px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px}
+.card-title{font-size:15.5px;font-weight:600;color:var(--text);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:4px}
 .card-title .action{font-size:13px;font-weight:400;color:var(--primary);cursor:pointer;padding:2px 6px;border-radius:4px;background:none;border:none;outline:none}
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:10px}
 .stat-card{background:var(--card);border-radius:var(--radius);padding:13px 10px;box-shadow:var(--shadow);text-align:center}
-.stat-card .num{font-size:23px;font-weight:700;color:var(--primary)}.stat-card .label{font-size:11.5px;color:var(--text2);margin-top:2px}
+.stat-card .num{font-size:24px;font-weight:700;color:var(--primary)}.stat-card .label{font-size:13px;color:var(--text2);margin-top:2px}
 .stat-card.danger .num{color:var(--danger)}.stat-card.success .num{color:var(--success)}
 .room-item{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer}
 .room-item:last-child{border-bottom:none}
 .room-badge{width:46px;height:46px;border-radius:10px;background:linear-gradient(135deg,var(--primary-light),var(--primary));color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;margin-right:11px}
-.room-info{flex:1;min-width:0}.room-name{font-size:14.5px;font-weight:600}.room-detail{font-size:11.5px;color:var(--text2);margin-top:2px}
-.room-amount{text-align:right;flex-shrink:0}.room-rent{font-size:15px;font-weight:700;color:#E53935}.room-status{font-size:10.5px;color:var(--text3);margin-top:2px}
-.form-group{margin-bottom:11px}.form-group label{display:block;font-size:12.5px;font-weight:500;color:var(--text2);margin-bottom:4px}
+.room-info{flex:1;min-width:0}.room-name{font-size:15px;font-weight:600}.room-detail{font-size:13px;color:var(--text2);margin-top:2px}
+.room-amount{text-align:right;flex-shrink:0}.room-rent{font-size:16px;font-weight:700;color:#E53935}.room-status{font-size:12px;color:var(--text3);margin-top:2px}
+.form-group{margin-bottom:11px}.form-group label{display:block;font-size:13.5px;font-weight:500;color:var(--text2);margin-bottom:4px}
 .form-group input,.form-group select,.form-group textarea{width:100%;padding:10px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;background:#FAFCFF;transition:border-color .2s;outline:none;-webkit-appearance:none}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(25,118,210,.1)}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.form-group textarea{resize:vertical;min-height:55px}
 .btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:.15s;gap:4px;outline:none}
 .btn:active{transform:scale(.97);opacity:.85}
 .btn-primary{background:var(--primary);color:#fff}.btn-danger{background:var(--danger);color:#fff}.btn-success{background:var(--success);color:#fff}
-.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}.btn-sm{padding:6px 11px;font-size:12px}.btn-block{width:100%}
+.btn-outline{background:transparent;color:var(--primary);border:1.5px solid var(--primary)}.btn-sm{padding:6px 11px;font-size:13px}.btn-block{width:100%}
 .btn-group{display:flex;gap:8px;margin-top:12px}.btn-group .btn{flex:1}
-.billing-month{font-size:13.5px;font-weight:600;padding:9px 12px;background:var(--primary);color:#fff;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px}
+.billing-month{font-size:14.5px;font-weight:600;padding:9px 12px;background:var(--primary);color:#fff;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px}
 .billing-body{border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:11px}
-.billing-row{display:grid;grid-template-columns:26px 1fr 48px 38px 52px;gap:3px;padding:7px 9px;font-size:11.5px;align-items:center;border-bottom:1px solid #F5F5F5}
-.billing-row:last-child{border-bottom:none}.billing-row.header{background:#F8FAFD;font-weight:600;color:var(--text2);font-size:10.5px}
-.billing-row .type-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.billing-row{display:grid;grid-template-columns:26px 1fr 48px 38px 52px;gap:3px;padding:7px 9px;font-size:13px;align-items:center;border-bottom:1px solid #F5F5F5}
+.billing-row:last-child{border-bottom:none}.billing-row.header{background:#F8FAFD;font-weight:600;color:var(--text2);font-size:12px}
+.billing-row .type-icon{width:22px;height:22px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:12.5px;flex-shrink:0}
 .type-electric{background:#FFF3E0;color:#E65100}.type-water{background:#E3F2FD;color:#1565C0}.type-gas{background:#FCE4EC;color:#C62828}.type-rent{background:#E8F5E9;color:#2E7D32}.type-deposit{background:#F3E5F5;color:#7B1FA2}
-.billing-total{background:#FFF8E1;padding:9px;text-align:right;font-size:13.5px;font-weight:700;border-top:2px dashed var(--warning)}
+.billing-total{background:#FFF8E1;padding:9px;text-align:right;font-size:14.5px;font-weight:700;border-top:2px dashed var(--warning)}
 .maint-item{display:flex;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border)}.maint-item:last-child{border-bottom:none}
-.maint-date{font-size:10.5px;color:var(--text3);width:56px;flex-shrink:0;padding-top:2px}
-.maint-content{flex:1;min-width:0}.maint-room{font-size:11.5px;color:var(--primary);font-weight:500}.maint-desc{font-size:12.5px;margin:2px 0}
-.maint-cost{font-size:14px;font-weight:700;color:var(--danger);flex-shrink:0}
+.maint-date{font-size:12px;color:var(--text3);width:56px;flex-shrink:0;padding-top:2px}
+.maint-content{flex:1;min-width:0}.maint-room{font-size:13px;color:var(--primary);font-weight:500}.maint-desc{font-size:14px;margin:2px 0}
+.maint-cost{font-size:15px;font-weight:700;color:var(--danger);flex-shrink:0}
 /* Toggle Switch */
 .switch{position:relative;display:inline-block;width:48px;height:26px;flex-shrink:0}.switch input{opacity:0;width:0;height:0}.switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background-color:#ccc;border-radius:26px;transition:.3s}.switch .slider:before{content:"";position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s;box-shadow:0 1px 3px rgba(0,0,0,.25)}.switch input:checked+.slider{background-color:var(--danger)}.switch input:checked+.slider:before{transform:translateX(22px)}
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-end;justify-content:center}
@@ -62,48 +62,71 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .modal{background:var(--card);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;padding:18px}
 .modal-header{font-size:16.5px;font-weight:600;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
 .modal-close{width:30px;height:30px;border-radius:50%;border:none;background:var(--bg);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;outline:none}
-.expense-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.expense-table{width:100%;border-collapse:collapse;font-size:13px}
 .expense-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
 .expense-table th,.expense-table td{padding:7px 5px;text-align:center;border-bottom:1px solid var(--border)}.expense-table th{background:#F5F7FA;font-weight:600;color:var(--text2)}
 .empty-state{text-align:center;padding:35px 16px;color:var(--text3)}.empty-state .icon{font-size:44px;margin-bottom:8px}.empty-state p{font-size:13px}
-.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10.5px;font-weight:500}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:12px;font-weight:500}
 .badge-success{background:#E8F5E9;color:#2E7D32}.badge-warning{background:#FFF3E0;color:#E65100}
-.quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.quick-actions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
 .quick-action{display:flex;flex-direction:column;align-items:center;padding:11px 4px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);cursor:pointer;transition:.15s;border:none;outline:none}
 .quick-action:active{transform:scale(.95);background:#f0f0f0}
 .quick-action .qa-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:5px}
-.quick-action .qa-label{font-size:10.5px;color:var(--text2)}
+.quick-action .qa-label{font-size:12px;color:var(--text2)}
 .selector{display:flex;gap:7px;margin-bottom:11px;align-items:center;flex-wrap:wrap}
 .selector select{padding:7px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;background:var(--card)}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#CCC;border-radius:3px}
-.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:12.5px}
+.summary-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--border);font-size:13.5px}
 .summary-row:last-child{border-bottom:none}.summary-row .val{font-weight:600}
 .summary-row .val.red{color:var(--danger)}.summary-row .val.green{color:var(--success)}
 .meter-form{background:#FAFCFF;border-radius:10px;padding:11px;margin-bottom:9px}
 .meter-form .meter-row{display:flex;align-items:center;gap:5px;margin-bottom:7px}.meter-form .meter-row:last-child{margin-bottom:0}
-.meter-form label{font-size:11.5px;color:var(--text2);width:22px;flex-shrink:0}
+.meter-form label{font-size:13px;color:var(--text2);width:22px;flex-shrink:0}
 .meter-form input{flex:1;padding:7px 9px;border:1px solid var(--border);border-radius:6px;font-size:14px;text-align:center}
-.meter-form .unit{font-size:10.5px;color:var(--text3);width:28px;flex-shrink:0}
-.meter-form .calc{font-size:11.5px;color:var(--primary);font-weight:600;min-width:0;flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meter-form .unit{font-size:12px;color:var(--text3);width:28px;flex-shrink:0}
+.meter-form .calc{font-size:13px;color:var(--primary);font-weight:600;min-width:0;flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bill-total-row{text-align:right;padding:8px 4px 2px;border-top:1px dashed var(--border);margin-top:4px;font-size:14px;color:var(--text-primary)}
 #billTotalAmount{color:var(--danger);font-size:16px}
 /* 新表格式结算/代缴弹窗 */
 .meter-table-wrap{background:#FAFCFF;border-radius:10px;padding:8px;margin-bottom:9px;overflow-x:auto}
-.meter-th{display:flex;align-items:center;padding:4px 2px 6px;border-bottom:1px solid var(--border);margin-bottom:6px;font-size:11.5px;color:var(--text3);font-weight:600}
+.meter-th{display:flex;align-items:center;padding:4px 2px 6px;border-bottom:1px solid var(--border);margin-bottom:6px;font-size:13px;color:var(--text3);font-weight:600}
 .meter-th span{flex:1;text-align:center}.meter-th .mt-label{flex:.55;text-align:left;padding-left:2px}
 .meter-row-t{display:flex;align-items:center;gap:4px;margin-bottom:7px}.meter-row-t:last-of-type{margin-bottom:0}
 .meter-row-t label{font-size:12px;width:22px;flex-shrink:0;padding-left:2px}
 .meter-row-t input[type=number]{flex:1;padding:6px 4px;border:1px solid var(--border);border-radius:6px;font-size:13px;text-align:center;min-width:0;-moz-appearance:textfield}
 .meter-row-t input[type=number]::-webkit-outer-spin-button,.meter-row-t input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.meter-row-t input:nth-child(2){flex:.85}.meter-row-t input:nth-child(3){flex:.65}.meter-row-t input:nth-child(4){flex:.7}.meter-row-t input:nth-child(5){flex:1}
+.meter-row-t input:nth-child(3){flex:1}.meter-row-t input:nth-child(4){flex:.55}.meter-row-t input:nth-child(5){flex:.42}.meter-row-t input:nth-child(6){flex:1}
+.prev-read{flex:1;font-size:13px;color:var(--primary);text-align:center;padding:6px 2px;border:1px solid var(--border);border-radius:6px;background:#f0f7ff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .bill-total-row-t{display:flex;align-items:center;justify-content:flex-end;gap:6px;padding:8px 4px 4px;border-top:1.5px dashed var(--primary);margin-top:6px;font-size:14px;color:var(--text-primary);font-weight:600}
 .fab{position:fixed;right:14px;bottom:76px;width:50px;height:50px;border-radius:50%;background:var(--primary);color:#fff;border:none;font-size:25px;box-shadow:0 3px 10px rgba(25,118,210,.32);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:40;transition:.15s;outline:none}
 .fab:active{transform:scale(.9)}
 .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:rgba(40,40,40,.92);color:#fff;padding:9px 18px;border-radius:8px;font-size:13.5px;z-index:999;transition:transform .3s;white-space:nowrap;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
+/* ===== 全局错误浮层（防白屏/一眼看原因） ===== */
+.err-panel{position:fixed;top:0;left:0;right:0;z-index:9999;background:#fff;color:#222;border-bottom:3px solid #e53935;box-shadow:0 4px 18px rgba(0,0,0,.28);font-size:13px;max-height:62vh;overflow:auto}
+.err-head{display:flex;align-items:center;justify-content:space-between;background:#e53935;color:#fff;padding:10px 14px;font-weight:600}
+.err-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;line-height:1;padding:0 4px}
+.err-body{padding:12px 14px;white-space:pre-wrap;word-break:break-word;line-height:1.6;color:#b71c1c;font-family:ui-monospace,Menlo,Consolas,monospace}
+.err-actions{display:flex;gap:8px;padding:0 14px 12px}
+.err-btn{background:#e53935;color:#fff;border:none;padding:7px 12px;border-radius:6px;font-size:12.5px;cursor:pointer}
+.err-btn-ghost{background:#eee;color:#333}
+/* ===== 抄表历史时间线 ===== */
+.tl{position:relative;padding-left:6px}
+.tl-item{position:relative;padding:8px 0 8px 16px;border-left:2px solid #e3e3e3;margin-left:5px}
+.tl-item:last-child{border-left-color:transparent}
+.tl-dot{position:absolute;left:-7px;top:12px;width:10px;height:10px;border-radius:50%;background:var(--primary);box-shadow:0 0 0 3px rgba(33,150,243,.15)}
+.tl-date{font-size:13px;font-weight:600;color:var(--text1);margin-bottom:3px}
+.tl-row{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--text2);padding:1px 0}
+.tl-ic{width:18px;text-align:center}
+.tl-lbl{width:20px}
+.tl-val{color:var(--text1);font-weight:600}
+.tl-val i{font-style:normal;font-weight:400;color:var(--text2);font-size:13px;margin-left:2px}
+.tl-collapse{max-height:320px;overflow:hidden;transition:max-height .25s ease}
+.tl-collapse.expanded{max-height:none}
+.tl-toggle{cursor:pointer;font-size:13px;color:var(--primary);font-weight:600;padding:6px 0 2px;display:inline-block}
 .delete-confirm{text-align:center;padding:18px 0}.delete-confirm .warn-icon{font-size:44px;margin-bottom:8px}.delete-confirm p{font-size:14px;color:var(--text);margin-bottom:14px}
-.monospace-textarea{width:100%;height:150px;padding:9px;border:1.5px solid var(--border);border-radius:8px;font-family:Consolas,Monaco,monospace;font-size:11px;background:#FAFCFF;resize:none;outline:none;line-height:1.5}
-.backup-hint{font-size:11.5px;color:var(--text3);margin-top:8px;line-height:1.5}
+.monospace-textarea{width:100%;height:150px;padding:9px;border:1.5px solid var(--border);border-radius:8px;font-family:Consolas,Monaco,monospace;font-size:13px;background:#FAFCFF;resize:none;outline:none;line-height:1.5}
+.backup-hint{font-size:13px;color:var(--text3);margin-top:8px;line-height:1.5}
 .login-bar{display:flex;align-items:center;justify-content:space-between;background:#E3F2FD;padding:8px 14px;font-size:13px;color:#1565C0;margin-bottom:8px}
 .login-bar button{margin-left:8px}
 /* ===== 年度结算明细打印/导出（仿手工账本——A4分页） ===== */
@@ -119,7 +142,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .lt-date-cell{font-size:13px;font-weight:700;letter-spacing:1px;width:70px;text-align:center}
 .lt-summary{font-weight:600}
 .lt-total-row td{font-weight:700;font-size:13px}
-.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}
+.lt-note-col{text-align:left!important;font-size:13px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}
 .lt-grand td{font-weight:700;font-size:14px;border-width:2px 1.5px}
 .ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}
 /* 分页：每页一个 ledger-sheet，page-break */
@@ -157,7 +180,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .pp-num-cell{width:70px}
 .pp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:75px}
 .pp-total-row td{font-weight:700;font-size:13px;border-width:2px 1.5px}
-.pp-note-row td{text-align:left;font-size:11.5px;padding:4px 8px;color:#555}
+.pp-note-row td{text-align:left;font-size:13px;padding:4px 8px;color:#555}
 @media print{
   body *{visibility:hidden!important}
   #printArea,#printArea *{visibility:visible!important}
@@ -192,7 +215,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 
 <!-- PAGE: Maintenance -->
 <div class="page" id="pageMaint">
-  <div class="selector"><select id="maintYearSelect" onchange="renderMaint()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printMaintBtn" onclick="printMaint()" style="display:none">📙 打印</button><button class="btn btn-primary btn-sm" id="exportMaintBtn" onclick="exportMaint()" style="display:none">📋 导出</button><button class="btn btn-primary btn-sm" onclick="showAddMaintModal()">+ 记录维修</button></div>
+  <div class="selector"><select id="maintRoomFilter" onchange="renderMaint()"><option value="">全部房间</option></select><select id="maintYearSelect" onchange="renderMaint()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printMaintBtn" onclick="printMaint()" style="display:none">📙 打印</button><button class="btn btn-primary btn-sm" id="exportMaintBtn" onclick="exportMaint()" style="display:none">📋 导出</button><button class="btn btn-primary btn-sm" onclick="showAddMaintModal()">+ 记录维修</button></div>
   <div class="card"><div class="card-title" id="maintSummaryTitle">年度汇总</div><div id="maintSummary"></div></div>
   <div id="maintList"></div>
 </div>
@@ -206,14 +229,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
     <div class="form-row"><div class="form-group"><label>燃气单价 (元/m³)</label><input id="pubGasPrice" type="number" step="0.01"></div><div class="form-group"></div></div>
     <div class="btn-group"><button class="btn btn-primary btn-sm" onclick="savePublicPrices()">保存设置</button></div>
   </div>
-  <div class="selector"><select id="payYearSelect" onchange="renderPay()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printPayBtn" onclick="printPay()" style="display:none">📙 打印</button><button class="btn btn-primary btn-sm" id="exportPayBtn" onclick="exportPay()" style="display:none">📋 导出</button><button class="btn btn-primary btn-sm" onclick="showAddPayModal()">+ 记录代缴</button></div>
+  <div class="selector"><select id="payYearSelect" onchange="renderPay()"></select><span style="font-size:12.5px;color:var(--text2)">年</span><select id="payRoomFilter" onchange="renderPay()"><option value="">全部房间</option></select><select id="payTypeFilter" onchange="renderPay()"><option value="">全部类型</option><option value="电">电费</option><option value="水">水费</option><option value="燃气">燃气费</option><option value="其他">其他</option></select><div style="flex:1"></div><button class="btn btn-primary btn-sm" id="printPayBtn" onclick="printPay()" style="display:none">📙 打印</button><button class="btn btn-primary btn-sm" id="exportPayBtn" onclick="exportPay()" style="display:none">📋 导出</button><button class="btn btn-primary btn-sm" onclick="showAddPayModal()">+ 记录代缴</button></div>
   <div class="card"><div class="card-title" id="paySummaryTitle">年度代缴汇总</div><div id="paySummary"></div></div>
   <div id="payList"></div>
 </div>
 
 <!-- PAGE: Expenses -->
 <div class="page" id="pageExpenses">
-  <div class="selector"><select id="expRoomSelect" onchange="renderExpenses()"><option value="">全部房间</option></select><select id="expYearSelect" onchange="renderExpenses()"></select><span style="font-size:12.5px;color:var(--text2)">年</span></div>
+  <div class="selector"><select id="expYearSelect" onchange="renderExpenses()"></select><span style="font-size:12.5px;color:var(--text2)">年</span></div>
   <div class="card"><div class="card-title">费用统计</div><div id="expenseStats"></div></div>
   <div class="card">
     <div class="card-title">💾 数据备份与恢复</div>
@@ -256,12 +279,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <div class="modal-overlay" id="modalBilling"><div class="modal">
   <div class="modal-header"><span id="billingModalTitle">抄表结算</span><button class="modal-close" onclick="closeModal('modalBilling')">✕</button></div>
   <input type="hidden" id="billId"><input type="hidden" id="billRoomId">
-  <div class="form-row"><div class="form-group"><label>日期</label><input id="billDate" type="date"></div><div class="form-group"><label>房号</label><input id="billRoomDisplay" type="text" readonly style="background:#f5f5f5;color:var(--text1);font-weight:600"></div></div>
+  <div class="form-row"><div class="form-group"><label>日期</label><input id="billDate" type="date"></div><div class="form-group"><label>房号</label><select id="billRoomSelectModal"><option value="">选择房号</option></select></div></div>
   <div class="meter-table-wrap">
-    <div class="meter-th"><span class="mt-label"></span><span>读数</span><span>用量</span><span>单价</span><span>金额(元)</span></div>
-    <div class="meter-row-t"><label>⚡电</label><input id="bElecRead" type="number" placeholder="读数" oninput="onBillReadChange('elec')"><input id="bElecUsage" type="number" placeholder="用量" oninput="onBillFieldChange('elec')"><input id="bElecPrice" type="number" placeholder="单价" oninput="onBillFieldChange('elec')"><input id="bElecCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
-    <div class="meter-row-t"><label>💧水</label><input id="bWaterRead" type="number" placeholder="读数" oninput="onBillReadChange('water')"><input id="bWaterUsage" type="number" placeholder="用量" oninput="onBillFieldChange('water')"><input id="bWaterPrice" type="number" placeholder="单价" oninput="onBillFieldChange('water')"><input id="bWaterCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
-    <div class="meter-row-t"><label>🔥气</label><input id="bGasRead" type="number" placeholder="读数" oninput="onBillReadChange('gas')"><input id="bGasUsage" type="number" placeholder="用量" oninput="onBillFieldChange('gas')"><input id="bGasPrice" type="number" placeholder="单价" oninput="onBillFieldChange('gas')"><input id="bGasCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
+    <div class="meter-th"><span class="mt-label"></span><span>上次</span><span>读数</span><span>用量</span><span>单价</span><span>金额(元)</span></div>
+    <div class="meter-row-t"><label>⚡电</label><span id="bElecPrev" class="prev-read"></span><input id="bElecRead" type="number" placeholder="读数" oninput="onBillReadChange('elec')"><input id="bElecUsage" type="number" placeholder="用量" oninput="onBillFieldChange('elec')"><input id="bElecPrice" type="number" placeholder="单价" oninput="onBillFieldChange('elec')"><input id="bElecCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
+    <div class="meter-row-t"><label>💧水</label><span id="bWaterPrev" class="prev-read"></span><input id="bWaterRead" type="number" placeholder="读数" oninput="onBillReadChange('water')"><input id="bWaterUsage" type="number" placeholder="用量" oninput="onBillFieldChange('water')"><input id="bWaterPrice" type="number" placeholder="单价" oninput="onBillFieldChange('water')"><input id="bWaterCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
+    <div class="meter-row-t"><label>🔥气</label><span id="bGasPrev" class="prev-read"></span><input id="bGasRead" type="number" placeholder="读数" oninput="onBillReadChange('gas')"><input id="bGasUsage" type="number" placeholder="用量" oninput="onBillFieldChange('gas')"><input id="bGasPrice" type="number" placeholder="单价" oninput="onBillFieldChange('gas')"><input id="bGasCost" type="number" placeholder="金额" oninput="onBillCostChange()"></div>
     <div class="meter-row-t"><label>📦其他</label><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:55px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input id="bOtherCost" type="number" placeholder="金额" oninput="onBillCostChange()" style="min-width:70px"></div>
     <div class="bill-total-row-t">本次合计：<input id="billTotalAmount" type="number" step="0.01" oninput="markManualTotal()" style="width:90px;text-align:right;font-weight:700;color:var(--danger);font-size:16px;border:none;background:transparent;padding:0"> 元</div>
   </div>
@@ -287,10 +310,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
   <input type="hidden" id="payId">
   <div class="form-row"><div class="form-group"><label>日期</label><input id="payDate" type="date"></div><div class="form-group"><label>房号（公共选第一项）</label><select id="payRoom"><option value="">公共/总表</option></select></div></div>
   <div class="meter-table-wrap">
-    <div class="meter-th"><span class="mt-label"></span><span>读数</span><span>用量</span><span>单价</span><span>金额(元)</span></div>
-    <div class="meter-row-t"><label>⚡电</label><input id="pElecRead" type="number" placeholder="读数" oninput="onPayReadChange('elec')"><input id="pElecUsage" type="number" placeholder="用量"><input id="pElecPrice" type="number" placeholder="单价"><input id="pElecCost" type="number" placeholder="金额"></div>
-    <div class="meter-row-t"><label>💧水</label><input id="pWaterRead" type="number" placeholder="读数" oninput="onPayReadChange('water')"><input id="pWaterUsage" type="number" placeholder="用量"><input id="pWaterPrice" type="number" placeholder="单价"><input id="pWaterCost" type="number" placeholder="金额"></div>
-    <div class="meter-row-t"><label>🔥气</label><input id="pGasRead" type="number" placeholder="读数" oninput="onPayReadChange('gas')"><input id="pGasUsage" type="number" placeholder="用量"><input id="pGasPrice" type="number" placeholder="单价"><input id="pGasCost" type="number" placeholder="金额"></div>
+    <div class="meter-th"><span class="mt-label"></span><span>上次</span><span>读数</span><span>用量</span><span>单价</span><span>金额(元)</span></div>
+    <div class="meter-row-t"><label>⚡电</label><span id="pElecPrev" class="prev-read"></span><input id="pElecRead" type="number" placeholder="读数" oninput="onPayReadChange('elec')"><input id="pElecUsage" type="number" placeholder="用量"><input id="pElecPrice" type="number" placeholder="单价"><input id="pElecCost" type="number" placeholder="金额"></div>
+    <div class="meter-row-t"><label>💧水</label><span id="pWaterPrev" class="prev-read"></span><input id="pWaterRead" type="number" placeholder="读数" oninput="onPayReadChange('water')"><input id="pWaterUsage" type="number" placeholder="用量"><input id="pWaterPrice" type="number" placeholder="单价"><input id="pWaterCost" type="number" placeholder="金额"></div>
+    <div class="meter-row-t"><label>🔥气</label><span id="pGasPrev" class="prev-read"></span><input id="pGasRead" type="number" placeholder="读数" oninput="onPayReadChange('gas')"><input id="pGasUsage" type="number" placeholder="用量"><input id="pGasPrice" type="number" placeholder="单价"><input id="pGasCost" type="number" placeholder="金额"></div>
     <div class="meter-row-t"><label>📦其他</label><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:50px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input type="text" readonly value="—" style="width:55px;background:#f8f8f8;color:#999;text-align:center;border:1px solid #eee"><input id="pOtherCost" type="number" placeholder="金额" oninput="onPayCostInput('other')" style="min-width:70px"></div>
     <div class="bill-total-row-t">本次合计：<input id="payTotalAmount" type="number" step="0.01" oninput="markManualPayTotal()" style="width:90px;text-align:right;font-weight:700;color:var(--danger);font-size:16px;border:none;background:transparent;padding:0"> 元</div>
   </div>
@@ -308,7 +331,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <!-- MODAL: Room Detail -->
 <div class="modal-overlay" id="modalRoomDetail"><div class="modal" style="max-width:500px">
   <div class="modal-header"><span id="detailRoomName">房间详情</span><button class="modal-close" onclick="closeModal('modalRoomDetail')">✕</button></div>
-  <div id="roomDetailBody"></div>
+  <div id="roomDetailBody" style="max-height:70vh;overflow-y:auto;padding-right:4px"></div>
 </div></div>
 
 <!-- MODAL: Paste Restore -->
@@ -323,7 +346,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <div class="modal-overlay" id="modalBackupText"><div class="modal" style="max-width:520px">
   <div class="modal-header"><span>备份文本</span><button class="modal-close" onclick="closeModal('modalBackupText')">✕</button></div>
   <div class="backup-hint" style="margin:0 0 8px">下方为完整备份文本。长按选中后可复制，或点下方按钮复制。</div>
-  <div class="form-group"><textarea id="backupTextShow" class="monospace-textarea" style="height:300px;font-size:11px" readonly></textarea></div>
+  <div class="form-group"><textarea id="backupTextShow" class="monospace-textarea" style="height:300px;font-size:13px" readonly></textarea></div>
   <div class="btn-group"><button class="btn btn-outline btn-block" onclick="closeModal('modalBackupText')">关闭</button><button class="btn btn-success btn-block" onclick="copyBackupTextNow()">📋 复制文本</button></div>
 </div></div>
 
@@ -345,8 +368,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- 全局错误浮层：任何未捕获的 JS 错误都会显示在这里，便于排查（不再白屏盲调） -->
+<div class="err-panel" id="errPanel" style="display:none">
+  <div class="err-head"><span id="errTitle">⚠️ 运行出错</span><button class="err-close" onclick="hideErrPanel()">✕</button></div>
+  <div class="err-body" id="errBody"></div>
+  <div class="err-actions">
+    <button class="err-btn" onclick="copyErr()">复制错误信息</button>
+    <button class="err-btn err-btn-ghost" onclick="hideErrPanel()">知道了</button>
+  </div>
+</div>
+
 <script>
-window.onerror=function(m){try{var t=document.getElementById('toast');if(t){t.textContent='⚠️ 出错:'+m;t.classList.add('show');setTimeout(function(){t.classList.remove('show')},4000);}}catch(e){}return false;};
+// ========== 全局错误捕获（防白屏） ==========
+// 任何未捕获的 JS 错误都会弹出醒目浮层，并显示位置/堆栈，可直接复制上报，不用再来回截图猜。
+function showErrPanel(msg){try{var p=document.getElementById('errPanel');if(!p)return;var b=document.getElementById('errBody');if(b)b.textContent=msg;p.style.display='block';}catch(e){}}
+function hideErrPanel(){try{var p=document.getElementById('errPanel');if(p)p.style.display='none';}catch(e){}}
+function copyErr(){try{var t=document.getElementById('errBody');if(!t||!t.textContent)return;var ta=document.createElement('textarea');ta.value=t.textContent;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}try{document.body.removeChild(ta)}catch(e){}toast(ok?'已复制错误信息':'复制失败，请手动长按选择')}catch(e){toast('复制失败')}}
+// 供关键 catch 块调用，把被吞掉的错误显形
+function reportError(e,where){try{var msg=(where?('['+where+'] '):'')+(e&&e.message?e.message:(e?String(e):'未知错误'))+'\n'+(e&&e.stack?e.stack:'');console.error(msg);showErrPanel(msg);}catch(_){}}
+window.onerror=function(m,src,line,col,err){try{var msg=(m||'未知错误')+(src?('\n位置: '+src+' :'+line+':'+col):'')+(err&&err.stack?('\n'+err.stack):'');showErrPanel(msg);}catch(e){}return false;};
+window.addEventListener('unhandledrejection',function(ev){try{var r=ev&&ev.reason;var msg='未处理的异步错误: '+(r&&r.message?r.message:(r?String(r):''))+(r&&r.stack?('\n'+r.stack):'');showErrPanel(msg);}catch(e){}});
 // ========== Data Store ==========
 var DB={rooms:[],bills:[],maint:[],payments:[],publicPrices:{elec:1,water:5,gas:0},
  _useFile:function(){try{return !!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform()&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem)}catch(e){return false}},
@@ -372,6 +413,25 @@ var DB={rooms:[],bills:[],maint:[],payments:[],publicPrices:{elec:1,water:5,gas:
  }catch(e){}}
 };
 
+// 是否原生（手机APK）环境；浏览器预览时为 false
+var IS_NATIVE=false;
+// 浏览器预览：把内容下载到本机（替代原生 Filesystem 写入）
+function webDownload(content,filename){
+  try{
+    var ext=(filename.split('.').pop()||'').toLowerCase();
+    var mime='text/plain';
+    if(ext==='html')mime='text/html';
+    else if(ext==='json')mime='application/json';
+    else if(ext==='csv')mime='text/csv';
+    var blob=new Blob([content],{type:mime+';charset=utf-8'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;a.download=filename;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){try{document.body.removeChild(a)}catch(e){}try{URL.revokeObjectURL(url)}catch(e){}},1000);
+    return true;
+  }catch(e){return false;}
+}
 // ========== Supabase Auth & Cloud Sync ==========
 var SB_URL='https://sjccrtdlsflszrfteejy.supabase.co';
 var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqY2NydGRsc2Zsc3pyZnRlZWp5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0ODUyNDEsImV4cCI6MjEwMTA2MTI0MX0.AG3U87Lg_9eiaxYpI62xDWb1iPcwM55CIB5MjmxK9jc';
@@ -400,7 +460,7 @@ function showLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.s
 function hideLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='';closeModal('modalLogin');var lb=document.getElementById('loginBar');if(lb)lb.style.display='flex';var lu=document.getElementById('loginUser');if(lu&&currentUser)lu.textContent=currentUser.email}catch(e){}}
 async function doLogin(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}showLoginLoading(true);var r=await sbClient.auth.signInWithPassword({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u767B\u5F55\u5931\u8D25\uFF1A'+r.error.message);return}currentUser=r.data.user;currentToken=r.data.session.access_token;await afterLogin()}catch(e){showLoginLoading(false);toast('\u767B\u5F55\u51FA\u9519')}}
 async function doRegister(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}if(p.length<6){toast('\u5BC6\u7801\u81F3\u5C116\u4F4D');return}showLoginLoading(true);var r=await sbClient.auth.signUp({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u6CE8\u518C\u5931\u8D25\uFF1A'+r.error.message);return}if(r.data&&r.data.session){currentUser=r.data.user;currentToken=r.data.session.access_token;await afterLogin()}else{toast('\u6CE8\u518C\u6210\u529F\uFF01\u8BF7\u67E5\u6536\u90AE\u7BB1\u9A8C\u8BC1\u90AE\u4EF6\u540E\u518D\u767B\u5F55')}}catch(e){showLoginLoading(false);toast('\u6CE8\u518C\u51FA\u9519')}}
-async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){}}
+async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){reportError(e,'afterLogin')}}
 async function doLogout(){try{if(_syncTimer)clearTimeout(_syncTimer);if(sbClient&&currentUser){try{await flushSync()}catch(e){}}if(sbClient){try{await sbClient.auth.signOut()}catch(e){}}currentUser=null;currentToken=null;showLogin();toast('\u5DF2\u9000\u51FA\u767B\u5F55')}catch(e){}}
 function forgotPwd(){try{var e=document.getElementById('loginEmail').value.trim();if(!e){toast('\u8BF7\u5148\u8F93\u5165\u90AE\u7BB1');return}sbClient.auth.resetPasswordForEmail(e).then(function(){toast('\u5DF2\u53D1\u9001\u91CD\u7F6E\u90AE\u4EF6\uFF0C\u8BF7\u67E5\u6536')}).catch(function(err){toast('\u53D1\u9001\u5931\u8D25\uFF1A'+(err.message||''))})}catch(e){}}
 function showLoginLoading(on){try{var b=document.getElementById('loginSubmit');if(b)b.disabled=on;var l=document.getElementById('loginLoading');if(l)l.style.display=on?'block':'none'}catch(e){}}
@@ -412,6 +472,7 @@ function genId(){return Date.now().toString(36)+Math.random().toString(36).slice
 function fmt(n){if(n==null)return '—';var v=Number(n);if(isNaN(v))return '—';return v.toLocaleString('zh-CN',{minimumFractionDigits:v%1!==0?1:0})}
 function fmtDate(d){if(!d)return '—';try{var x=new Date(d);return(x.getMonth()+1)+'月'+x.getDate()+'日'}catch(e){return '—'}}
 function fmtDateFull(d){if(!d)return '';try{var x=new Date(d),m=x.getMonth()+1,dd=x.getDate();return x.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd)}catch(e){return ''}}
+function fmtDateShort(d){if(!d)return '';try{var x=new Date(d);return(x.getMonth()+1)+'/'+x.getDate()}catch(e){return ''}}
 function getYear(){return new Date().getFullYear()}
 function getMonth(){return new Date().getMonth()+1}
 function pad(n){return n<10?'0'+n:''+n}
@@ -419,8 +480,9 @@ function row(lbl,val,color){var c=color?' '+color:'';return'<div class="summary-
 
 // ========== Top-level click handlers (no escaped quotes!) ==========
 function qaAddRoom(){showAddRoomModal()}
-function qaBill(){var v=$('billRoomSelect').value;if(v){showAddBillModal(v)}else{goPage('pageBilling')}}
+function qaBill(){showAddBillModal()}
 function qaMaint(){showAddMaintModal()}
+function qaPay(){showAddPayModal()}
 function qaReport(){goPage('pageExpenses')}
 
 // ========== Tabs ==========
@@ -433,7 +495,7 @@ function switchTab(btn,pgId){
     btn.classList.add('active');
     $(pgId).classList.add('active');
     var fab=$('fab');
-    if(fab)fab.style.display=(pgId==='pageDashboard'||pgId==='pageMaint'||pgId==='pagePay')?'flex':'none';
+    if(fab)fab.style.display=(pgId==='pageExpenses')?'none':'flex';
     if(pgId==='pageBilling')renderBilling();
     if(pgId==='pageMaint')renderMaint();
     if(pgId==='pagePay')renderPay();
@@ -451,9 +513,10 @@ function handleFabClick(){
     var pg=document.querySelector('.page.active');
     if(!pg)return;
     var pid=pg.id;
-    if(pid==='pageDashboard'||pid==='pageMaint'){showAddMaintModal();return}
+    if(pid==='pageDashboard'){showAddRoomModal();return}
+    if(pid==='pageBilling'){qaBill();return}
+    if(pid==='pageMaint'){showAddMaintModal();return}
     if(pid==='pagePay'){showAddPayModal();return}
-    showAddRoomModal();
   }catch(e){}
 }
 
@@ -523,7 +586,7 @@ function renderAllRooms(){
     if(DB.rooms.length>0){for(var i=0;i<DB.rooms.length;i++)html+=renderRoomItem(DB.rooms[i])}
     else html='<div class="empty-state"><div class="icon">🏠</div><p>暂无房间，点击上方添加</p></div>';
     $('roomList').innerHTML=html;
-  }catch(e){}
+  }catch(e){reportError(e,'renderAllRooms')}
 }
 
 // Room detail uses data-id pattern to avoid quote escaping
@@ -548,13 +611,34 @@ function showRoomDetail(id){
       '<button class="btn btn-sm btn-danger" onclick="rdDelRoom(\''+r.id+'\')">删除</button></div></div>'+
       row('房租收入','\u00A5'+fmt(totalRent),'green')+row('电费','\u00A5'+fmt(totalElec),'red')+row('水费','\u00A5'+fmt(totalWater),'red')+row('燃气费','\u00A5'+fmt(totalGas),'red')+row('保证金变动','\u00A5'+fmt(totalDeposit))+
       '<div class="summary-row" style="border-top:2px solid var(--primary);padding-top:8px;margin-top:4px"><span>累计总额</span><span class="val" style="color:var(--primary);font-size:16px">\u00A5'+fmt(grandTotal)+'</span></div></div>';
+    // 抄表历史时间线（按日期倒序，默认显示最近6条，可展开）
+    if(roomBills.length>0){
+      var TL_SHOW=6;
+      var tlId='tl_'+r.id;
+      var needCollapse=roomBills.length>TL_SHOW;
+      h+='<div class="card"><div class="card-title">\uD83D\uDCC8 抄表历史时间线 <span class="action" onclick="rdGoBilling(\''+r.id+'\')">查看结算 \u2192</span></div><div class="tl'+(needCollapse?' tl-collapse':'')+'" id="'+tlId+'">';
+      for(var ti=roomBills.length-1;ti>=0;ti--){
+        var b=roomBills[ti],items=[];
+        if(b.elecRead!=null)items.push({ic:'\u26A1',lbl:'\u7535',rd:b.elecRead,us:b.elecUsage});
+        if(b.waterRead!=null)items.push({ic:'\uD83D\uDCA7',lbl:'\u6C34',rd:b.waterRead,us:b.waterUsage});
+        if(b.gasRead!=null)items.push({ic:'\uD83D\uDD25',lbl:'\u6C14',rd:b.gasRead,us:b.gasUsage});
+        var rows='';
+        if(items.length){
+          for(var mi=0;mi<items.length;mi++){var m=items[mi];rows+='<div class="tl-row"><span class="tl-ic">'+m.ic+'</span><span class="tl-lbl">'+m.lbl+'</span><span class="tl-val">'+fmt(m.rd)+(m.us!=null&&m.us!==''?' <i>\u7528'+fmt(m.us)+'</i>':'')+'</span></div>'}
+        }else{rows='<div class="tl-row"><span class="tl-ic">\uD83D\uDCDD</span><span class="tl-lbl">\u7ED3\u7B97</span><span class="tl-val">\u65E0\u6284\u8868\u8BFB\u6570</span></div>'}
+        h+='<div class="tl-item"><div class="tl-dot"></div><div class="tl-date">'+fmtDate(b.date)+'</div>'+rows+'</div>';
+      }
+      h+='</div>';
+      if(needCollapse)h+='<span class="tl-toggle" id="'+tlId+'_tg" onclick="toggleTl(\''+tlId+'\','+roomBills.length+')">▼ \u5C55\u5F00\u5168\u90E8('+roomBills.length+')</span>';
+      h+='</div>';
+    }
     if(roomBills.length>0){
       h+='<div class="card"><div class="card-title">最近结算记录 <span class="action" onclick="rdGoBilling(\''+r.id+'\')">查看全部 \u2192</span></div>';
-      for(var si=Math.max(0,roomBills.length-5);si<roomBills.length;si++){
+      for(var si=Math.max(0,roomBills.length-3);si<roomBills.length;si++){
         var b=roomBills[si],bt=(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.rent||0)+(b.depositChange||0);
         h+='<div class="billing-month"><span>'+fmtDate(b.date)+'</span><span>\u00A5'+fmt(bt)+
-          ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
-          ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
+          ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:13px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
+          ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:13px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
         h+='<div class="billing-row header"><span></span><span>\u9879\u76EE</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
         if(b.elecRead!=null)h+=bRow('electric','\u26A1','\u7535','('+fmt(r.elecPrice)+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
         if(b.waterRead!=null)h+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(r.waterPrice)+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
@@ -562,7 +646,7 @@ function showRoomDetail(id){
         if(b.otherCost)h+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost,null,'green');
         h+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
         if(b.depositChange)h+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
-        if(b.note)h+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
+        if(b.note)h+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
         h+='<div class="billing-total">\u672C\u6708\u5408\u8BA1:\u00A5'+fmt(bt)+'</div></div>';
       }
       h+='</div>';
@@ -571,6 +655,16 @@ function showRoomDetail(id){
     }
     $('roomDetailBody').innerHTML=h;
     openModal('modalRoomDetail');
+  }catch(e){reportError(e,'showRoomDetail')}
+}
+// 抄表时间线 展开/收起 切换
+function toggleTl(tlId,total){
+  try{
+    var el=document.getElementById(tlId);
+    var tg=document.getElementById(tlId+'_tg');
+    if(!el||!tg)return;
+    var expanded=el.classList.toggle('expanded');
+    tg.textContent=expanded?'\u25B2 \u6536\u8D77':'\u25BC \u5C55\u5F00\u5168\u90E8('+total+')';
   }catch(e){}
 }
 
@@ -619,7 +713,7 @@ function initBillSelects(){
     for(var i=0;i<DB.rooms.length;i++){var r=DB.rooms[i];opts+='<option value="'+r.id+'">'+r.number+(r.tenant?'('+r.tenant+')':'')+'</option>'}
     rs.innerHTML=opts;
     if(curRoom)rs.value=curRoom;
-    var ys=$('billYearSelect'),y=getYear(),s='';
+    var ys=$('billYearSelect'),y=getYear(),s='<option value="">\u5168\u90E8</option>';
     var curYear=ys?ys.value:'';
     for(var i=y-2;i<=y+1;i++)s+='<option value="'+i+'"'+(i===y?' selected':'')+'>'+i+'</option>';
     ys.innerHTML=s;
@@ -633,24 +727,26 @@ function showAddBillModal(roomId){
   try{
     $('billingModalTitle').textContent='抄表结算';
     $('billId').value='';
-    $('billRoomId').value=roomId||$('billRoomSelect').value;
+    fillBillRoomOptions();
+    $('billRoomSelectModal').value=roomId||'';
     $('billDate').value=fmtDateFull(new Date());
-    // 显示房号
-    var rid=$('billRoomId').value,ro=findRoomById(rid);
-    $('billRoomDisplay').value=ro?ro.number:'（未选择）';
     // 清空所有字段
     var allInputs=['bElecRead','bElecUsage','bElecPrice','bElecCost','bWaterRead','bWaterUsage','bWaterPrice','bWaterCost','bGasRead','bGasUsage','bGasPrice','bGasCost','bOtherCost','bRent','bDeposit'];
     for(var i=0;i<allInputs.length;i++)$(allInputs[i]).value='';
     $('bNote').value='';
     $('billTotalAmount').value='0';
     window._manualTotal=false;
+    showPrevReads(roomId||'','b');
     openModal('modalBilling');
-    if(ro){
-      $('bRent').value=ro.rent||'';
-      // 预填默认单价
-      $('bElecPrice').value=ro.elecPrice||1;
-      $('bWaterPrice').value=ro.waterPrice||5;
-      $('bGasPrice').value=ro.gasPrice||0;
+    // 选了房间则预填
+    if(roomId){
+      var ro=findRoomById(roomId);
+      if(ro){
+        $('bRent').value=ro.rent||'';
+        $('bElecPrice').value=ro.elecPrice||1;
+        $('bWaterPrice').value=ro.waterPrice||5;
+        $('bGasPrice').value=ro.gasPrice||0;
+      }
     }
   }catch(e){}
 }
@@ -661,9 +757,10 @@ function editBill(id){
     for(var i=0;i<DB.bills.length;i++){if(DB.bills[i].id===id){b=DB.bills[i];break}}
     if(!b)return;
     $('billingModalTitle').textContent='编辑结算';
-    $('billId').value=b.id;$('billRoomId').value=b.roomId;
+    $('billId').value=b.id;
+    fillBillRoomOptions();
+    $('billRoomSelectModal').value=b.roomId||'';
     var ro=findRoomById(b.roomId);
-    $('billRoomDisplay').value=ro?ro.number:'（未知）';
     $('billDate').value=b.date||'';
     $('bElecRead').value=b.elecRead!=null?b.elecRead:'';
     $('bElecUsage').value=b.elecUsage!=null?b.elecUsage:'';
@@ -686,17 +783,23 @@ function editBill(id){
     window._manualTotal=false;
     if(b.totalAmount!=null&&b.totalAmount!==''){$('billTotalAmount').value=b.totalAmount;window._manualTotal=true;}
     else{onBillCostChange();}
+    showPrevReads(b.roomId||'','b');
     openModal('modalBilling');
   }catch(e){}
 }
 
 var _prevBillForCalc=null;
 
-// 获取该房间上一条结算记录
-function getPrevBill(roomId,excludeId){
-  var prev=null;
-  for(var i=DB.bills.length-1;i>=0;i--){
-    if(DB.bills[i].roomId===roomId&&DB.bills[i].id!==excludeId){prev=DB.bills[i];break}
+// 获取该房间上一条结算记录（按日期取"当前记录之前"最近一笔，避免乱序录入拿错上一次读数）
+function getPrevBill(roomId,excludeId,curDate){
+  var prev=null,bestDate=null;
+  for(var i=0;i<DB.bills.length;i++){
+    var b=DB.bills[i];
+    if(b.roomId!==roomId||b.id===excludeId) continue;
+    var bd=b.date||'';
+    // 跳过不早于当前记录日期的（同日或之后的记录都不算"上一次"）
+    if(curDate&&bd>=curDate) continue;
+    if(bestDate===null||bd>bestDate){bestDate=bd;prev=b;}
   }
   return prev;
 }
@@ -707,9 +810,9 @@ function round2(v){var n=Number(v)||0;return Math.round(n*100)/100}
 
 function onBillReadChange(type){
   try{
-    var rid=$('billRoomId').value;if(!rid)return;
+    var rid=$('billRoomSelectModal').value;if(!rid)return;
     var ro=findRoomById(rid);
-    var prev=getPrevBill(rid,$('billId').value);
+    var prev=getPrevBill(rid,$('billId').value,$('billDate').value);
     var readMap={elec:'bElecRead',water:'bWaterRead',gas:'bGasRead'};
     var usageMap={elec:'bElecUsage',water:'bWaterUsage',gas:'bGasUsage'};
     var priceMap={elec:'bElecPrice',water:'bWaterPrice',gas:'bGasPrice'};
@@ -760,11 +863,10 @@ function updateBillTotal(){onBillCostChange()}
 
 function saveBilling(){
   try{
-    var roomId=$('billRoomId').value;if(!roomId){toast('\u8BF7\u9009\u62E9\u623F\u53F7');return}
+    var roomId=$('billRoomSelectModal').value;if(!roomId){toast('\u8BF7\u9009\u62E9\u623F\u53F7');return}
     var date=$('billDate').value;if(!date){toast('\u8BF7\u9009\u62E9\u65E5\u671F');return}
     var ro=findRoomById(roomId);
-    var prev=null;
-    for(var i=DB.bills.length-1;i>=0;i--){if(DB.bills[i].roomId===roomId&&DB.bills[i].id!==$('billId').value){prev=DB.bills[i];break}}
+    var prev=getPrevBill(roomId,$('billId').value,$('billDate').value);
     var eRead=parseFloat($('bElecRead').value),wRead=parseFloat($('bWaterRead').value),gRead=parseFloat($('bGasRead').value);
     var eU=Number($('bElecUsage').value)||0;
     var wU=Number($('bWaterUsage').value)||0;
@@ -798,44 +900,47 @@ function renderBilling(){
   try{
     initBillSelects();
     var roomId=$('billRoomSelect').value;
-    var year=parseInt($('billYearSelect').value)||getYear();
+    var yearSel=$('billYearSelect').value;
+    var year=parseInt(yearSel)||0;
     var html='';
-    if(!roomId){
-      html='<div class="empty-state"><div class="icon">\uD83D\uDCBB</div><p>\u8BF7\u5148\u9009\u62E9\u623F\u53F7\u67E5\u770B\u7ED3\u7B97\u8BB0\u5F55</p></div>';
+    var allBills=[];
+    for(var i=0;i<DB.bills.length;i++){
+      var b=DB.bills[i];
+      if(roomId&&b.roomId!==roomId)continue;
+      if(year&&new Date(b.date).getFullYear()!==year)continue;
+      allBills.push(b);
+    }
+    allBills.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
+    if(allBills.length===0){
+      html='<div class="empty-state"><div class="icon">\uD83D\uDCBB</div><p>'+(year?year+'\u5E74':'')+'\u6682\u65E0\u7ED3\u7B97\u8BB0\u5F55</p>'+(roomId?'<button class="btn btn-primary btn-sm" onclick="showAddBillModal(\''+roomId+'\')">\u7ACB\u5373\u6284\u8868</button>':'')+'</div>';
     }else{
-      var ro=findRoomById(roomId);
-      var bills=[];
-      for(var i=0;i<DB.bills.length;i++){var b=DB.bills[i];if(b.roomId===roomId&&new Date(b.date).getFullYear()===year)bills.push(b)}
-      bills.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
-      if(bills.length===0){
-        html='<div class="empty-state"><div class="icon">\uD83D\uDCBB</div><p>'+year+'\u5E74\u6682\u65E0\u7ED3\u7B97\u8BB0\u5F55</p><button class="btn btn-primary btn-sm" onclick="showAddBillModal(\''+roomId+'\')">\u7ACB\u5373\u6284\u8868</button></div>';
-      }else{
-        var totalAll=0;
-        for(var bi=0;bi<bills.length;bi++){
-          var b=bills[bi],t=(b.totalAmount!=null&&b.totalAmount!=='')?b.totalAmount:(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.otherCost||0)+(b.rent||0)+(b.depositChange||0);
-          totalAll+=t;
-          html+='<div class="billing-month"><span>'+fmtDate(b.date)+' \u7ED3\u7B97</span><span>\u00A5'+fmt(t)+
-            ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
-            ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
-          html+='<div class="billing-row header"><span></span><span>\u9879\u76EE</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
-          if(b.elecRead!=null)html+=bRow('electric','\u26A1','\u7535','('+fmt(b.elecPrice!=null?b.elecPrice:ro.elecPrice)+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
-          if(b.waterRead!=null)html+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(b.waterPrice!=null?b.waterPrice:ro.waterPrice)+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
-          if(b.gasRead!=null)html+=bRow('gas','\uD83D\uDD25','\u71C3\u6C14','('+fmt(b.gasPrice!=null?b.gasPrice:ro.gasPrice)+'\u5143/m\xB3)',b.gasRead,b.gasUsage,b.gasCost);
-          html+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
-          if(b.depositChange)html+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
-          if(b.otherCost)html+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost);
-          if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
-          html+='<div class="billing-total">\u672C\u6708\u5408\u8BA1:\u00A5'+fmt(t)+'</div></div>';
-        }
-        html='<div class="card" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border:none"><div style="text-align:center;padding:8px"><div style="font-size:12.5px;color:var(--text2)">'+year+'\u5E74 '+(ro?ro.number:'')+' \u7D2F\u8BA1</div><div style="font-size:27px;font-weight:700;color:var(--primary-dark)">\u00A5'+fmt(totalAll)+'</div></div></div>'+html;
-        html+='<div style="text-align:center;margin-top:8px"><button class="btn btn-primary" onclick="showAddBillModal(\''+roomId+'\')">+ \u65B0\u5EFA\u7ED3\u7B97</button></div>';
+      var totalAll=0;
+      for(var bi=0;bi<allBills.length;bi++){
+        var b=allBills[bi];
+        var ro=findRoomById(b.roomId);
+        var t=(b.totalAmount!=null&&b.totalAmount!=='')?b.totalAmount:(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.otherCost||0)+(b.rent||0)+(b.depositChange||0);
+        totalAll+=t;
+        html+='<div class="billing-month"><span>'+fmtDate(b.date)+(ro?' '+ro.number:'')+' \u7ED3\u7B97</span><span>\u00A5'+fmt(t)+
+          ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:13px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
+          ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:13px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
+        html+='<div class="billing-row header"><span></span><span>\u9879\u76EE</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
+        if(b.elecRead!=null)html+=bRow('electric','\u26A1','\u7535','('+fmt(b.elecPrice!=null?b.elecPrice:(ro?ro.elecPrice:1))+'\u5143/\u5EA6)',b.elecRead,b.elecUsage,b.elecCost);
+        if(b.waterRead!=null)html+=bRow('water','\uD83D\uDCA7','\u6C34','('+fmt(b.waterPrice!=null?b.waterPrice:(ro?ro.waterPrice:5))+'\u5143/\u5428)',b.waterRead,b.waterUsage,b.waterCost);
+        if(b.gasRead!=null)html+=bRow('gas','\uD83D\uDD25','\u71C3\u6C14','('+fmt(b.gasPrice!=null?b.gasPrice:(ro?ro.gasPrice:0))+'\u5143/m\xB3)',b.gasRead,b.gasUsage,b.gasCost);
+        html+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
+        if(b.depositChange)html+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
+        if(b.otherCost)html+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost);
+        if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
+        html+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(t)+'</div></div>';
       }
+      var headTxt=(year?year+'\u5E74 ':'\u5168\u90E8 ')+(roomId&&ro?ro.number+' ':'')+'\u7D2F\u8BA1';
+      html='<div class="card" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border:none"><div style="text-align:center;padding:8px"><div style="font-size:12.5px;color:var(--text2)">'+headTxt+'</div><div style="font-size:27px;font-weight:700;color:var(--primary-dark)">\u00A5'+fmt(totalAll)+'</div></div></div>'+html;
+      html+='<div style="text-align:center;margin-top:8px"><button class="btn btn-primary" onclick="showAddBillModal(\''+(roomId||'')+'\')">+ \u65B0\u5EFA\u7ED3\u7B97</button></div>';
     }
     $('billingContent').innerHTML=html;
-    // 选中房号+年份时显示打印/导出按钮
+    // 有数据时显示打印/导出按钮
     try{
-      var hasRoom=!!roomId, hasData=!hasRoom||bills.length>0;
-      var show=(hasRoom&&hasData)?'inline-flex':'none';
+      var show=allBills.length>0?'inline-flex':'none';
       $('printBillBtn').style.display=show;
       $('exportBillBtn').style.display=show;
     }catch(e){}
@@ -863,7 +968,7 @@ function buildBillBlock(b,ro){
   var dateStr=(d.getFullYear()%100)+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日';
   var body='';
   body+='<tr class="lt-blk-title">'
-    +'<td rowspan="'+nRows+'" class="lt-date-cell"><div style="font-size:11px;font-weight:700;color:#333;margin-bottom:4px">日期</div>'+dateStr+'</td>'
+    +'<td rowspan="'+nRows+'" class="lt-date-cell"><div style="font-size:13px;font-weight:700;color:#333;margin-bottom:4px">日期</div>'+dateStr+'</td>'
     +'<td></td><td>读表</td><td>用量单价</td><td>金额</td>'
     +'<td></td><td>汇总</td>'
     +'<td rowspan="'+nRows+'" class="lt-note-col">'+(note||' ')+'</td>'
@@ -1018,16 +1123,16 @@ function buildPrintContent(d){
     +'.ls-head{text-align:center;padding:10px 0 4px;border-bottom:2px solid #333}'
     +'.ls-head h1{font-size:24px;font-weight:700;letter-spacing:8px;margin:0}'
     +'.ls-meta{display:flex;justify-content:center;gap:28px;font-size:14px;margin-top:8px;color:#000}'
-    +'.ledger-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.5;table-layout:fixed}'
+    +'.ledger-table{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.5;table-layout:fixed}'
     +'.ledger-table th,.ledger-table td{border:1.5px solid #333;padding:3px 5px;text-align:center;vertical-align:middle}'
-    +'.lt-blk-title td{font-weight:700;font-size:12px}'
+    +'.lt-blk-title td{font-weight:700;font-size:13px}'
     +'.lt-blk-row td{height:26px}'
     +'.lt-blk-label{font-weight:600;width:32px}'
     +'.lt-date-cell{font-size:13px;font-weight:700;letter-spacing:1px;width:70px;text-align:center}'
     +'.lt-summary{font-weight:600}'
-    +'.lt-total-row td{font-weight:700;font-size:13px}'
-    +'.lt-note-col{text-align:left!important;font-size:11.5px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}'
-    +'.lt-grand td{font-weight:700;font-size:14px;border-width:2px 1.5px}'
+    +'.lt-total-row td{font-weight:700;font-size:14px}'
+    +'.lt-note-col{text-align:left!important;font-size:13px;padding-left:8px;padding-right:6px;white-space:pre-wrap;word-break:break-all;width:150px!important;max-width:150px!important}'
+    +'.lt-grand td{font-weight:700;font-size:15px;border-width:2px 1.5px}'
     +'.lt-empty-row td{height:26px;border-color:#ddd;color:#ccc}'
     +'.ledger-foot{margin-top:20px;display:flex;justify-content:space-between;font-size:13px}'
     +'@media print{@page{size:A4 portrait;margin:8mm}.ledger-page{width:100%;min-height:0;padding:10mm 8mm}}'
@@ -1045,8 +1150,9 @@ function doCapacitorSave(content,filename,callback){
     if(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem) fs=Capacitor.Plugins.Filesystem;
     else if(window.CapacitorPlugins&&window.CapacitorPlugins.Filesystem) fs=window.CapacitorPlugins.Filesystem;
     if(!fs){
-      console.error('doCapacitorSave: Filesystem 插件不可用');
-      callback(false,'','filesystem_unavailable');
+      // 浏览器预览：降级为 Blob 下载
+      if(webDownload(content,filename)) callback(true,'web','');
+      else callback(false,'','web_download_failed');
       return;
     }
     // 策略1：EXTERNAL_STORAGE/Download（公共下载目录）
@@ -1081,6 +1187,7 @@ function capSaveLocText(loc,fname){
 function saveAndShare(content,filename,title,hint){
   doCapacitorSave(content,filename,function(ok,loc,reason){
     if(!ok){toast(capSaveErrText(reason,'保存'));return}
+    if(!IS_NATIVE){toast('🌐 浏览器预览：已下载「'+filename+'」到本机\n（原生打印/分享不可用，HTML 可用电脑浏览器打开后打印）');return}
     var locText=capSaveLocText(loc,filename);
     var okHint=hint||'已弹出分享，选 Chrome 可打印/存PDF';
     try{
@@ -1118,6 +1225,7 @@ function saveAndShare(content,filename,title,hint){
 // 根据失败原因生成错误提示文案
 function capSaveErrText(reason,kind){
   if(reason==='filesystem_unavailable') return '⚠️ 文件系统不可用，请确认安装的是最新版APK（含Filesystem插件）';
+  if(reason==='web_download_failed') return '浏览器下载失败，请换用 Chrome 或检查浏览器下载权限';
   return (kind||'导出')+'失败，请检查存储权限';
 }
 
@@ -1139,6 +1247,63 @@ function fillMaintRoomOptions(){
     var opts='<option value="">\u516C\u5171/\u603B\u8868</option>';
     for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
     $('maintRoom').innerHTML=opts;
+  }catch(e){}
+}
+function fillMaintRoomFilter(){
+  try{
+    var sel=$('maintRoomFilter');if(!sel)return;
+    var cur=sel.value,opts='<option value="">\u5168\u90E8\u623F\u95F4</option>';
+    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+(DB.rooms[i].tenant?'('+DB.rooms[i].tenant+')':'')+'</option>';
+    sel.innerHTML=opts;
+    if(cur)sel.value=cur;
+  }catch(e){}
+}
+function fillBillRoomOptions(){
+  try{
+    var opts='<option value="">\u9009\u62E9\u623F\u53F7</option>';
+    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
+    $('billRoomSelectModal').innerHTML=opts;
+  }catch(e){}
+}
+// 结算弹窗：选房间后自动预填房租和默认单价
+$('billRoomSelectModal')&&($('billRoomSelectModal').onchange=function(){
+  var rid=this.value;var ro=findRoomById(rid);
+  if(ro){
+    $('bRent').value=ro.rent||'';
+    $('bElecPrice').value=ro.elecPrice||1;
+    $('bWaterPrice').value=ro.waterPrice||5;
+    $('bGasPrice').value=ro.gasPrice||0;
+  }
+  showPrevReads(rid,'b');
+});
+// 代缴弹窗：选房间后显示上次读数
+$('payRoom')&&($('payRoom').onchange=function(){showPrevReads(this.value,'p')});
+
+// 显示上一次读数（结算/代缴共用，prefix='b'或'p'）
+function showPrevReads(roomId,prefix){
+  try{
+    var ids=[prefix+'ElecPrev',prefix+'WaterPrev',prefix+'GasPrev'];
+    var keys=['elecRead','waterRead','gasRead'];
+    for(var i=0;i<3;i++){
+      var el=$(ids[i]);if(!el){el.textContent='';continue}
+      if(!roomId){el.textContent='';continue}
+      // 查找该房间最近一次有读数的记录（排除当前编辑中的）
+      var prev=null;
+      var curDate=$(prefix==='b'?'billDate':'payDate');
+      curDate=curDate?curDate.value:'';
+      for(var j=DB.bills.length-1;j>=0;j--){
+        var b=DB.bills[j];
+        if(b.roomId!==roomId)continue;
+        if(prefix==='b'&&b.id===$('billId').value)continue;
+        if(prefix==='p'&&b.id===$('payId').value)continue;
+        if(curDate&&b.date&&b.date>=curDate)continue;
+        if(b[keys[i]]!=null){prev=b;break}
+      }
+      if(prev&&prev[keys[i]]!=null){
+        var d=prev.date?fmtDateShort(prev.date):'';
+        el.textContent=fmt(prev[keys[i]])+(d?' '+d:'');
+      }else{el.textContent=''}
+    }
   }catch(e){}
 }
 
@@ -1165,25 +1330,27 @@ function renderMaint(){
     for(var i=y-2;i<=y+1;i++)h+='<option value="'+i+'"'+(i===y?' selected':'')+'>'+i+'</option>';
     s.innerHTML=h;
     if(cur)s.value=cur;
+    fillMaintRoomFilter();
+    var fltRoom=$('maintRoomFilter')?$('maintRoomFilter').value:'';
     fillMaintRoomOptions();
     var year=parseInt(s.value)||getYear();
     var records=[];
-    for(var i=0;i<DB.maint.length;i++){if(new Date(DB.maint[i].date).getFullYear()===year)records.push(DB.maint[i])}
+    for(var i=0;i<DB.maint.length;i++){if(new Date(DB.maint[i].date).getFullYear()===year){if(fltRoom&&DB.maint[i].roomId!==fltRoom)continue;records.push(DB.maint[i])}}
     records.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
     var total=0;
     for(var i=0;i<records.length;i++)total+=records[i].cost;
     $('maintSummary').innerHTML=row('\u672C\u5E74\u7EF4\u4FEE\u6B21\u6570',records.length+' \u6B21')+row('\u672C\u5E74\u652F\u51FA\u603B\u8BA1','\u00A5'+fmt(total),'red')+row('\u5E73\u5747\u6BCF\u6B21',records.length?'\u00A5'+fmt(total/records.length):'\u00A50');
-    $('maintSummaryTitle').textContent=year+'\u5E74 \u7EF4\u4FEE\u6C47\u603B';
+    $('maintSummaryTitle').textContent=year+'年 '+(fltRoom&&findRoomById(fltRoom)?findRoomById(fltRoom).number+' ':'')+'维修汇总';
     if(records.length===0){$('maintList').innerHTML='<div class="empty-state"><div class="icon">\uD83D\uDD27</div><p>\u672C\u5E74\u6682\u65E0\u7EF4\u4FEE\u8BB0\u5F55</p></div>';return}
     var mh='';
     for(var mi=0;mi<records.length;mi++){
       var m=records[mi],mr=findRoomById(m.roomId);
       mh+='<div class="billing-month"><span>'+fmtDate(m.date)+' \u7EF4\u4FEE</span><span>\u00A5'+fmt(m.cost)+
-        ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="showAddMaintModal(DB.maint.find(function(x){return x.id===\''+m.id+'\'}))">\u7F16\u8F91</button>'+
-        ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deleteMaint(\''+m.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
+        ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:13px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="showAddMaintModal(DB.maint.find(function(x){return x.id===\''+m.id+'\'}))">\u7F16\u8F91</button>'+
+        ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:13px" onclick="deleteMaint(\''+m.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
       mh+='<div class="billing-row header" style="grid-template-columns:26px 60px 1fr 70px"><span></span><span>\u623F\u53F7</span><span>\u7EF4\u4FEE\u9879\u76EE</span><span>\u91D1\u989D</span></div>';
       mh+='<div class="billing-row" style="grid-template-columns:26px 60px 1fr 70px"><span class="type-icon type-rent">\uD83C\uDFE0</span><span>'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+(m.desc||'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(m.cost)+'</span></div>';
-      if(m.note)mh+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+m.note+'</span></div>';
+      if(m.note)mh+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+m.note+'</span></div>';
       mh+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(m.cost)+'</div></div>';
     }
     $('maintList').innerHTML='<div class="card"><div class="card-title">\u7EF4\u4FEE\u660E\u7EC6</div>'+mh+'</div>';
@@ -1196,7 +1363,8 @@ function renderMaint(){
 function getMaintPrintData(){
   var year=parseInt($('maintYearSelect').value)||getYear();
   var records=[];
-  for(var i=0;i<DB.maint.length;i++){if(new Date(DB.maint[i].date).getFullYear()===year)records.push(DB.maint[i])}
+  var fltRoom=$('maintRoomFilter')?$('maintRoomFilter').value:'';
+  for(var i=0;i<DB.maint.length;i++){if(new Date(DB.maint[i].date).getFullYear()===year){if(fltRoom&&DB.maint[i].roomId!==fltRoom)continue;records.push(DB.maint[i])}}
   records.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
   if(records.length===0){toast(year+'\u5E74\u6682\u65E0\u7EF4\u4FEE\u8BB0\u5F55');return null}
   return {year:year,records:records};
@@ -1254,12 +1422,12 @@ function printMaint(){
         +'.maint-print-sheet{background:#fff;color:#000;font-family:SimSun,"Songti SC",serif}'
         +'.mp-head{text-align:center;padding:12px 0 6px;border-bottom:2px solid #333}'
         +'.mp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
-        +'.mp-table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6}'
+        +'.mp-table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.6}'
         +'.mp-table th,.mp-table td{border:1.5px solid #333;padding:5px 8px;text-align:left;vertical-align:middle}'
-        +'.mp-table th{font-weight:700;text-align:center;font-size:14px}'
-        +'.mp-date-cell{font-size:12.5px;width:85px}.mp-room-cell{font-size:12.5px;font-weight:600;width:65px}'
-        +'.mp-desc-cell{font-size:13px}.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px}'
-        +'.mp-total-row td{font-weight:700;font-size:14px;background:#EDEDED;border-width:2px 1.5px}'
+        +'.mp-table th{font-weight:700;text-align:center;font-size:15px}'
+        +'.mp-date-cell{font-size:13.5px;width:85px}.mp-room-cell{font-size:13.5px;font-weight:600;width:65px}'
+        +'.mp-desc-cell{font-size:14px}.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px}'
+        +'.mp-total-row td{font-weight:700;font-size:15px;background:#EDEDED;border-width:2px 1.5px}'
         +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
         +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'+html+'</body></html>';
       var fname=d.year+'_维修汇总表.html';
@@ -1293,12 +1461,12 @@ function exportMaint(){
       +'.maint-print-sheet{background:#fff;color:#000;font-family:SimSun,"Songti SC",serif}'
       +'.mp-head{text-align:center;padding:12px 0 6px;border-bottom:2px solid #333}'
       +'.mp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
-      +'.mp-table{width:100%;border-collapse:collapse;font-size:13px;line-height:1.6}'
+      +'.mp-table{width:100%;border-collapse:collapse;font-size:14px;line-height:1.6}'
       +'.mp-table th,.mp-table td{border:1.5px solid #333;padding:5px 8px;text-align:left;vertical-align:middle}'
-      +'.mp-table th{font-weight:700;text-align:center;font-size:14px}'
-      +'.mp-date-cell{font-size:12.5px;width:85px}.mp-room-cell{font-size:12.5px;font-weight:600;width:65px}'
-      +'.mp-desc-cell{font-size:13px}.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px}'
-      +'.mp-total-row td{font-weight:700;font-size:14px;background:#EDEDED;border-width:2px 1.5px}'
+      +'.mp-table th{font-weight:700;text-align:center;font-size:15px}'
+      +'.mp-date-cell{font-size:13.5px;width:85px}.mp-room-cell{font-size:13.5px;font-weight:600;width:65px}'
+      +'.mp-desc-cell{font-size:14px}.mp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:90px}'
+      +'.mp-total-row td{font-weight:700;font-size:15px;background:#EDEDED;border-width:2px 1.5px}'
       +'.mp-foot{margin-top:18px;display:flex;justify-content:space-between;font-size:13px}'
       +'@media print{@page{size:A4 portrait;margin:8mm}}'
       +'</style></head><body>'
@@ -1420,12 +1588,12 @@ function printPay(){
       +'.pp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
       +'.pp-type-block{margin:14px 0;border:1.5px solid #333}'
       +'.pp-type-title{background:#fff;font-weight:700;font-size:15px;text-align:center;padding:5px 0;border-bottom:1.5px solid #333}'
-      +'.pp-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.4;table-layout:fixed}'
+      +'.pp-table{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.4;table-layout:fixed}'
       +'.pp-table th,.pp-table td{border:1.5px solid #333;padding:3px 4px;text-align:center;vertical-align:middle}'
-      +'.pp-table th{font-weight:700;font-size:13px}'
+      +'.pp-table th{font-weight:700;font-size:14px}'
       +'.pp-room-cell{font-weight:600;width:60px}.pp-date-cell{width:80px}.pp-num-cell{width:70px}'
       +'.pp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:75px}'
-      +'.pp-total-row td{font-weight:700;font-size:13px;border-width:2px 1.5px}'
+      +'.pp-total-row td{font-weight:700;font-size:14px;border-width:2px 1.5px}'
       +'@media print{@page{size:A4 portrait;margin:8mm}}'
       +'</style></head><body>'
       +buildPayPages(d.year,d.records)
@@ -1453,12 +1621,12 @@ function exportPay(){
       +'.pp-head h1{font-size:22px;font-weight:700;letter-spacing:6px;margin:0}'
       +'.pp-type-block{margin:14px 0;border:1.5px solid #333}'
       +'.pp-type-title{background:#fff;font-weight:700;font-size:15px;text-align:center;padding:5px 0;border-bottom:1.5px solid #333}'
-      +'.pp-table{width:100%;border-collapse:collapse;font-size:12.5px;line-height:1.4;table-layout:fixed}'
+      +'.pp-table{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.4;table-layout:fixed}'
       +'.pp-table th,.pp-table td{border:1.5px solid #333;padding:3px 4px;text-align:center;vertical-align:middle}'
-      +'.pp-table th{font-weight:700;font-size:13px}'
+      +'.pp-table th{font-weight:700;font-size:14px}'
       +'.pp-room-cell{font-weight:600;width:60px}.pp-date-cell{width:80px}.pp-num-cell{width:70px}'
       +'.pp-cost-cell{text-align:right;font-weight:700;white-space:nowrap;width:75px}'
-      +'.pp-total-row td{font-weight:700;font-size:13px;border-width:2px 1.5px}'
+      +'.pp-total-row td{font-weight:700;font-size:14px;border-width:2px 1.5px}'
       +'@media print{@page{size:A4 portrait;margin:8mm}}</style></head><body>'
       +buildPayPages(d.year,d.records)
       +'</body></html>';
@@ -1531,6 +1699,7 @@ function showAddPayModal(record){
       if(!$('pGasPrice').value)$('pGasPrice').value=DB.publicPrices.gas!=null?DB.publicPrices.gas:0;
     }
     if(record)recalcPayTotal();
+    showPrevReads($('payRoom').value||'','p');
     openModal('modalPay');
   }catch(e){}
 }
@@ -1663,21 +1832,36 @@ function renderPay(){
     s.innerHTML=h;
     if(cur)s.value=cur;
     fillPayRoomOptions();
+    // 填充房间筛选器
+    var prf=$('payRoomFilter'),prfOpts='<option value="">\u5168\u90E8\u623F\u95F4</option>',curPrf=prf?prf.value:'';
+    for(var i=0;i<DB.rooms.length;i++)prfOpts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
+    if(prf)prf.innerHTML=prfOpts;
+    if(curPrf&&prf)prf.value=curPrf;
     var year=parseInt(s.value)||getYear();
+    var filterRoomId=prf?prf.value:'';
+    var filterType=$('payTypeFilter')?$('payTypeFilter').value:'';
     var typeIcon={'\u7535':'\u26A1','\u6C34':'\uD83D\uDCA7','\u71C3\u6C14':'\uD83D\uDD25','\u5176\u4ED6':'\uD83D\uDCE6'};
     var records=[];
-    for(var i=0;i<DB.payments.length;i++){if(new Date(DB.payments[i].date).getFullYear()===year)records.push(DB.payments[i])}
+    for(var i=0;i<DB.payments.length;i++){
+      var p=DB.payments[i];
+      if(new Date(p.date).getFullYear()===year&&(!filterRoomId||p.roomId===filterRoomId)&&(!filterType||p.type===filterType))records.push(p)
+    }
     records.sort(function(a,b){return new Date(a.date)-new Date(b.date)});
-    var total=0,byType={'\u7535':0,'\u6C34':0,'\u71C3\u6C14':0,'\u5176\u4ED6':0};
-    for(var i=0;i<records.length;i++){total+=records[i].cost;byType[records[i].type]=(byType[records[i].type]||0)+records[i].cost}
+    var total=0,byType={'\u7535':0,'\u6C34':0,'\u71C3\u6C14':0,'\u5176\u4ED6':0},byUsage={'\u7535':0,'\u6C34':0,'\u71C3\u6C14':0};
+    for(var i=0;i<records.length;i++){total+=records[i].cost;byType[records[i].type]=(byType[records[i].type]||0)+records[i].cost;if(records[i].usage)byUsage[records[i].type]=(byUsage[records[i].type]||0)+records[i].usage}
+    function uRow(icon,label,typeKey){
+      var amt='\u91D1\u989D \u00A5'+fmt(byType[typeKey]),use=byUsage[typeKey]?fmt(byUsage[typeKey]):'';
+      if(use)return row(icon+" "+label,"\u7528\u91CF "+use+" / "+amt,"red");
+      return row(icon+" "+label,amt,"red");
+    }
     $('paySummary').innerHTML=
       row('\u672C\u5E74\u4EE3\u7F34\u603B\u652F\u51FA','\u00A5'+fmt(total),'red')+
-      row('\u26A1 \u7535\u8D39','\u00A5'+fmt(byType['\u7535']),'red')+
-      row('\uD83D\uDCA7 \u6C34\u8D39','\u00A5'+fmt(byType['\u6C34']),'red')+
-      row('\uD83D\uDD25 \u71C3\u6C14\u8D39','\u00A5'+fmt(byType['\u71C3\u6C14']),'red')+
+      uRow('\u26A1','\u7535\u8D39','\u7535')+
+      uRow('\uD83D\uDCA7','\u6C34\u8D39','\u6C34')+
+      uRow('\uD83D\uDD25','\u71C3\u6C14\u8D39','\u71C3\u6C14')+
       (byType['\u5176\u4ED6']?row('\uD83D\uDCE6 \u5176\u4ED6','\u00A5'+fmt(byType['\u5176\u4ED6']),'red'):'')+
       row('\u4EE3\u7F34\u7B14\u6570',records.length+' \u7B14');
-    $('paySummaryTitle').textContent=year+'\u5E74 \u4EE3\u7F34\u6C47\u603B';
+    $('paySummaryTitle').textContent=year+'\u5E74 \u4EE3\u7F34\u6C47\u603B'+(filterRoomId?'('+findRoomById(filterRoomId).number+')':'')+(filterType?' · '+filterType:'');
     // 打印/导出按钮：有数据时显示
     var showBtns=records.length>0;
     $('printPayBtn').style.display=showBtns?'inline-block':'none';
@@ -1687,12 +1871,12 @@ function renderPay(){
     for(var mi=0;mi<records.length;mi++){
       var p=records[mi],mr=findRoomById(p.roomId);
       ph+='<div class="billing-month"><span>'+fmtDate(p.date)+' \u4EE3\u7F34</span><span>\u00A5'+fmt(p.cost)+
-        ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:11px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="showAddPayModal(DB.payments.find(function(x){return x.id===\''+p.id+'\'}))">\u7F16\u8F91</button>'+
-        ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:11px" onclick="deletePay(\''+p.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
+        ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:13px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="showAddPayModal(DB.payments.find(function(x){return x.id===\''+p.id+'\'}))">\u7F16\u8F91</button>'+
+        ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:13px" onclick="deletePay(\''+p.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
       ph+='<div class="billing-row header" style="grid-template-columns:26px 55px 50px 60px 50px 65px"><span></span><span>\u623F\u53F7</span><span>\u7C7B\u578B</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
       var typeIcon={'\u7535':'\u26A1','\u6C34':'\uD83D\uDCA7','\u71C3\u6C14':'\uD83D\uDD25','\u5176\u4ED6':'\uD83D\uDCE6'};
       ph+='<div class="billing-row" style="grid-template-columns:26px 55px 50px 60px 50px 65px"><span class="type-icon type-electric">'+(typeIcon[p.type]||'\uD83D\uDCE6')+'</span><span>'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+p.type+'</span><span>'+(p.reading?fmt(p.reading):'\u2014')+'</span><span>'+(p.usage?fmt(p.usage):'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(p.cost)+'</span></div>';
-      if(p.note)ph+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:11px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+p.note+'</span></div>';
+      if(p.note)ph+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+p.note+'</span></div>';
       ph+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(p.cost)+'</div></div>';
     }
     $('payList').innerHTML='<div class="card"><div class="card-title">\u4EE3\u7F34\u660E\u7EC6</div>'+ph+'</div>';
@@ -1707,24 +1891,19 @@ function renderExpenses(){
     for(var i=y-2;i<=y+1;i++)h+='<option value="'+i+'"'+(i===y?' selected':'')+'>'+i+'</option>';
     s.innerHTML=h;
     if(cur)s.value=cur;
-    var rs=$('expRoomSelect'),ropts='<option value="">\u5168\u90E8\u623F\u95F4</option>',curRoom=rs?rs.value:'';
-    for(var i=0;i<DB.rooms.length;i++){var r=DB.rooms[i];ropts+='<option value="'+r.id+'">'+r.number+(r.tenant?'('+r.tenant+')':'')+'</option>'}
-    rs.innerHTML=ropts;
-    if(curRoom)rs.value=curRoom;
     renderBackupStat();
     var year=parseInt(s.value)||getYear();
-    var filterRoomId=rs?rs.value:'';
     // Filter helpers
     var fb=[],fm=[],fp=[];
     for(var i=0;i<DB.bills.length;i++){
       var b=DB.bills[i];
-      if(new Date(b.date).getFullYear()===year&&(!filterRoomId||b.roomId===filterRoomId))fb.push(b);
+      if(new Date(b.date).getFullYear()===year)fb.push(b);
     }
     for(var i=0;i<DB.maint.length;i++){
-      if(new Date(DB.maint[i].date).getFullYear()===year&&(!filterRoomId||DB.maint[i].roomId===filterRoomId))fm.push(DB.maint[i]);
+      if(new Date(DB.maint[i].date).getFullYear()===year)fm.push(DB.maint[i]);
     }
     for(var i=0;i<DB.payments.length;i++){
-      if(new Date(DB.payments[i].date).getFullYear()===year&&(!filterRoomId||DB.payments[i].roomId===filterRoomId))fp.push(DB.payments[i]);
+      if(new Date(DB.payments[i].date).getFullYear()===year)fp.push(DB.payments[i]);
     }
 
     var tR=0,tE=0,tW=0,tG=0,tO=0,tD=0;
@@ -1734,9 +1913,8 @@ function renderExpenses(){
     var tP=0;
     for(var i=0;i<fp.length;i++)tP+=fp[i].cost;
     var net=tR+tE+tW+tG+tO+tD-tM-tP;
-    var roomLabel=filterRoomId?(findRoomById(filterRoomId)?findRoomById(filterRoomId).number:''):'\u5168\u90E8\u623F\u95F4';
     $('expenseStats').innerHTML=
-      '<div style="font-size:12px;color:var(--text2);margin-bottom:6px">\u7EDF\u8BA1\u8303\u56FF:'+roomLabel+' \u00B7 '+year+'\u5E74</div>'+
+      '<div style="font-size:13px;color:var(--text2);margin-bottom:6px">\u7EDF\u8BA1\u8303\u56FF:\u5168\u90E8\u623F\u95F4 \u00B7 '+year+'\u5E74</div>'+
       row('\u623F\u79DF\u6536\u5165','\u00A5'+fmt(tR),'green')+
       row('\u7535\u8D39\u6536\u5165\uFF08\u5411\u79DF\u6237\u6536\uFF09','\u00A5'+fmt(tE),'green')+
       row('\u6C34\u8D39\u6536\u5165\uFF08\u5411\u79DF\u6237\u6536\uFF09','\u00A5'+fmt(tW),'green')+
@@ -1747,10 +1925,21 @@ function renderExpenses(){
       row('\u4EE3\u7F34\u6C34\u7535\u8D39\u652F\u51FA','\u00A5'+fmt(tP),'red')+
       '<div class="summary-row" style="border-top:2px solid var(--primary);padding-top:8px;margin-top:4px"><span>\u51C0\u6536\u5165</span><span class="val" style="color:'+(net>=0?'var(--success)':'var(--danger)')+';font-size:17px">\u00A5'+fmt(net)+'</span></div>';
 
-    // Per-room breakdown table (only when "all rooms" selected)
-    if(!filterRoomId){
+    // Per-room breakdown table
+    {
+      var expCols=[
+        {key:'rent',h:'\u623F\u79DF',get:function(r){return r.R},tot:function(){return tR},cls:'success'},
+        {key:'elec',h:'\u7535\u8D39',get:function(r){return r.E},tot:function(){return tE},cls:'success'},
+        {key:'water',h:'\u6C34\u8D39',get:function(r){return r.W},tot:function(){return tW},cls:'success'},
+        {key:'gas',h:'\u71C3\u6C14',get:function(r){return r.G},tot:function(){return tG},cls:'success'},
+        {key:'other',h:'\u5176\u4ED6',get:function(r){return r.O},tot:function(){return tO},cls:'success'},
+        {key:'maint',h:'\u7EF4\u4FEE',get:function(r){return r.M},tot:function(){return tM},cls:'danger'},
+        {key:'pay',h:'\u4EE3\u7F34',get:function(r){return r.P},tot:function(){return tP},cls:'danger'}
+      ];
       var bt='<div class="card"><div class="card-title">\u5404\u623F\u95F4\u6536\u652F\u660E\u7EC6\uFF08'+year+'\u5E74\uFF09</div><div class="expense-table-wrap">';
-      bt+='<table class="expense-table"><tr><th>\u623F\u53F7</th><th>\u79DF\u6237</th><th>\u623F\u79DF</th><th>\u7535\u8D39</th><th>\u6C34\u8D39</th><th>\u71C3\u6C14</th><th>\u5176\u4ED6</th><th>\u4FDD\u8BC1\u91D1</th><th>\u7EF4\u4FEE</th><th>\u4EE3\u7F34</th><th>\u51C0\u6536\u5165</th></tr>';
+      bt+='<table class="expense-table"><tr><th>\u623F\u53F7</th><th>\u79DF\u6237</th>';
+      for(var ci=0;ci<expCols.length;ci++)bt+='<th>'+expCols[ci].h+'</th>';
+      bt+='<th>\u51C0\u6536\u5165</th></tr>';
       var grandNet=0;
       for(var ri=0;ri<DB.rooms.length;ri++){
         var room=DB.rooms[ri];
@@ -1765,9 +1954,14 @@ function renderExpenses(){
         var rNet=rR+rE+rW+rG+rO+rD-rM-rP;
         grandNet+=rNet;
         var nc=rNet>=0?'color:var(--success)':'color:var(--danger)';
-        bt+='<tr><td><strong>'+room.number+'</strong></td><td>'+(room.tenant||'<span style="color:var(--text3)">\u7A7A</span>')+'</td><td style="color:var(--success)">\u00A5'+fmt(rR)+'</td><td style="color:var(--success)">\u00A5'+fmt(rE)+'</td><td style="color:var(--success)">\u00A5'+fmt(rW)+'</td><td style="color:var(--success)">\u00A5'+fmt(rG)+'</td><td style="color:var(--success)">\u00A5'+fmt(rO)+'</td><td>\u00A5'+fmt(rD)+'</td><td style="color:var(--danger)">\u00A5'+fmt(rM)+'</td><td style="color:var(--danger)">\u00A5'+fmt(rP)+'</td><td style="'+nc+';font-weight:600">\u00A5'+fmt(rNet)+'</td></tr>';
+        var rec={R:rR,E:rE,W:rW,G:rG,O:rO,M:rM,P:rP};
+        bt+='<tr><td><strong>'+room.number+'</strong></td><td>'+(room.tenant||'<span style="color:var(--text3)">\u7A7A</span>')+'</td>';
+        for(var ci=0;ci<expCols.length;ci++)bt+='<td style="color:var(--'+expCols[ci].cls+')">\u00A5'+fmt(expCols[ci].get(rec))+'</td>';
+        bt+='<td style="'+nc+';font-weight:600">\u00A5'+fmt(rNet)+'</td></tr>';
       }
-      bt+='<tr style="background:#F5F7FA;font-weight:600"><td colspan="2">\u5408\u8BA1</td><td style="color:var(--success)">\u00A5'+fmt(tR)+'</td><td style="color:var(--success)">\u00A5'+fmt(tE)+'</td><td style="color:var(--success)">\u00A5'+fmt(tW)+'</td><td style="color:var(--success)">\u00A5'+fmt(tG)+'</td><td style="color:var(--success)">\u00A5'+fmt(tO)+'</td><td>\u00A5'+fmt(tD)+'</td><td style="color:var(--danger)">\u00A5'+fmt(tM)+'</td><td style="color:var(--danger)">\u00A5'+fmt(tP)+'</td><td style="'+(net>=0?'color:var(--success)':'color:var(--danger)')+'">\u00A5'+fmt(net)+'</td></tr>';
+      bt+='<tr style="background:#F5F7FA;font-weight:600"><td colspan="2">\u5408\u8BA1</td>';
+      for(var ci=0;ci<expCols.length;ci++)bt+='<td style="color:var(--'+expCols[ci].cls+')">\u00A5'+fmt(expCols[ci].tot())+'</td>';
+      bt+='<td style="'+(net>=0?'color:var(--success)':'color:var(--danger)')+'">\u00A5'+fmt(net)+'</td></tr>';
       bt+='</table></div></div>';
       var expStats=$('expenseStats');
       if(expStats&&expStats.parentNode){
@@ -1776,9 +1970,6 @@ function renderExpenses(){
         var div=document.createElement('div');div.id='roomBreakdown';div.innerHTML=bt;
         expStats.parentNode.insertBefore(div,expStats.nextSibling);
       }
-    }else{
-      var breakdown=document.getElementById('roomBreakdown');
-      if(breakdown)breakdown.parentNode.removeChild(breakdown);
     }
   }catch(e){}
 }
@@ -1892,7 +2083,7 @@ function renderBackupStat(){
 }
 
 // ========== DASHBOARD ==========
-function renderAll(){try{renderAllRooms();renderDashStats();renderQuickActions()}catch(e){}}
+function renderAll(){try{renderAllRooms();renderDashStats();renderQuickActions()}catch(e){reportError(e,'renderAll')}}
 
 function renderDashStats(){
   try{
@@ -1918,6 +2109,7 @@ function renderQuickActions(){
       '<div class="quick-action" onclick="qaAddRoom()"><div class="qa-icon" style="background:#E3F2FD;color:#1565C0">\u2795</div><span class="qa-label">\u52A0\u623F\u95F4</span></div>'+
       '<div class="quick-action" onclick="qaBill()"><div class="qa-icon" style="background:#E8F5E9;color:#2E7D32">\uD83D\uDCCD</div><span class="qa-label">\u6284\u8868</span></div>'+
       '<div class="quick-action" onclick="qaMaint()"><div class="qa-icon" style="background:#FFF3E0;color:#E65100">\uD83D\uDD27</div><span class="qa-label">\u8BB0\u7EF4\u4FEE</span></div>'+
+      '<div class="quick-action" onclick="qaPay()"><div class="qa-icon" style="background:#FFF8E1;color:#F57F17">\uD83D\uDCB5</div><span class="qa-label">\u4EE3\u7F34</span></div>'+
       '<div class="quick-action" onclick="qaReport()"><div class="qa-icon" style="background:#F3E5F5;color:#7B1FA2">\uD83D\uDCCA</div><span class="qa-label">\u770B\u62A5\u8868</span></div>';
   }catch(e){}
 }
@@ -1941,10 +2133,23 @@ function initData(){
   }
 }
 
-function detectPlatform(){}
+function detectPlatform(){
+  IS_NATIVE=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+  if(!IS_NATIVE){
+    try{
+      if(!document.getElementById('previewBar')){
+        var bar=document.createElement('div');
+        bar.id='previewBar';
+        bar.style.cssText='position:fixed;top:0;left:0;right:0;z-index:9999;background:#ff9800;color:#fff;font-size:13px;text-align:center;padding:4px 8px;box-shadow:0 1px 4px rgba(0,0,0,.2)';
+        bar.textContent='🌐 浏览器预览模式：原生存文件/分享已模拟为下载，云同步正常，仅用于验证界面与逻辑';
+        document.body.appendChild(bar);
+      }
+    }catch(e){}
+  }
+}
 
 // ===== BOOTSTRAP ===== //
-function startApp(){try{detectPlatform();DB.load().then(function(){try{initData();renderAll();}catch(e){console.error('Init error:',e);alert('\u521D\u59CB\u5316\u51FA\u9519\uFF0C\u8BF7\u91CD\u8BD5')}})}catch(e){}}
+function startApp(){try{detectPlatform();DB.load().then(function(){try{initData();renderAll();}catch(e){console.error('Init error:',e);reportError(e,'initData/renderAll')}})}catch(e){reportError(e,'startApp')}}
 try{
   if(initSupabase()){
     sbClient.auth.getSession().then(function(r){
