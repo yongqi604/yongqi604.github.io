@@ -70,9 +70,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 .badge-success{background:#E8F5E9;color:#2E7D32}.badge-warning{background:#FFF3E0;color:#E65100}.badge-danger{background:#FFEBEE;color:#C62828}.badge-muted{background:#F5F5F5;color:var(--text3)}
 .rent-remind-row{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer}
 .rent-remind-row:last-child{border-bottom:none}
-.rent-chips{display:flex;flex-wrap:wrap;gap:6px}
-.rent-chip{display:flex;align-items:center;font-size:12.5px;padding:5px 8px;background:#F5F7FA;border-radius:8px;cursor:pointer;border:1px solid var(--border)}
+.rent-chips{display:flex;flex-direction:column;gap:0}
+.rent-chip{display:flex;align-items:center;font-size:14px;padding:10px 12px;background:#fff;border-radius:10px;cursor:pointer;border:1px solid var(--border);transition:background .15s}
+.rent-chip:active{background:#F5F7FA}
 .rent-chip-danger{background:#FFEBEE;border-color:#FFCDD2}
+.rent-chip-warning{background:#FFF8E1;border-color:#FFE082}
 .quick-actions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
 .quick-action{display:flex;flex-direction:column;align-items:center;padding:11px 4px;border-radius:10px;background:var(--card);box-shadow:var(--shadow);cursor:pointer;transition:.15s;border:none;outline:none}
 .quick-action:active{transform:scale(.95);background:#f0f0f0}
@@ -208,6 +210,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
   <div class="stats-grid" id="dashStats"></div>
   <div class="quick-actions" id="quickActions"></div>
   <div id="rentReminderBox"></div>
+</div>
+
+<!-- PAGE: Rooms -->
+<div class="page" id="pageRooms">
   <div class="card"><div class="card-title">房间列表 <span class="action" onclick="showAddRoomModal()">+ 添加房间</span></div><div id="roomList"></div></div>
 </div>
 
@@ -257,6 +263,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
 <!-- Bottom Tabs -->
 <div class="tabs" id="tabBar">
   <button class="tab active" onclick="switchTab(this,'pageDashboard')"><span class="icon">🏠</span>首页</button>
+  <button class="tab" onclick="switchTab(this,'pageRooms')"><span class="icon">🚪</span>房间</button>
   <button class="tab" onclick="switchTab(this,'pageBilling')"><span class="icon">📋</span>结算</button>
   <button class="tab" onclick="switchTab(this,'pageMaint')"><span class="icon">🔧</span>维修</button>
   <button class="tab" onclick="switchTab(this,'pagePay')"><span class="icon">💵</span>代缴</button>
@@ -506,6 +513,7 @@ function switchTab(btn,pgId){
     if(pgId==='pageMaint')renderMaint();
     if(pgId==='pagePay')renderPay();
     if(pgId==='pageExpenses')renderExpenses();
+    if(pgId==='pageRooms')renderAllRooms();
   }catch(e){}
 }
 
@@ -520,6 +528,7 @@ function handleFabClick(){
     if(!pg)return;
     var pid=pg.id;
     if(pid==='pageDashboard'){showAddRoomModal();return}
+    if(pid==='pageRooms'){showAddRoomModal();return}
     if(pid==='pageBilling'){qaBill();return}
     if(pid==='pageMaint'){showAddMaintModal();return}
     if(pid==='pagePay'){showAddPayModal();return}
@@ -710,7 +719,7 @@ function bRow(cls,ic,lbl,sub,rd,us,cst,extra,color){
   return '<div class="billing-row"><span class="type-icon type-'+cls+'">'+ic+'</span><span>'+lbl+(sub?' '+sub:'')+'</span><span>'+fmt(rd)+'</span><span>'+fmt(us)+'</span><span '+c+'">'+extraStr+'</span></div>';
 }
 
-function goPage(pg){var map={pageDashboard:0,pageBilling:1,pageMaint:2,pagePay:3,pageExpenses:4};var idx=map[pg];if(idx!=null){var tabs=document.querySelectorAll('.tab');if(tabs[idx])switchTab(tabs[idx],pg)}}
+function goPage(pg){var map={pageDashboard:0,pageRooms:1,pageBilling:2,pageMaint:3,pagePay:4,pageExpenses:5};var idx=map[pg];if(idx!=null){var tabs=document.querySelectorAll('.tab');if(tabs[idx])switchTab(tabs[idx],pg)}}
 
 // ========== BILLING ==========
 function initBillSelects(){
@@ -2210,9 +2219,9 @@ function renderRentReminders(){
       if(r.isVacant) continue;
       list.push({r:r, st:rentDueStatus(r)});
     }
-    var h='<div class="card" style="border-left:4px solid var(--primary)"><div class="card-title" style="margin-bottom:8px">\uD83D\uDCC5 房租到期 <span class="action" onclick="showAddRoomModal()">设置</span></div>';
+    var h='<div class="card" style="border-left:4px solid var(--primary);overflow:hidden"><div class="card-title" style="margin-bottom:10px;font-size:15px">\uD83D\uDCC5 房租到期 <span class="action" onclick="showAddRoomModal()">设置</span></div>';
     if(list.length===0){
-      h+='<div style="padding:8px;text-align:center;color:var(--text3);font-size:12.5px">暂无已租房间</div>';
+      h+='<div style="padding:12px;text-align:center;color:var(--text3);font-size:14px">暂无已租房间</div>';
       box.innerHTML=h; return;
     }
     list.sort(function(a,b){
@@ -2223,12 +2232,16 @@ function renderRentReminders(){
     for(var i=0;i<list.length;i++){
       var r=list[i].r, st=list[i].st;
       var dot=st.cls==='danger'?'\uD83D\uDD34':(st.cls==='warning'?'\uD83D\uDFE0':(st.cls==='success'?'\uD83D\uDFE2':'\u26AB'));
-      var dueText=st.cls==='muted'?'未设':(r.rentDueDay+'号');
-      h+='<div class="rent-chip'+(st.cls==='danger'?' rent-chip-danger':'')+'" onclick="showRoomDetail(\''+r.id+'\')">'+
-        '<span style="margin-right:4px">'+dot+'</span>'+
-        '<span style="font-weight:600">'+r.number+'</span>'+
-        '<span style="color:var(--text2);margin-left:4px">'+dueText+'</span>'+
-        '<span class="badge badge-'+st.cls+'" style="margin-left:4px;font-size:10px;padding:1px 5px">'+st.txt+'</span>'+
+      var dueText=st.cls==='muted'?'未设置交租日':(r.rentDueDay+'号到期');
+      var rentTxt=r.rent>0?' \u00A5'+fmt(r.rent):'';
+      h+='<div class="rent-chip'+(st.cls==='danger'?' rent-chip-danger':'')+(st.cls==='warning'?' rent-chip-warning':'')+'" onclick="showRoomDetail(\''+r.id+'\')">'+
+        '<span style="margin-right:8px;font-size:16px">'+dot+'</span>'+
+        '<span style="font-weight:700;font-size:15px;min-width:52px">'+r.number+'</span>'+
+        '<div style="flex:1;display:flex;flex-direction:column;gap:2px;margin-left:6px">'+
+          '<span style="color:var(--text1);font-size:14px">'+dueText+'</span>'+
+          (r.tenant?'<span style="color:var(--text3);font-size:12px">'+r.tenant+(rentTxt?' · '+rentTxt:'')+'</span>':'')+
+        '</div>'+
+        '<span class="badge badge-'+st.cls+'" style="margin-left:8px;font-size:11px;padding:3px 8px;border-radius:10px;white-space:nowrap">'+st.txt+'</span>'+
         '</div>';
     }
     h+='</div></div>';
