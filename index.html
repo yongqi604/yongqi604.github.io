@@ -1075,23 +1075,42 @@ function capSaveLocText(loc,fname){
   return fname;
 }
 
-// 保存文件后弹出系统分享面板（用户可选"打印服务"/"Chrome"/PDF转换器等）
-// 这是 Oppo 等无打印入口的手机的推荐方案
+// 保存文件后弹出系统分享面板，并把文件本身附上（content:// URI）
+// 用户可在面板里选：Chrome（打开后打印/存PDF）、文件管理（保存到可见位置）、打印服务等
+// 这是 Oppo 无打印入口 / 华为文件管理器扫不到 Download 的统一解法
 function saveAndShare(content,filename,title){
   doCapacitorSave(content,filename,function(ok,loc,reason){
     if(!ok){toast(capSaveErrText(reason,'保存'));return}
-    // 文件已保存，尝试调起分享面板
+    var locText=capSaveLocText(loc,filename);
     try{
+      var fs=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem);
       var Share=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share);
-      if(Share){
-        Share.share({title:title||filename,text:'请用浏览器打开此文件进行打印或另存为PDF',url:''})
-          .catch(function(){/* 用户取消分享，静默 */});
-        toast('已保存：'+capSaveLocText(loc,filename)+'\n已弹出分享面板');
+      if(Share&&fs){
+        var dir=loc==='download'?'EXTERNAL_STORAGE':'DOCUMENTS';
+        var fpath=loc==='download'?'Download/'+filename:filename;
+        // 取文件 URI（仅用于分享，失败不影响已保存结果）
+        fs.getUri({path:fpath,directory:dir}).then(function(res){
+          var uri=res&&res.uri;
+          if(uri){
+            Share.share({title:title||filename,text:'打开后可打印或另存为PDF',files:[uri]})
+              .then(function(){toast('已保存：'+locText+'\n已弹出分享，选 Chrome 可打印/存PDF');})
+              .catch(function(){toast('已保存：'+locText);});
+          }else{
+            Share.share({title:title||filename,text:'文件已保存：'+locText}).catch(function(){});
+            toast('已保存：'+locText);
+          }
+        }).catch(function(){
+          // getUri 失败：文件已保存，引导用文件管理器/Chrome
+          toast('已保存：'+locText+'\n用文件管理器打开，或装 Chrome 用浏览器打印/存PDF');
+        });
+      }else if(Share){
+        Share.share({title:title||filename,text:'文件已保存：'+locText}).catch(function(){});
+        toast('已保存：'+locText);
       }else{
-        toast('已保存：'+capSaveLocText(loc,filename)+'\n请用文件管理器打开，或安装Chrome后用浏览器打印/存PDF');
+        toast('已保存：'+locText+'\n用文件管理器打开，或装 Chrome 用浏览器打印/存PDF');
       }
     }catch(e){
-      toast('已保存：'+capSaveLocText(loc,filename));
+      toast('已保存：'+locText);
     }
   });
 }
