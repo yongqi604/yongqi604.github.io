@@ -1155,16 +1155,16 @@ function doCapacitorSave(content,filename,callback){
       else callback(false,'','web_download_failed');
       return;
     }
-    // 策略1：EXTERNAL_STORAGE/Download（公共下载目录）
-    fs.writeFile({path:'Download/'+filename,data:content,directory:'EXTERNAL_STORAGE',encoding:'utf8'})
-    .then(function(){callback(true,'download','')})
+    // 优先 DOCUMENTS（App 私有但跨 App 分享最可靠，getUri 返回的 content:// 可被其他 App 读取）
+    // 失败再回退 EXTERNAL_STORAGE/Download
+    fs.writeFile({path:filename,data:content,directory:'DOCUMENTS',encoding:'utf8'})
+    .then(function(){callback(true,'documents','')})
     .catch(function(e1){
-      console.error('doCapacitorSave: EXTERNAL_STORAGE 失败',e1);
-      // 策略2：DOCUMENTS（App私有目录，与 DB.save() 相同的已验证路径）
-      fs.writeFile({path:filename,data:content,directory:'DOCUMENTS',encoding:'utf8'})
-      .then(function(){callback(true,'documents','')})
+      console.error('doCapacitorSave: DOCUMENTS 失败',e1);
+      fs.writeFile({path:'Download/'+filename,data:content,directory:'EXTERNAL_STORAGE',encoding:'utf8'})
+      .then(function(){callback(true,'download','')})
       .catch(function(e2){
-        console.error('doCapacitorSave: DOCUMENTS 也失败',e2);
+        console.error('doCapacitorSave: EXTERNAL_STORAGE 也失败',e2);
         callback(false,'','write_failed');
       });
     });
@@ -1176,49 +1176,47 @@ function doCapacitorSave(content,filename,callback){
 
 // 根据保存位置生成路径提示文案
 function capSaveLocText(loc,fname){
-  if(loc==='download') return '下载/Download 目录：'+fname;
-  if(loc==='documents') return 'App 私有目录（文件管理需授权才能查看）：'+fname;
-  return fname;
+  if(loc==='download') return '已保存至 Download 目录：'+fname;
+  if(loc==='documents') return '已保存至应用文档目录：'+fname;
+  return '已保存：'+fname;
 }
 
 // 保存文件后弹出系统分享面板，并把文件本身附上（content:// URI）
-// 用户可在面板里选：Chrome（打开后打印/存PDF）、文件管理（保存到可见位置）、打印服务等
+// 用户可在面板里选：文件管理（保存到可见位置）、微信（发给文件传输助手）、Chrome（打开后打印/存PDF）
 // 这是 Oppo 无打印入口 / 华为文件管理器扫不到 Download 的统一解法
 function saveAndShare(content,filename,title,hint){
   doCapacitorSave(content,filename,function(ok,loc,reason){
     if(!ok){toast(capSaveErrText(reason,'保存'));return}
     if(!IS_NATIVE){toast('🌐 浏览器预览：已下载「'+filename+'」到本机\n（原生打印/分享不可用，HTML 可用电脑浏览器打开后打印）');return}
     var locText=capSaveLocText(loc,filename);
-    var okHint=hint||'已弹出分享，选 Chrome 可打印/存PDF';
+    var dir=loc==='download'?'EXTERNAL_STORAGE':'DOCUMENTS';
+    var fpath=loc==='download'?'Download/'+filename:filename;
     try{
       var fs=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Filesystem);
       var Share=(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.Share);
       if(Share&&fs){
-        var dir=loc==='download'?'EXTERNAL_STORAGE':'DOCUMENTS';
-        var fpath=loc==='download'?'Download/'+filename:filename;
-        // 取文件 URI（仅用于分享，失败不影响已保存结果）
+        // 取文件 URI（content://），用于跨 App 分享，失败不影响已保存结果
         fs.getUri({path:fpath,directory:dir}).then(function(res){
           var uri=res&&res.uri;
-          if(uri){
-            Share.share({title:title||filename,text:'打开后可打印或另存为PDF',files:[uri]})
-              .then(function(){toast('已保存：'+locText+'\n'+okHint);})
-              .catch(function(){toast('已保存：'+locText);});
-          }else{
-            Share.share({title:title||filename,text:'文件已保存：'+locText}).catch(function(){});
-            toast('已保存：'+locText);
-          }
+          var opts={title:title||filename,text:'打开后可打印或另存为PDF'};
+          if(uri)opts.files=[uri];
+          Share.share(opts)
+            .then(function(){toast('✅ 已弹出分享面板，选择「微信 / 文件管理 / Chrome」即可保存或打印');})
+            .catch(function(){
+              // 分享被取消或目标不可用：文件已在，引导用户去文件管理
+              toast('⚠️ 分享未弹出，文件已保存：'+locText+'\n请用手机「文件管理」App 打开，或安装 Chrome 打开 HTML 后打印');
+            });
         }).catch(function(){
-          // getUri 失败：文件已保存，引导用文件管理器/Chrome
-          toast('已保存：'+locText+'\n用文件管理器打开，或装 Chrome 用浏览器打印/存PDF');
+          toast('⚠️ 文件已保存：'+locText+'\n请用手机「文件管理」App 打开，或装 Chrome 打开 HTML 后打印');
         });
       }else if(Share){
         Share.share({title:title||filename,text:'文件已保存：'+locText}).catch(function(){});
-        toast('已保存：'+locText);
+        toast('文件已保存：'+locText+'\n（未取到文件URI，已以文本方式分享）');
       }else{
-        toast('已保存：'+locText+'\n用文件管理器打开，或装 Chrome 用浏览器打印/存PDF');
+        toast('✅ '+locText+'\n（缺少系统分享组件，请用文件管理 App 打开）');
       }
     }catch(e){
-      toast('已保存：'+locText);
+      toast('✅ '+locText+'\n（分享调用异常，文件已保存，请用文件管理 App 打开）');
     }
   });
 }
