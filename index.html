@@ -253,8 +253,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
   <button class="tab active" onclick="switchTab(this,'pageDashboard')"><span class="icon">🏠</span>首页</button>
   <button class="tab" onclick="switchTab(this,'pageBilling')"><span class="icon">📋</span>结算</button>
   <button class="tab" onclick="switchTab(this,'pageMaint')"><span class="icon">🔧</span>维修</button>
-  <button class="tab" onclick="switchTab(this,'pagePay')"><span class="icon">💡</span>代缴</button>
-  <button class="tab" onclick="switchTab(this,'pageExpenses')"><span class="icon">💰</span>费用</button>
+  <button class="tab" onclick="switchTab(this,'pagePay')"><span class="icon">💵</span>代缴</button>
+  <button class="tab" onclick="switchTab(this,'pageExpenses')"><span class="icon">📊</span>报表</button>
 </div>
 
 <button class="fab" onclick="handleFabClick()">+</button>
@@ -2104,7 +2104,7 @@ function renderQuickActions(){
   try{
     $('quickActions').innerHTML=
       '<div class="quick-action" onclick="qaAddRoom()"><div class="qa-icon" style="background:#E3F2FD;color:#1565C0">\u2795</div><span class="qa-label">\u52A0\u623F\u95F4</span></div>'+
-      '<div class="quick-action" onclick="qaBill()"><div class="qa-icon" style="background:#E8F5E9;color:#2E7D32">\uD83D\uDCCD</div><span class="qa-label">\u6284\u8868</span></div>'+
+      '<div class="quick-action" onclick="qaBill()"><div class="qa-icon" style="background:#E8F5E9;color:#2E7D32">\uD83D\uDCCB</div><span class="qa-label">\u6284\u8868</span></div>'+
       '<div class="quick-action" onclick="qaMaint()"><div class="qa-icon" style="background:#FFF3E0;color:#E65100">\uD83D\uDD27</div><span class="qa-label">\u8BB0\u7EF4\u4FEE</span></div>'+
       '<div class="quick-action" onclick="qaPay()"><div class="qa-icon" style="background:#FFF8E1;color:#F57F17">\uD83D\uDCB5</div><span class="qa-label">\u4EE3\u7F34</span></div>'+
       '<div class="quick-action" onclick="qaReport()"><div class="qa-icon" style="background:#F3E5F5;color:#7B1FA2">\uD83D\uDCCA</div><span class="qa-label">\u770B\u62A5\u8868</span></div>';
