@@ -250,6 +250,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
     <div class="btn-group"><button class="btn btn-primary btn-sm" onclick="backupDownload()">下载备份</button><button class="btn btn-outline btn-sm" onclick="backupText()">复制文本</button></div>
     <div class="btn-group"><button class="btn btn-success btn-sm" onclick="document.getElementById('fileInput').click()">从文件恢复</button><button class="btn btn-outline btn-sm" onclick="showPasteRestore()">粘贴恢复</button></div>
     <div class="btn-group"><button class="btn btn-outline btn-sm" onclick="sendTestNotification()">🔔 发送测试通知</button></div>
+    <div id="runModeBox" style="margin-top:8px;padding:8px 10px;border-radius:8px;font-size:13px;background:#F5F7FA;color:#333;line-height:1.6"></div>
     <div class="backup-hint">⚠️ 换手机或清理浏览器缓存前请先备份。备份文件/文本包含全部房间、结算、维修数据，请妥善保存。</div>
     <input type="file" id="fileInput" accept=".json,application/json" style="display:none" onchange="handleFileRestore(this)">
   </div>
@@ -480,6 +481,7 @@ function fmt(n){if(n==null)return '—';var v=Number(n);if(isNaN(v))return '—'
 function fmtDate(d){if(!d)return '—';try{var x=new Date(d);return(x.getMonth()+1)+'月'+x.getDate()+'日'}catch(e){return '—'}}
 function fmtDateFull(d){if(!d)return '';try{var x=new Date(d),m=x.getMonth()+1,dd=x.getDate();return x.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd)}catch(e){return ''}}
 function fmtDateShort(d){if(!d)return '';try{var x=new Date(d);return(x.getMonth()+1)+'/'+x.getDate()}catch(e){return ''}}
+function escHtml(s){try{s=String(s==null?'':s);s=s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,'').replace(/﻿/g,'');return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}catch(e){return String(s==null?'':s)}}
 function getYear(){return new Date().getFullYear()}
 function getMonth(){return new Date().getMonth()+1}
 function pad(n){return n<10?'0'+n:''+n}
@@ -1241,7 +1243,11 @@ function saveAndShare(content,filename,title,hint){
 // 根据失败原因生成错误提示文案
 function capSaveErrText(reason,kind){
   if(reason==='filesystem_unavailable') return '⚠️ 文件系统不可用，请确认安装的是最新版APK（含Filesystem插件）';
-  return (kind||'导出')+'失败，请检查存储权限';
+  // 显示真实失败原因，便于定位（reason 形如 write_failed:<原生错误> 或 exception:...）
+  var detail='';
+  if(reason&&reason.indexOf('write_failed:')===0) detail='（写入失败：'+(reason.slice('write_failed:'.length)||'未知')+'）';
+  else if(reason&&reason.indexOf('exception:')===0) detail='（异常：'+(reason.slice('exception:'.length)||'未知')+'）';
+  return (kind||'导出')+'失败，请检查存储权限'+detail;
 }
 
 // ========== 房租到期提醒 + 系统通知 ==========
@@ -1290,7 +1296,25 @@ function isRentCollected(roomId, y, m){
 function fitNotifAt(t,valid){if(t.getTime()>Date.now())return t;if(valid)return new Date(Date.now()+3000);return null;}
 function sendTestNotification(){
   try{
-    if(!IS_NATIVE){toast('测试通知仅在手机APP内有效（网页预览不会弹）');return;}
+    var capOK=!!(window.Capacitor);
+    var isNativeFunc=!!(window.Capacitor&&Capacitor.isNativePlatform);
+    var isNative=isNativeFunc?Capacitor.isNativePlatform():false;
+    var platform=(window.Capacitor&&Capacitor.getPlatform)?Capacitor.getPlatform():'n/a';
+    var hasPlugin=!!(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications);
+    console.warn('[TEST通知诊断] IS_NATIVE='+isNative+' platform='+platform+' Capacitor全局='+capOK+' isNativePlatform函数='+isNativeFunc+' LocalNotif插件='+hasPlugin);
+    if(!isNative){
+      toast('检测到你正在【网页/PWA】里打开（platform='+platform+'），不是原生APK，系统通知不可用。请安装并打开原生APK版本');
+      // 网页环境尽力而为：浏览器通知 API（仅应用打开时有效，关掉页面即失效）
+      try{
+        if(typeof Notification!=='undefined'){
+          Notification.requestPermission().then(function(perm){
+            if(perm==='granted'){setTimeout(function(){new Notification('🔔 测试通知（网页临时）',{body:'这是浏览器通知，仅在你打开本页面时有效；真正的系统通知需原生APK'})},1500);toast('已申请浏览器通知权限，约1.5秒后弹网页通知（仅应用打开时有效）')}
+            else toast('浏览器通知权限被拒；真正的系统通知需安装原生APK')
+          }).catch(function(){toast('浏览器通知不可用')})
+        } else toast('当前浏览器不支持 Notification，真正的系统通知需原生APK')
+      }catch(e){toast('网页临时通知失败：'+(e&&e.message||e))}
+      return;
+    }
     var LN=getLocalNotif();
     if(!LN){toast('本地通知插件未启用：APK 未包含 @capacitor/local-notifications，请重新构建');return;}
     LN.requestPermissions().then(function(p){
@@ -1301,6 +1325,8 @@ function sendTestNotification(){
   }catch(e){toast('测试通知出错：'+(e&&e.message||e))}
 }
 function scheduleRentReminders(){
+  // 重新检测原生平台：避免启动过早（Capacitor 尚未就绪）把 IS_NATIVE 误判为 false，导致通知永远排不上
+  try{ if(window.Capacitor&&Capacitor.isNativePlatform) IS_NATIVE=!!Capacitor.isNativePlatform(); }catch(e){}
   if(!IS_NATIVE) return;
   var LN=getLocalNotif();
   if(!LN){console.warn('LocalNotifications 插件不可用');if(IS_NATIVE)toast('本地通知插件未启用：APK 未包含本地通知插件，请确认已重新构建');return;}
@@ -1502,7 +1528,7 @@ function buildMaintPages(year,records){
       rows+='<tr>'
         +'<td class="mp-date-cell">'+dateStr+'</td>'
         +'<td class="mp-room-cell">'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</td>'
-        +'<td class="mp-desc-cell">'+m.desc+'</td>'
+        +'<td class="mp-desc-cell">'+escHtml(m.desc)+'</td>'
         +'<td class="mp-cost-cell">-'+fmt(m.cost)+'\u5143</td>'
         +'</tr>';
     }
@@ -2198,7 +2224,7 @@ function renderBackupStat(){
 }
 
 // ========== DASHBOARD ==========
-function renderAll(){try{renderAllRooms();renderDashStats();renderQuickActions()}catch(e){reportError(e,'renderAll')}}
+function renderAll(){try{updateRunModeBox();renderAllRooms();renderDashStats();renderQuickActions()}catch(e){reportError(e,'renderAll')}}
 
 function renderDashStats(){
   try{
@@ -2247,8 +2273,24 @@ function initData(){
   }
 }
 
+function updateRunModeBox(){
+  try{
+    var box=document.getElementById('runModeBox'); if(!box) return;
+    var capOK=!!(window.Capacitor);
+    var isNative=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+    var platform=(window.Capacitor&&Capacitor.getPlatform)?Capacitor.getPlatform():'n/a';
+    var hasPlugin=!!(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications);
+    var mode=isNative?('原生APK（'+platform+'）'):('网页预览（'+platform+'）');
+    var color=isNative?'#1B873F':'#B26A00';
+    box.style.background=isNative?'#E8F5EC':'#FFF4E5';
+    box.innerHTML='<b style="color:'+color+'">运行模式：'+mode+'</b><br>'+
+      'Capacitor全局：'+(capOK?'有':'无')+'　系统通知插件：'+(hasPlugin?'已加载 ✅':'未加载 ❌')+'<br>'+
+      (isNative?(hasPlugin?'✅ 可发送系统通知（关App也能弹）':'⚠️ 需重装含本地通知插件的APK'):'⚠️ 网页模式无法发系统通知，请安装原生APK');
+  }catch(e){}
+}
 function detectPlatform(){
   IS_NATIVE=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
+  updateRunModeBox();
   if(!IS_NATIVE){
     try{
       if(!document.getElementById('previewBar')){
