@@ -1286,13 +1286,15 @@ function isRentCollected(roomId, y, m){
   return false;
 }
 
+function fitNotifAt(t,valid){if(t.getTime()>Date.now())return t;if(valid)return new Date(Date.now()+3000);return null;}
 function scheduleRentReminders(){
   if(!IS_NATIVE) return;
   var LN=getLocalNotif();
   if(!LN){console.warn('LocalNotifications 插件不可用');return;}
   try{
     LN.requestPermissions().then(function(p){
-      if(!p||p.display!=='granted'){console.warn('通知权限未授予');return;}
+      var granted=p&&(p.display==='granted'||p.receive==='granted');
+      if(!granted){if(IS_NATIVE)toast('通知权限未开启，请在系统设置中允许本应用发送通知');console.warn('通知权限未授予',p);return;}
       LN.cancelAll().then(function(){
         var notifs=[]; var nid=1; var now=new Date();
         for(var i=0;i<DB.rooms.length;i++){
@@ -1309,18 +1311,21 @@ function scheduleRentReminders(){
             var due=new Date(y,mo,day,9,0,0,0);
             var warn=new Date(due.getTime()); warn.setDate(due.getDate()-3);
             var over=new Date(due.getTime()); over.setDate(due.getDate()+2);
-            if(warn.getTime()>now.getTime()){
-              notifs.push({id:nid++, title:'📅 '+r.number+' 房租即将到期', body:tenant+'房租 ¥'+fmt(r.rent)+' 还有3天（每月'+day+'号）到期，请提前联系租户', schedule:{at:warn.getTime()}, extra:{roomId:r.id,type:'warn'}});
+            var atWarn=fitNotifAt(warn, due.getTime()>now.getTime());
+            var atDue=fitNotifAt(due, over.getTime()>now.getTime());
+            var atOver=fitNotifAt(over, true);
+            if(atWarn){
+              notifs.push({id:nid++, title:'📅 '+r.number+' 房租即将到期', body:tenant+'房租 ¥'+fmt(r.rent)+' 还有3天（每月'+day+'号）到期，请提前联系租户', schedule:{at:atWarn}, extra:{roomId:r.id,type:'warn'}});
             }
-            if(due.getTime()>now.getTime()){
-              notifs.push({id:nid++, title:'⚠️ '+r.number+' 房租今天到期！', body:tenant+'房租 ¥'+fmt(r.rent)+' 今天（每月'+day+'号）到期，请尽快催收', schedule:{at:due.getTime()}, extra:{roomId:r.id,type:'due'}});
+            if(atDue){
+              notifs.push({id:nid++, title:'⚠️ '+r.number+' 房租今天到期！', body:tenant+'房租 ¥'+fmt(r.rent)+' 今天（每月'+day+'号）到期，请尽快催收', schedule:{at:atDue}, extra:{roomId:r.id,type:'due'}});
             }
-            if(over.getTime()>now.getTime()){
-              notifs.push({id:nid++, title:'🚨 '+r.number+' 房租已逾期', body:tenant+'房租 ¥'+fmt(r.rent)+' 已逾期2天，请确认是否已收取', schedule:{at:over.getTime()}, extra:{roomId:r.id,type:'over'}});
+            if(atOver){
+              notifs.push({id:nid++, title:'🚨 '+r.number+' 房租已逾期', body:tenant+'房租 ¥'+fmt(r.rent)+' 已逾期2天，请确认是否已收取', schedule:{at:atOver}, extra:{roomId:r.id,type:'over'}});
             }
           }
         }
-        if(notifs.length) LN.schedule({notifications:notifs});
+        if(notifs.length){LN.schedule({notifications:notifs}).then(function(){if(IS_NATIVE)console.log('已排程 '+notifs.length+' 条房租提醒')}).catch(function(e){console.error('schedule 失败',e);if(IS_NATIVE)toast('通知排程失败：'+e.message)})}else if(IS_NATIVE)console.log('无待排程的房租提醒')
       }).catch(function(e){console.error('cancelAll 失败',e)});
     }).catch(function(e){console.error('请求通知权限失败',e)});
   }catch(e){console.error('scheduleRentReminders 异常',e)}
