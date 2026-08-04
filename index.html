@@ -249,6 +249,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
     <div class="summary-row"><span>当前数据</span><span class="val" id="backupDataStat">—</span></div>
     <div class="btn-group"><button class="btn btn-primary btn-sm" onclick="backupDownload()">下载备份</button><button class="btn btn-outline btn-sm" onclick="backupText()">复制文本</button></div>
     <div class="btn-group"><button class="btn btn-success btn-sm" onclick="document.getElementById('fileInput').click()">从文件恢复</button><button class="btn btn-outline btn-sm" onclick="showPasteRestore()">粘贴恢复</button></div>
+    <div class="btn-group"><button class="btn btn-outline btn-sm" onclick="sendTestNotification()">🔔 发送测试通知</button></div>
     <div class="backup-hint">⚠️ 换手机或清理浏览器缓存前请先备份。备份文件/文本包含全部房间、结算、维修数据，请妥善保存。</div>
     <input type="file" id="fileInput" accept=".json,application/json" style="display:none" onchange="handleFileRestore(this)">
   </div>
@@ -1287,10 +1288,22 @@ function isRentCollected(roomId, y, m){
 }
 
 function fitNotifAt(t,valid){if(t.getTime()>Date.now())return t;if(valid)return new Date(Date.now()+3000);return null;}
+function sendTestNotification(){
+  try{
+    if(!IS_NATIVE){toast('测试通知仅在手机APP内有效（网页预览不会弹）');return;}
+    var LN=getLocalNotif();
+    if(!LN){toast('本地通知插件未启用：APK 未包含 @capacitor/local-notifications，请重新构建');return;}
+    LN.requestPermissions().then(function(p){
+      var granted=p&&(p.display==='granted'||p.receive==='granted');
+      if(!granted){toast('通知权限未开启，请在系统设置中允许本应用发送通知');return;}
+      LN.schedule({notifications:[{id:990001,title:'🔔 测试通知',body:'如果你看到这条，说明本地通知已正常工作',schedule:{at:new Date(Date.now()+3000)}}]}).then(function(){toast('已发送，约3秒后查看通知栏')}).catch(function(e){toast('发送失败：'+(e&&e.message||e))});
+    }).catch(function(e){toast('请求权限失败：'+(e&&e.message||e))});
+  }catch(e){toast('测试通知出错：'+(e&&e.message||e))}
+}
 function scheduleRentReminders(){
   if(!IS_NATIVE) return;
   var LN=getLocalNotif();
-  if(!LN){console.warn('LocalNotifications 插件不可用');return;}
+  if(!LN){console.warn('LocalNotifications 插件不可用');if(IS_NATIVE)toast('本地通知插件未启用：APK 未包含本地通知插件，请确认已重新构建');return;}
   try{
     LN.requestPermissions().then(function(p){
       var granted=p&&(p.display==='granted'||p.receive==='granted');
