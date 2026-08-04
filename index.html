@@ -482,6 +482,26 @@ function fmtDate(d){if(!d)return '—';try{var x=new Date(d);return(x.getMonth()
 function fmtDateFull(d){if(!d)return '';try{var x=new Date(d),m=x.getMonth()+1,dd=x.getDate();return x.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd)}catch(e){return ''}}
 function fmtDateShort(d){if(!d)return '';try{var x=new Date(d);return(x.getMonth()+1)+'/'+x.getDate()}catch(e){return ''}}
 function escHtml(s){try{s=String(s==null?'':s);s=s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,'').replace(/﻿/g,'');return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}catch(e){return String(s==null?'':s)}}
+// 保存前对整段文件内容做清洗：去掉会让原生 Filesystem.writeFile(JSON 序列化) 失败的控制字符/孤立 UTF-16 代理
+function cleanSaveContent(s){
+  try{
+    s=String(s==null?'':s);
+    s=s.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,'');
+    // 去掉孤立代理：成对代理(如emoji)保留，仅丢弃前后不成对的代理字符
+    var out='';
+    for(var i=0;i<s.length;i++){
+      var c=s.charCodeAt(i);
+      if(c>=0xD800&&c<=0xDBFF){
+        var n=s.charCodeAt(i+1);
+        if(n>=0xDC00&&n<=0xDFFF){out+=s.charAt(i)+s.charAt(i+1);i++;}
+        // 否则丢弃孤立高位代理
+      }else if(c>=0xDC00&&c<=0xDFFF){
+        // 孤立低位代理，丢弃
+      }else{out+=s.charAt(i);}
+    }
+    return out;
+  }catch(e){return String(s==null?'':s)}
+}
 function getYear(){return new Date().getFullYear()}
 function getMonth(){return new Date().getMonth()+1}
 function pad(n){return n<10?'0'+n:''+n}
@@ -1204,6 +1224,7 @@ function capSaveLocText(loc,fname){
 // 用户可在面板里选：文件管理（保存到可见位置）、微信（发给文件传输助手）、Chrome（打开后打印/存PDF）
 // 这是 Oppo 无打印入口 / 华为文件管理器扫不到 Download 的统一解法
 function saveAndShare(content,filename,title,hint){
+  try{content=cleanSaveContent(content);}catch(e){}
   doCapacitorSave(content,filename,function(ok,loc,reason){
     if(!ok){toast(capSaveErrText(reason,'保存'));return}
     var locText=capSaveLocText(loc,filename);
@@ -1334,7 +1355,7 @@ function scheduleRentReminders(){
     LN.requestPermissions().then(function(p){
       var granted=p&&(p.display==='granted'||p.receive==='granted');
       if(!granted){if(IS_NATIVE)toast('通知权限未开启，请在系统设置中允许本应用发送通知');console.warn('通知权限未授予',p);return;}
-      LN.cancelAll().then(function(){
+      function buildAndSchedule(){
         var notifs=[]; var nid=1; var now=new Date();
         for(var i=0;i<DB.rooms.length;i++){
           var r=DB.rooms[i];
@@ -1365,7 +1386,11 @@ function scheduleRentReminders(){
           }
         }
         if(notifs.length){LN.schedule({notifications:notifs}).then(function(){if(IS_NATIVE)console.log('已排程 '+notifs.length+' 条房租提醒')}).catch(function(e){console.error('schedule 失败',e);if(IS_NATIVE)toast('通知排程失败：'+e.message)})}else if(IS_NATIVE)console.log('无待排程的房租提醒')
-      }).catch(function(e){console.error('cancelAll 失败',e)});
+      }
+      // cancelAll 在「当前没有任何已排程通知」时某些插件版本会 reject；
+      // 若只 .catch 打印而不继续，buildAndSchedule 永不执行，房租提醒就排不上。
+      // 故 .then 与 .catch 都走 buildAndSchedule，确保无论 cancelAll 成功与否都排程。
+      LN.cancelAll().then(buildAndSchedule).catch(buildAndSchedule);
     }).catch(function(e){console.error('请求通知权限失败',e)});
   }catch(e){console.error('scheduleRentReminders 异常',e)}
 }
@@ -1671,10 +1696,10 @@ function buildPayPages(year,records){
       typeTotalCost+=p.cost;
       typeTotalUsage+=(p.usage||0);
       tbl+='<tr>'
-        +'<td class="pp-room-cell">'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</td>'
+        +'<td class="pp-room-cell">'+escHtml(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</td>'
         +'<td class="pp-date-cell">'+dateStr+'</td>'
-        +'<td class="pp-num-cell">'+(p.reading?p.reading:'')+'</td>'
-        +'<td class="pp-num-cell">'+(p.usage?p.usage:'')+'</td>'
+        +'<td class="pp-num-cell">'+escHtml(p.reading?p.reading:'')+'</td>'
+        +'<td class="pp-num-cell">'+escHtml(p.usage?p.usage:'')+'</td>'
         +'<td class="pp-cost-cell">'+fmt(p.cost)+' \u5143</td>'
         +'</tr>';
     }
@@ -2307,7 +2332,7 @@ function detectPlatform(){
 // ===== BOOTSTRAP ===== //
 function startApp(){try{detectPlatform();
   document.addEventListener('visibilitychange',function(){if(!document.hidden){try{scheduleRentReminders()}catch(e){}}});
-  DB.load().then(function(){try{initData();renderAll();scheduleRentReminders();}catch(e){console.error('Init error:',e);reportError(e,'initData/renderAll')}})}catch(e){reportError(e,'startApp')}}
+  DB.load().then(function(){try{initData();renderAll();scheduleRentReminders();setTimeout(function(){try{scheduleRentReminders()}catch(e){}},2000);}catch(e){console.error('Init error:',e);reportError(e,'initData/renderAll')}})}catch(e){reportError(e,'startApp')}}
 try{
   if(initSupabase()){
     sbClient.auth.getSession().then(function(r){
