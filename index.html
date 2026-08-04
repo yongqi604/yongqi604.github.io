@@ -252,6 +252,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
     <div class="backup-hint">⚠️ 换手机或清理浏览器缓存前请先备份。备份文件/文本包含全部房间、结算、维修数据，请妥善保存。</div>
     <input type="file" id="fileInput" accept=".json,application/json" style="display:none" onchange="handleFileRestore(this)">
   </div>
+  <div class="card"><div class="card-title">👤 账号</div><div class="btn-group"><button class="btn btn-outline btn-block" onclick="doLogout()">🚪 退出登录</button></div></div>
 </div>
 
 <!-- Bottom Tabs -->
@@ -475,6 +476,8 @@ function showLoginLoading(on){try{var b=document.getElementById('loginSubmit');i
 function $(id){return document.getElementById(id)}
 function toast(msg){try{$('toast').textContent=msg;$('toast').classList.add('show');setTimeout(function(){$('toast').classList.remove('show')},1800)}catch(e){}}
 function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+// 净化记录 id：只允许安全字符，避免 id 含引号/尖括号破坏 onclick 或 <option value>
+function cleanId(v){try{if(typeof v==='string'&&/^[A-Za-z0-9_\-]{1,40}$/.test(v))return v;}catch(e){}return genId()}
 function fmt(n){if(n==null)return '—';var v=Number(n);if(isNaN(v))return '—';return v.toLocaleString('zh-CN',{minimumFractionDigits:v%1!==0?1:0})}
 function fmtDate(d){if(!d)return '—';try{var x=new Date(d);return(x.getMonth()+1)+'月'+x.getDate()+'日'}catch(e){return '—'}}
 function fmtDateFull(d){if(!d)return '';try{var x=new Date(d),m=x.getMonth()+1,dd=x.getDate();return x.getFullYear()+'-'+(m<10?'0'+m:m)+'-'+(dd<10?'0'+dd:dd)}catch(e){return ''}}
@@ -508,7 +511,7 @@ function row(lbl,val,color){var c=color?' '+color:'';return'<div class="summary-
 
 // ========== Top-level click handlers (no escaped quotes!) ==========
 function qaAddRoom(){showAddRoomModal()}
-function qaBill(){showAddBillModal()}
+function qaBill(){var rs=document.getElementById('billRoomSelect');showAddBillModal(rs?rs.value:'')}
 function qaMaint(){showAddMaintModal()}
 function qaPay(){showAddPayModal()}
 function qaReport(){goPage('pageExpenses')}
@@ -608,13 +611,13 @@ function renderRoomItem(r){
       if(st.cls==='muted'){
         dueHtml='<div class="room-detail due-line">'+dot+' <span class="badge badge-muted">未设置交租日</span></div>';
       }else{
-        dueHtml='<div class="room-detail due-line">'+dot+' '+r.rentDueDay+'号到期 <span class="badge badge-'+st.cls+'">'+st.txt+'</span></div>';
+        dueHtml='<div class="room-detail due-line">'+dot+' '+escHtml(r.rentDueDay)+'号到期 <span class="badge badge-'+st.cls+'">'+st.txt+'</span></div>';
       }
     }
-    return '<div class="room-item" onclick="showRoomDetail(\''+r.id+'\')">'+
-      '<div class="room-badge">'+r.number+'</div>'+
-      '<div class="room-info"><div class="room-name">'+(r.tenant||r.number)+' '+status+'</div>'+
-      '<div class="room-detail">'+(r.phone||'无电话')+' · '+(r.settleMethod||'月底')+(lastBill?' · 上次:'+fmtDate(lastBill.date):'')+'</div>'+dueHtml+'</div>'+
+    return '<div class="room-item" onclick="showRoomDetail(\''+cleanId(r.id)+'\')">'+
+      '<div class="room-badge">'+escHtml(r.number)+'</div>'+
+      '<div class="room-info"><div class="room-name">'+escHtml(r.tenant||r.number)+' '+status+'</div>'+
+      '<div class="room-detail">'+escHtml(r.phone||'无电话')+' · '+escHtml(r.settleMethod||'月底')+(lastBill?' · 上次:'+fmtDate(lastBill.date):'')+'</div>'+dueHtml+'</div>'+
       '<div class="room-amount"><div class="room-rent">¥'+fmt(r.rent)+'</div><div class="room-status">'+(r.deposit?'押¥'+fmt(r.deposit):'')+'</div></div></div>';
   }catch(e){return ''}
 }
@@ -642,9 +645,9 @@ function showRoomDetail(id){
     for(var i=0;i<roomBills.length;i++){var b=roomBills[i];totalRent+=(b.rent||0);totalElec+=(b.elecCost||0);totalWater+=(b.waterCost||0);totalGas+=(b.gasCost||0);totalDeposit+=(b.depositChange||0)}
     var grandTotal=totalRent+totalElec+totalWater+totalGas+totalDeposit;
     var isV=!!r.isVacant;
-    var h='<div class="card">'+row('\u79DF\u6237',r.tenant||'\u2014')+
+    var h='<div class="card">'+row('\u79DF\u6237',escHtml(r.tenant||'\u2014'))+
       '<div class="summary-row" style="align-items:center"><span>\u72B6\u6001</span><span class="val" style="display:flex;align-items:center;gap:8px"><label class="switch" for="detailVacant_'+r.id+'" style="margin:0"><input type="checkbox" id="detailVacant_'+r.id+'" '+(isV?'checked':'')+' onchange="toggleVacant(\''+r.id+'\')"><span class="slider"></span></label><span id="detailVacantLbl_'+r.id+'" style="font-size:13px;color:'+(isV?'var(--danger)':'var(--text2)')+'">'+(isV?'\u7A7A\u7F6E\u4E2D':'\u5DF2\u79DF')+'</span></span></div>'+
-      row('\u7535\u8BDD',r.phone||'\u2014')+row('\u6708\u79DF\u91D1','\u00A5'+fmt(r.rent),'red')+row('\u4FDD\u8BC1\u91D1','\u00A5'+fmt(r.deposit))+row('\u7ED3\u7B97\u65B9\u5F0F',r.settleMethod||'\u6708\u5E95')+row('\u7535\u8868\u53F7',r.elecMeter||'\u2014')+(r.note?row('\u5907\u6CE8',r.note):'')+'</div>';
+      row('\u7535\u8BDD',escHtml(r.phone||'\u2014'))+row('\u6708\u79DF\u91D1','\u00A5'+fmt(r.rent),'red')+row('\u4FDD\u8BC1\u91D1','\u00A5'+fmt(r.deposit))+row('\u7ED3\u7B97\u65B9\u5F0F',escHtml(r.settleMethod||'\u6708\u5E95'))+row('\u7535\u8868\u53F7',escHtml(r.elecMeter||'\u2014'))+(r.note?row('\u5907\u6CE8',escHtml(r.note)):'')+'</div>';
     h+='<div class="card"><div class="card-title">累计汇总（共'+roomBills.length+'笔）'+
       '<div style="display:flex;gap:6px"><button class="btn btn-sm btn-outline" onclick="rdEditRoom(\''+r.id+'\')">编辑</button>'+
       '<button class="btn btn-sm btn-danger" onclick="rdDelRoom(\''+r.id+'\')">删除</button></div></div>'+
@@ -685,7 +688,7 @@ function showRoomDetail(id){
         if(b.otherCost)h+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost,null,'green');
         h+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
         if(b.depositChange)h+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
-        if(b.note)h+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
+        if(b.note)h+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+escHtml(b.note)+'</span></div>';
         h+='<div class="billing-total">\u672C\u6708\u5408\u8BA1:\u00A5'+fmt(bt)+'</div></div>';
       }
       h+='</div>';
@@ -749,7 +752,7 @@ function initBillSelects(){
   try{
     var rs=$('billRoomSelect'),opts='<option value="">\u9009\u62E9\u623F\u53F7</option>';
     var curRoom=rs?rs.value:'';
-    for(var i=0;i<DB.rooms.length;i++){var r=DB.rooms[i];opts+='<option value="'+r.id+'">'+r.number+(r.tenant?'('+r.tenant+')':'')+'</option>'}
+    for(var i=0;i<DB.rooms.length;i++){var r=DB.rooms[i];opts+='<option value="'+cleanId(r.id)+'">'+escHtml(r.number)+(r.tenant?'('+escHtml(r.tenant)+')':'')+'</option>'}
     rs.innerHTML=opts;
     if(curRoom)rs.value=curRoom;
     var ys=$('billYearSelect'),y=getYear(),s='<option value="">\u5168\u90E8</option>';
@@ -959,7 +962,7 @@ function renderBilling(){
         var ro=findRoomById(b.roomId);
         var t=(b.totalAmount!=null&&b.totalAmount!=='')?b.totalAmount:(b.elecCost||0)+(b.waterCost||0)+(b.gasCost||0)+(b.otherCost||0)+(b.rent||0)+(b.depositChange||0);
         totalAll+=t;
-        html+='<div class="billing-month"><span>'+fmtDate(b.date)+(ro?' '+ro.number:'')+' \u7ED3\u7B97</span><span>\u00A5'+fmt(t)+
+        html+='<div class="billing-month"><span>'+fmtDate(b.date)+(ro?' '+escHtml(ro.number):'')+' \u7ED3\u7B97</span><span>\u00A5'+fmt(t)+
           ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:13px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="editBill(\''+b.id+'\')">\u7F16\u8F91</button>'+
           ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:13px" onclick="deleteBill(\''+b.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
         html+='<div class="billing-row header"><span></span><span>\u9879\u76EE</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
@@ -969,10 +972,10 @@ function renderBilling(){
         html+=bRow('rent','\uD83C\uDFE0','\u623F\u79DF','','','',b.rent,null,'green');
         if(b.depositChange)html+=bRow('deposit','\uD83D\uDCB0','\u4FDD\u8BC1\u91D1','','','',b.depositChange);
         if(b.otherCost)html+=bRow('other','\uD83D\uDCE6','\u5176\u4ED6','','','',b.otherCost);
-        if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+b.note+'</span></div>';
+        if(b.note)html+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+escHtml(b.note)+'</span></div>';
         html+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(t)+'</div></div>';
       }
-      var headTxt=(year?year+'\u5E74 ':'\u5168\u90E8 ')+(roomId&&ro?ro.number+' ':'')+'\u7D2F\u8BA1';
+      var headTxt=(year?year+'\u5E74 ':'\u5168\u90E8 ')+(roomId&&ro?escHtml(ro.number)+' ':'')+'\u7D2F\u8BA1';
       html='<div class="card" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border:none"><div style="text-align:center;padding:8px"><div style="font-size:12.5px;color:var(--text2)">'+headTxt+'</div><div style="font-size:27px;font-weight:700;color:var(--primary-dark)">\u00A5'+fmt(totalAll)+'</div></div></div>'+html;
       html+='<div style="text-align:center;margin-top:8px"><button class="btn btn-primary" onclick="showAddBillModal(\''+(roomId||'')+'\')">+ \u65B0\u5EFA\u7ED3\u7B97</button></div>';
     }
@@ -997,6 +1000,10 @@ function buildBillBlock(b,ro){
   var dep=b.depositChange||0;
   var otherCost=b.otherCost||0;
   var total=(b.totalAmount!=null&&b.totalAmount!=='')?b.totalAmount:(fee+rent+dep+otherCost);
+  // 房间可能被删除：单价用账单自带值兜底，避免 ro 为 null 时崩溃
+  var ep=(ro&&ro.elecPrice!=null)?ro.elecPrice:((b&&b.elecPrice!=null)?b.elecPrice:1);
+  var wp=(ro&&ro.waterPrice!=null)?ro.waterPrice:((b&&b.waterPrice!=null)?b.waterPrice:5);
+  var gp=(ro&&ro.gasPrice!=null)?ro.gasPrice:((b&&b.gasPrice!=null)?b.gasPrice:0);
   function c(v){return(v==null||v===''||(typeof v==='number'&&isNaN(v)))?'':fmt(v)}
   function up(u,p){if(u==null)return'';var s=fmt(u);if(p!=null&&p>0)s+='×'+fmt(p);return s}
   var hasElec=(b.elecRead!=null),hasWater=(b.waterRead!=null),hasGas=(b.gasRead!=null);
@@ -1010,26 +1017,26 @@ function buildBillBlock(b,ro){
     +'<td rowspan="'+nRows+'" class="lt-date-cell"><div style="font-size:13px;font-weight:700;color:#333;margin-bottom:4px">日期</div>'+dateStr+'</td>'
     +'<td></td><td>读表</td><td>用量单价</td><td>金额</td>'
     +'<td></td><td>汇总</td>'
-    +'<td rowspan="'+nRows+'" class="lt-note-col">'+(note||' ')+'</td>'
+    +'<td rowspan="'+nRows+'" class="lt-note-col">'+escHtml(note||' ')+'</td>'
     +'</tr>';
   body+='<tr class="lt-blk-row">'
     +'<td class="lt-blk-label">电</td>'
     +'<td>'+(hasElec?c(b.elecRead):'')+'</td>'
-    +'<td>'+(hasElec?up(b.elecUsage,ro.elecPrice):'')+'</td>'
+    +'<td>'+(hasElec?up(b.elecUsage,ep):'')+'</td>'
     +'<td>'+(hasElec?c(b.elecCost):'')+'</td>'
     +'<td>费用</td><td>'+c(fee)+'</td>'
     +'</tr>';
   body+='<tr class="lt-blk-row">'
     +'<td class="lt-blk-label">水</td>'
     +'<td>'+(hasWater?c(b.waterRead):'')+'</td>'
-    +'<td>'+(hasWater?up(b.waterUsage,ro.waterPrice):'')+'</td>'
+    +'<td>'+(hasWater?up(b.waterUsage,wp):'')+'</td>'
     +'<td>'+(hasWater?c(b.waterCost):'')+'</td>'
     +'<td>房租</td><td>'+c(rent)+'</td>'
     +'</tr>';
   if(hasGas){
     body+='<tr class="lt-blk-row">'
       +'<td class="lt-blk-label">燃气</td>'
-      +'<td>'+c(b.gasRead)+'</td><td>'+up(b.gasUsage,ro.gasPrice)+'</td>'
+      +'<td>'+c(b.gasRead)+'</td><td>'+up(b.gasUsage,gp)+'</td>'
       +'<td>'+c(b.gasCost)+'</td>'
       +'<td></td><td></td>'
       +'</tr>';
@@ -1080,8 +1087,8 @@ function buildLedgerPages(roomId,year,bills,ro){
     var pageHtml='<div class="ledger-page">'
       +'<div class="ls-head"><h1>出租管理</h1>'
       +'<div class="ls-meta">'
-      +'<span>房号：'+(ro?ro.number:'')+'</span>'
-      +'<span>结算方式：'+(ro?ro.settleMethod||'—':'')+'</span>'
+      +'<span>房号：'+escHtml(ro?ro.number:'')+'</span>'
+      +'<span>结算方式：'+escHtml(ro?ro.settleMethod||'—':'')+'</span>'
       +'<span>年度：'+year+' 年</span>'
       +(isLast?'':'<span style="margin-left:auto;color:#999;font-size:12px">第 '+Math.floor(pi/BILLS_PER_PAGE+1)+' 页</span>')
       +'</div></div>'
@@ -1153,7 +1160,7 @@ function exportBilling(){
 // ========== 打印内容生成器（供 print/export 复用） ==========
 function buildPrintContent(d){
   return '<!DOCTYPE html><html><head><meta charset="utf-8">'
-    +'<title>'+(d.ro?d.ro.number:'')+'_'+d.year+'年度结算明细</title>'
+    +'<title>'+escHtml(d.ro?d.ro.number:'')+'_'+d.year+'年度结算明细</title>'
     +'<style>'
     +'*{box-sizing:border-box}'
     +'body{margin:0;padding:0;background:#fff}'
@@ -1330,7 +1337,7 @@ function showAddMaintModal(record){
 function fillMaintRoomOptions(){
   try{
     var opts='<option value="">\u516C\u5171/\u603B\u8868</option>';
-    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
+    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+cleanId(DB.rooms[i].id)+'">'+escHtml(DB.rooms[i].number)+'</option>';
     $('maintRoom').innerHTML=opts;
   }catch(e){}
 }
@@ -1338,7 +1345,7 @@ function fillMaintRoomFilter(){
   try{
     var sel=$('maintRoomFilter');if(!sel)return;
     var cur=sel.value,opts='<option value="">\u5168\u90E8\u623F\u95F4</option>';
-    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+(DB.rooms[i].tenant?'('+DB.rooms[i].tenant+')':'')+'</option>';
+    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+cleanId(DB.rooms[i].id)+'">'+escHtml(DB.rooms[i].number)+(DB.rooms[i].tenant?'('+escHtml(DB.rooms[i].tenant)+')':'')+'</option>';
     sel.innerHTML=opts;
     if(cur)sel.value=cur;
   }catch(e){}
@@ -1346,7 +1353,7 @@ function fillMaintRoomFilter(){
 function fillBillRoomOptions(){
   try{
     var opts='<option value="">\u9009\u62E9\u623F\u53F7</option>';
-    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
+    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+cleanId(DB.rooms[i].id)+'">'+escHtml(DB.rooms[i].number)+'</option>';
     $('billRoomSelectModal').innerHTML=opts;
   }catch(e){}
 }
@@ -1434,8 +1441,8 @@ function renderMaint(){
         ' <button class="btn btn-sm" style="padding:2px 8px;margin-left:4px;font-size:13px;background:#fff;color:var(--primary);border:1.5px solid #fff;border-radius:4px" onclick="showAddMaintModal(DB.maint.find(function(x){return x.id===\''+m.id+'\'}))">\u7F16\u8F91</button>'+
         ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:13px" onclick="deleteMaint(\''+m.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
       mh+='<div class="billing-row header" style="grid-template-columns:26px 60px 1fr 70px"><span></span><span>\u623F\u53F7</span><span>\u7EF4\u4FEE\u9879\u76EE</span><span>\u91D1\u989D</span></div>';
-      mh+='<div class="billing-row" style="grid-template-columns:26px 60px 1fr 70px"><span class="type-icon type-rent">\uD83C\uDFE0</span><span>'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+(m.desc||'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(m.cost)+'</span></div>';
-      if(m.note)mh+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+m.note+'</span></div>';
+      mh+='<div class="billing-row" style="grid-template-columns:26px 60px 1fr 70px"><span class="type-icon type-rent">\uD83C\uDFE0</span><span>'+escHtml(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+escHtml(m.desc||'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(m.cost)+'</span></div>';
+      if(m.note)mh+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+escHtml(m.note)+'</span></div>';
       mh+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(m.cost)+'</div></div>';
     }
     $('maintList').innerHTML='<div class="card"><div class="card-title">\u7EF4\u4FEE\u660E\u7EC6</div>'+mh+'</div>';
@@ -1800,7 +1807,7 @@ function setPayRow(prefix,p){
 function fillPayRoomOptions(){
   try{
     var opts='<option value="">\u516C\u5171/\u603B\u8868</option>';
-    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
+    for(var i=0;i<DB.rooms.length;i++)opts+='<option value="'+cleanId(DB.rooms[i].id)+'">'+escHtml(DB.rooms[i].number)+'</option>';
     $('payRoom').innerHTML=opts;
   }catch(e){}
 }
@@ -1919,7 +1926,7 @@ function renderPay(){
     fillPayRoomOptions();
     // 填充房间筛选器
     var prf=$('payRoomFilter'),prfOpts='<option value="">\u5168\u90E8\u623F\u95F4</option>',curPrf=prf?prf.value:'';
-    for(var i=0;i<DB.rooms.length;i++)prfOpts+='<option value="'+DB.rooms[i].id+'">'+DB.rooms[i].number+'</option>';
+    for(var i=0;i<DB.rooms.length;i++)prfOpts+='<option value="'+cleanId(DB.rooms[i].id)+'">'+escHtml(DB.rooms[i].number)+'</option>';
     if(prf)prf.innerHTML=prfOpts;
     if(curPrf&&prf)prf.value=curPrf;
     var year=parseInt(s.value)||getYear();
@@ -1960,8 +1967,8 @@ function renderPay(){
         ' <button class="btn btn-sm btn-danger" style="padding:2px 8px;font-size:13px" onclick="deletePay(\''+p.id+'\')">\u5220\u9664</button></span></div><div class="billing-body">';
       ph+='<div class="billing-row header" style="grid-template-columns:26px 55px 50px 60px 50px 65px"><span></span><span>\u623F\u53F7</span><span>\u7C7B\u578B</span><span>\u8BFB\u6570</span><span>\u7528\u91CF</span><span>\u91D1\u989D</span></div>';
       var typeIcon={'\u7535':'\u26A1','\u6C34':'\uD83D\uDCA7','\u71C3\u6C14':'\uD83D\uDD25','\u5176\u4ED6':'\uD83D\uDCE6'};
-      ph+='<div class="billing-row" style="grid-template-columns:26px 55px 50px 60px 50px 65px"><span class="type-icon type-electric">'+(typeIcon[p.type]||'\uD83D\uDCE6')+'</span><span>'+(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+p.type+'</span><span>'+(p.reading?fmt(p.reading):'\u2014')+'</span><span>'+(p.usage?fmt(p.usage):'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(p.cost)+'</span></div>';
-      if(p.note)ph+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+p.note+'</span></div>';
+      ph+='<div class="billing-row" style="grid-template-columns:26px 55px 50px 60px 50px 65px"><span class="type-icon type-electric">'+(typeIcon[p.type]||'\uD83D\uDCE6')+'</span><span>'+escHtml(mr?mr.number:'\u516C\u5171/\u603B\u8868')+'</span><span>'+escHtml(p.type)+'</span><span>'+(p.reading?fmt(p.reading):'\u2014')+'</span><span>'+(p.usage?fmt(p.usage):'\u2014')+'</span><span style="color:var(--danger);font-weight:700">-\u00A5'+fmt(p.cost)+'</span></div>';
+      if(p.note)ph+='<div class="billing-row" style="grid-column:1/-1;display:flex;align-items:flex-start;gap:6px;font-size:13px;color:var(--text2);padding:6px 10px;background:rgba(0,0,0,.03);border-radius:4px;margin-top:2px"><span style="flex-shrink:0">\uD83D\uDCDD</span><span style="white-space:pre-wrap;word-break:break-all;line-height:1.5">'+escHtml(p.note)+'</span></div>';
       ph+='<div class="billing-total">\u672C\u6B21\u5408\u8BA1:\u00A5'+fmt(p.cost)+'</div></div>';
     }
     $('payList').innerHTML='<div class="card"><div class="card-title">\u4EE3\u7F34\u660E\u7EC6</div>'+ph+'</div>';
@@ -2040,7 +2047,7 @@ function renderExpenses(){
         grandNet+=rNet;
         var nc=rNet>=0?'color:var(--success)':'color:var(--danger)';
         var rec={R:rR,E:rE,W:rW,G:rG,O:rO,M:rM,P:rP};
-        bt+='<tr><td><strong>'+room.number+'</strong></td><td>'+(room.tenant||'<span style="color:var(--text3)">\u7A7A</span>')+'</td>';
+        bt+='<tr><td><strong>'+escHtml(room.number)+'</strong></td><td>'+(room.tenant?escHtml(room.tenant):'<span style="color:var(--text3)">\u7A7A</span>')+'</td>';
         for(var ci=0;ci<expCols.length;ci++)bt+='<td style="color:var(--'+expCols[ci].cls+')">\u00A5'+fmt(expCols[ci].get(rec))+'</td>';
         bt+='<td style="'+nc+';font-weight:600">\u00A5'+fmt(rNet)+'</td></tr>';
       }
@@ -2141,12 +2148,25 @@ function confirmPasteRestore(){
   }catch(e){}
 }
 
+// 校验并净化一条恢复数组：跳过非法项，确保每条记录的 id 安全（防坏 id 破坏引用或注入）
+function sanitizeRestoreArray(arr){
+  if(!Array.isArray(arr))return [];
+  var out=[];
+  for(var i=0;i<arr.length;i++){
+    var r=arr[i];
+    if(!r||typeof r!=='object'||Array.isArray(r))continue;
+    r=Object.assign({},r);
+    r.id=cleanId(r.id);
+    out.push(r);
+  }
+  return out;
+}
 function applyRestore(text,mode){
   try{
     var parsed=JSON.parse(text);
     if(!parsed||!parsed.rooms||!parsed.bills||!parsed.maint){toast('\u5907\u4EFD\u683C\u5F0F\u4E0D\u6B63\u786E');return}
-    var nr=parsed.rooms,nb=parsed.bills,nm=parsed.maint,np=parsed.payments||[];
-    if(!Array.isArray(nr)||!Array.isArray(nb)||!Array.isArray(nm)||!Array.isArray(np)){toast('\u5907\u4EFD\u683C\u5F0F\u4E0D\u6B63\u786E');return}
+    if(!Array.isArray(parsed.rooms)||!Array.isArray(parsed.bills)||!Array.isArray(parsed.maint)){toast('\u5907\u4EFD\u683C\u5F0F\u4E0D\u6B63\u786E');return}
+    var nr=sanitizeRestoreArray(parsed.rooms),nb=sanitizeRestoreArray(parsed.bills),nm=sanitizeRestoreArray(parsed.maint),np=sanitizeRestoreArray(parsed.payments||[]);
     if(mode==='merge'){
       var cr={},cb={},cm={},cp={};
       for(var i=0;i<DB.rooms.length;i++)cr[DB.rooms[i].id]=true;
