@@ -468,7 +468,7 @@ function showLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.s
 function hideLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='';closeModal('modalLogin');var lb=document.getElementById('loginBar');if(lb)lb.style.display='flex';var lu=document.getElementById('loginUser');if(lu&&currentUser)lu.textContent=currentUser.email}catch(e){}}
 async function doLogin(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}showLoginLoading(true);var r=await sbClient.auth.signInWithPassword({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u767B\u5F55\u5931\u8D25\uFF1A'+r.error.message);return}currentUser=r.data.user;currentToken=r.data.session.access_token;await afterLogin()}catch(e){showLoginLoading(false);toast('\u767B\u5F55\u51FA\u9519')}}
 async function doRegister(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}if(p.length<6){toast('\u5BC6\u7801\u81F3\u5C116\u4F4D');return}showLoginLoading(true);var r=await sbClient.auth.signUp({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u6CE8\u518C\u5931\u8D25\uFF1A'+r.error.message);return}if(r.data&&r.data.session){currentUser=r.data.user;currentToken=r.data.session.access_token;await afterLogin()}else{toast('\u6CE8\u518C\u6210\u529F\uFF01\u8BF7\u67E5\u6536\u90AE\u7BB1\u9A8C\u8BC1\u90AE\u4EF6\u540E\u518D\u767B\u5F55')}}catch(e){showLoginLoading(false);toast('\u6CE8\u518C\u51FA\u9519')}}
-async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();scheduleRentReminders();toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){reportError(e,'afterLogin')}}
+async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();scheduleRentReminders();setTimeout(function(){try{scheduleRentReminders()}catch(e){}},3000);toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){reportError(e,'afterLogin')}}
 async function doLogout(){try{if(_syncTimer)clearTimeout(_syncTimer);if(sbClient&&currentUser){try{await flushSync()}catch(e){}}if(sbClient){try{await sbClient.auth.signOut()}catch(e){}}currentUser=null;currentToken=null;showLogin();toast('\u5DF2\u9000\u51FA\u767B\u5F55')}catch(e){}}
 function forgotPwd(){try{var e=document.getElementById('loginEmail').value.trim();if(!e){toast('\u8BF7\u5148\u8F93\u5165\u90AE\u7BB1');return}sbClient.auth.resetPasswordForEmail(e).then(function(){toast('\u5DF2\u53D1\u9001\u91CD\u7F6E\u90AE\u4EF6\uFF0C\u8BF7\u67E5\u6536')}).catch(function(err){toast('\u53D1\u9001\u5931\u8D25\uFF1A'+(err.message||''))})}catch(e){}}
 function showLoginLoading(on){try{var b=document.getElementById('loginSubmit');if(b)b.disabled=on;var l=document.getElementById('loginLoading');if(l)l.style.display=on?'block':'none'}catch(e){}}
@@ -1366,7 +1366,7 @@ function sendTestNotification(){
     LN.requestPermissions().then(function(p){
       var granted=p&&(p.display==='granted'||p.receive==='granted');
       if(!granted){toast('通知权限未开启，请在系统设置中允许本应用发送通知');return;}
-      LN.schedule({notifications:[{id:990001,title:'🔔 测试通知',body:'如果你看到这条，说明本地通知已正常工作',schedule:{at:new Date(Date.now()+3000)}}]}).then(function(){toast('已发送，约3秒后查看通知栏')}).catch(function(e){toast('发送失败：'+(e&&e.message||e))});
+      LN.schedule({notifications:[{id:990001,title:'🔔 测试通知',body:'如果你看到这条，说明本地通知已正常工作',schedule:{at:new Date(Date.now()+3000)}}]}).then(function(){toast('已发送，约3秒后查看通知栏');try{scheduleRentReminders()}catch(e){}}).catch(function(e){toast('发送失败：'+(e&&e.message||e))});
     }).catch(function(e){toast('请求权限失败：'+(e&&e.message||e))});
   }catch(e){toast('测试通知出错：'+(e&&e.message||e))}
 }
@@ -1410,7 +1410,11 @@ function scheduleRentReminders(){
             }
           }
         }
-        if(notifs.length){LN.schedule({notifications:notifs}).then(function(){if(IS_NATIVE)console.log('已排程 '+notifs.length+' 条房租提醒')}).catch(function(e){console.error('schedule 失败',e);if(IS_NATIVE)toast('通知排程失败：'+e.message)})}else if(IS_NATIVE)console.log('无待排程的房租提醒')
+        if(notifs.length){
+          var imm=0;
+          for(var k=0;k<notifs.length;k++){var at=new Date(notifs[k].schedule.at).getTime();if(Math.abs(at-Date.now())<60000)imm++;}
+          LN.schedule({notifications:notifs}).then(function(){if(IS_NATIVE){console.log('已排程 '+notifs.length+' 条房租提醒');if(imm>0)toast('已排程 '+notifs.length+' 条提醒，其中 '+imm+' 条将在1分钟内弹出');}}).catch(function(e){console.error('schedule 失败',e);if(IS_NATIVE)toast('通知排程失败：'+e.message)})
+        }else if(IS_NATIVE)console.log('无待排程的房租提醒')
       }
       // cancelAll 在「当前没有任何已排程通知」时某些插件版本会 reject；
       // 若只 .catch 打印而不继续，buildAndSchedule 永不执行，房租提醒就排不上。
