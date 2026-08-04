@@ -249,8 +249,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-
     <div class="summary-row"><span>当前数据</span><span class="val" id="backupDataStat">—</span></div>
     <div class="btn-group"><button class="btn btn-primary btn-sm" onclick="backupDownload()">下载备份</button><button class="btn btn-outline btn-sm" onclick="backupText()">复制文本</button></div>
     <div class="btn-group"><button class="btn btn-success btn-sm" onclick="document.getElementById('fileInput').click()">从文件恢复</button><button class="btn btn-outline btn-sm" onclick="showPasteRestore()">粘贴恢复</button></div>
-    <div class="btn-group"><button class="btn btn-outline btn-sm" onclick="sendTestNotification()">🔔 发送测试通知</button></div>
-    <div id="runModeBox" style="margin-top:8px;padding:8px 10px;border-radius:8px;font-size:13px;background:#F5F7FA;color:#333;line-height:1.6"></div>
     <div class="backup-hint">⚠️ 换手机或清理浏览器缓存前请先备份。备份文件/文本包含全部房间、结算、维修数据，请妥善保存。</div>
     <input type="file" id="fileInput" accept=".json,application/json" style="display:none" onchange="handleFileRestore(this)">
   </div>
@@ -468,7 +466,7 @@ function showLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.s
 function hideLogin(){try{var ac=document.getElementById('appContent');if(ac)ac.style.display='';closeModal('modalLogin');var lb=document.getElementById('loginBar');if(lb)lb.style.display='flex';var lu=document.getElementById('loginUser');if(lu&&currentUser)lu.textContent=currentUser.email}catch(e){}}
 async function doLogin(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}showLoginLoading(true);var r=await sbClient.auth.signInWithPassword({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u767B\u5F55\u5931\u8D25\uFF1A'+r.error.message);return}currentUser=r.data.user;currentToken=r.data.session.access_token;await afterLogin()}catch(e){showLoginLoading(false);toast('\u767B\u5F55\u51FA\u9519')}}
 async function doRegister(){try{var e=document.getElementById('loginEmail').value.trim();var p=document.getElementById('loginPwd').value;if(!e||!p){toast('\u8BF7\u8F93\u5165\u90AE\u7BB1\u548C\u5BC6\u7801');return}if(p.length<6){toast('\u5BC6\u7801\u81F3\u5C116\u4F4D');return}showLoginLoading(true);var r=await sbClient.auth.signUp({email:e,password:p});showLoginLoading(false);if(r.error){toast('\u6CE8\u518C\u5931\u8D25\uFF1A'+r.error.message);return}if(r.data&&r.data.session){currentUser=r.data.user;currentToken=r.data.session.access_token;await afterLogin()}else{toast('\u6CE8\u518C\u6210\u529F\uFF01\u8BF7\u67E5\u6536\u90AE\u7BB1\u9A8C\u8BC1\u90AE\u4EF6\u540E\u518D\u767B\u5F55')}}catch(e){showLoginLoading(false);toast('\u6CE8\u518C\u51FA\u9519')}}
-async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();scheduleRentReminders();setTimeout(function(){try{scheduleRentReminders()}catch(e){}},3000);toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){reportError(e,'afterLogin')}}
+async function afterLogin(){try{hideLogin();await DB.load();initData();renderAll();toast('\u767B\u5F55\u6210\u529F\uFF0C\u5DF2\u540C\u6B65\u4E91\u7AEF\u6570\u636E')}catch(e){reportError(e,'afterLogin')}}
 async function doLogout(){try{if(_syncTimer)clearTimeout(_syncTimer);if(sbClient&&currentUser){try{await flushSync()}catch(e){}}if(sbClient){try{await sbClient.auth.signOut()}catch(e){}}currentUser=null;currentToken=null;showLogin();toast('\u5DF2\u9000\u51FA\u767B\u5F55')}catch(e){}}
 function forgotPwd(){try{var e=document.getElementById('loginEmail').value.trim();if(!e){toast('\u8BF7\u5148\u8F93\u5165\u90AE\u7BB1');return}sbClient.auth.resetPasswordForEmail(e).then(function(){toast('\u5DF2\u53D1\u9001\u91CD\u7F6E\u90AE\u4EF6\uFF0C\u8BF7\u67E5\u6536')}).catch(function(err){toast('\u53D1\u9001\u5931\u8D25\uFF1A'+(err.message||''))})}catch(e){}}
 function showLoginLoading(on){try{var b=document.getElementById('loginSubmit');if(b)b.disabled=on;var l=document.getElementById('loginLoading');if(l)l.style.display=on?'block':'none'}catch(e){}}
@@ -588,13 +586,13 @@ function saveRoom(){
     var idx=-1;
     for(var i=0;i<DB.rooms.length;i++){if(DB.rooms[i].id===data.id){idx=i;break}}
     if(idx>=0)DB.rooms[idx]=data;else DB.rooms.push(data);
-    DB.save();closeModal('modalRoom');toast('已保存');renderAll();scheduleRentReminders();
+    DB.save();closeModal('modalRoom');toast('已保存');renderAll();
   }catch(e){toast('保存失败')}
 }
 
 window._deleteCallback=null;
 function deleteRoom(id){
-  try{$('deleteMsg').textContent='确定删除该房间？相关结算记录不会被删除。';window._deleteCallback=function(){var arr=[];for(var i=0;i<DB.rooms.length;i++){if(DB.rooms[i].id!==id)arr.push(DB.rooms[i])}DB.rooms=arr;DB.save();closeModal('modalDelete');toast('已删除');renderAll();scheduleRentReminders()};openModal('modalDelete')}catch(e){}
+  try{$('deleteMsg').textContent='确定删除该房间？相关结算记录不会被删除。';window._deleteCallback=function(){var arr=[];for(var i=0;i<DB.rooms.length;i++){if(DB.rooms[i].id!==id)arr.push(DB.rooms[i])}DB.rooms=arr;DB.save();closeModal('modalDelete');toast('已删除');renderAll()};openModal('modalDelete')}catch(e){}
 }
 function doDelete(){if(window._deleteCallback)window._deleteCallback()}
 
@@ -727,7 +725,7 @@ function toggleVacant(roomId){
           if(DB.rooms[i].isVacant){lbl.textContent='\u7A7A\u7F6E\u4E2D';lbl.style.color='var(--danger)'}
           else{lbl.textContent='\u5DF2\u79DF';lbl.style.color='var(--text2)'}
         }
-        renderAll();scheduleRentReminders();
+        renderAll();
         toast(DB.rooms[i].isVacant?'\u623F\u95F4\u5DF2\u6807\u8BB0\u4E3A\u7A7A\u7F6E':'\u623F\u95F4\u5DF2\u6062\u590D\u5DF2\u79DF');
         break;
       }
@@ -929,7 +927,7 @@ function saveBilling(){
     var idx=-1;
     for(var i=0;i<DB.bills.length;i++){if(DB.bills[i].id===data.id){idx=i;break}}
     if(idx>=0)DB.bills[idx]=data;else DB.bills.push(data);
-    DB.save();closeModal('modalBilling');toast('\u7ED3\u7B97\u5DF2\u4FDD\u5B58');renderBilling();renderAll();scheduleRentReminders();
+    DB.save();closeModal('modalBilling');toast('\u7ED3\u7B97\u5DF2\u4FDD\u5B58');renderBilling();renderAll();
   }catch(e){toast('\u4FDD\u5B58\u5931\u8D25')}
 }
 
@@ -1296,14 +1294,7 @@ function capSaveErrText(reason,kind){
   return (kind||'导出')+'失败，请检查存储权限'+detail;
 }
 
-// ========== 房租到期提醒 + 系统通知 ==========
-function getLocalNotif(){
-  try{
-    if(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications) return Capacitor.Plugins.LocalNotifications;
-    if(window.CapacitorPlugins&&window.CapacitorPlugins.LocalNotifications) return window.CapacitorPlugins.LocalNotifications;
-  }catch(e){}
-  return null;
-}
+// ========== 房间交租状态显示 ==========
 function hashStr(s){var h=0;for(var i=0;i<s.length;i++){h=(h<<5)-h+s.charCodeAt(i);h|=0}return (Math.abs(h)%900000)+1000}
 // 计算某房间交租状态：{day, passed(本月已过天数,-1=未到), daysLeft(距下次交租天数)}
 function rentDueInfo(r){
@@ -1324,107 +1315,6 @@ function rentDueStatus(r){
   if(info.daysLeft<=3) return {txt:info.daysLeft+'天后到期', cls:'warning'};
   return {txt:info.daysLeft+'天后到期', cls:'success'};
 }
-// 原生环境：请求通知权限并排程每月提醒
-// 判断某房间某自然月是否已收租（存在 rent>0 的结算记录即视为已收）
-function isRentCollected(roomId, y, m){
-  try{
-    for(var i=0;i<DB.bills.length;i++){
-      var b=DB.bills[i];
-      if(b.roomId!==roomId) continue;
-      if(!(Number(b.rent)>0)) continue;
-      var d=new Date(b.date);
-      if(d.getFullYear()===y && d.getMonth()===m) return true;
-    }
-  }catch(e){}
-  return false;
-}
-
-function fitNotifAt(t,valid){if(t.getTime()>Date.now())return t;if(valid)return new Date(Date.now()+3000);return null;}
-function sendTestNotification(){
-  try{
-    var capOK=!!(window.Capacitor);
-    var isNativeFunc=!!(window.Capacitor&&Capacitor.isNativePlatform);
-    var isNative=isNativeFunc?Capacitor.isNativePlatform():false;
-    var platform=(window.Capacitor&&Capacitor.getPlatform)?Capacitor.getPlatform():'n/a';
-    var hasPlugin=!!(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications);
-    console.warn('[TEST通知诊断] IS_NATIVE='+isNative+' platform='+platform+' Capacitor全局='+capOK+' isNativePlatform函数='+isNativeFunc+' LocalNotif插件='+hasPlugin);
-    if(!isNative){
-      toast('检测到你正在【网页/PWA】里打开（platform='+platform+'），不是原生APK，系统通知不可用。请安装并打开原生APK版本');
-      // 网页环境尽力而为：浏览器通知 API（仅应用打开时有效，关掉页面即失效）
-      try{
-        if(typeof Notification!=='undefined'){
-          Notification.requestPermission().then(function(perm){
-            if(perm==='granted'){setTimeout(function(){new Notification('🔔 测试通知（网页临时）',{body:'这是浏览器通知，仅在你打开本页面时有效；真正的系统通知需原生APK'})},1500);toast('已申请浏览器通知权限，约1.5秒后弹网页通知（仅应用打开时有效）')}
-            else toast('浏览器通知权限被拒；真正的系统通知需安装原生APK')
-          }).catch(function(){toast('浏览器通知不可用')})
-        } else toast('当前浏览器不支持 Notification，真正的系统通知需原生APK')
-      }catch(e){toast('网页临时通知失败：'+(e&&e.message||e))}
-      return;
-    }
-    var LN=getLocalNotif();
-    if(!LN){toast('本地通知插件未启用：APK 未包含 @capacitor/local-notifications，请重新构建');return;}
-    LN.requestPermissions().then(function(p){
-      var granted=p&&(p.display==='granted'||p.receive==='granted');
-      if(!granted){toast('通知权限未开启，请在系统设置中允许本应用发送通知');return;}
-      LN.schedule({notifications:[{id:990001,title:'🔔 测试通知',body:'如果你看到这条，说明本地通知已正常工作',schedule:{at:new Date(Date.now()+3000)}}]}).then(function(){toast('已发送，约3秒后查看通知栏');try{scheduleRentReminders()}catch(e){}}).catch(function(e){toast('发送失败：'+(e&&e.message||e))});
-    }).catch(function(e){toast('请求权限失败：'+(e&&e.message||e))});
-  }catch(e){toast('测试通知出错：'+(e&&e.message||e))}
-}
-function scheduleRentReminders(){
-  // 重新检测原生平台：避免启动过早（Capacitor 尚未就绪）把 IS_NATIVE 误判为 false，导致通知永远排不上
-  try{ if(window.Capacitor&&Capacitor.isNativePlatform) IS_NATIVE=!!Capacitor.isNativePlatform(); }catch(e){}
-  if(!IS_NATIVE) return;
-  var LN=getLocalNotif();
-  if(!LN){console.warn('LocalNotifications 插件不可用');if(IS_NATIVE)toast('本地通知插件未启用：APK 未包含本地通知插件，请确认已重新构建');return;}
-  try{
-    LN.requestPermissions().then(function(p){
-      var granted=p&&(p.display==='granted'||p.receive==='granted');
-      if(!granted){if(IS_NATIVE)toast('通知权限未开启，请在系统设置中允许本应用发送通知');console.warn('通知权限未授予',p);return;}
-      function buildAndSchedule(){
-        var notifs=[]; var nid=1; var now=new Date();
-        for(var i=0;i<DB.rooms.length;i++){
-          var r=DB.rooms[i];
-          if(r.isVacant) continue;
-          var day=parseInt(r.rentDueDay);
-          if(!day||day<1||day>31) continue;
-          var tenant=(r.tenant?r.tenant+' ':'');
-          // 预排未来 12 个月，跨月自动校正（如 2号提前3天=上月30号）
-          for(var m=0;m<12;m++){
-            var y=now.getFullYear(), mo=now.getMonth()+m;
-            y+=Math.floor(mo/12); mo=((mo%12)+12)%12;
-            if(isRentCollected(r.id,y,mo)) continue; // 当月已收租，不再弹任何房租提醒
-            var due=new Date(y,mo,day,9,0,0,0);
-            var warn=new Date(due.getTime()); warn.setDate(due.getDate()-3);
-            var over=new Date(due.getTime()); over.setDate(due.getDate()+2);
-            var atWarn=fitNotifAt(warn, due.getTime()>now.getTime());
-            var atDue=fitNotifAt(due, over.getTime()>now.getTime());
-            var atOver=fitNotifAt(over, true);
-            if(atWarn){
-              notifs.push({id:nid++, title:'📅 '+r.number+' 房租即将到期', body:tenant+'房租 ¥'+fmt(r.rent)+' 还有3天（每月'+day+'号）到期，请提前联系租户', schedule:{at:atWarn}, extra:{roomId:r.id,type:'warn'}});
-            }
-            if(atDue){
-              notifs.push({id:nid++, title:'⚠️ '+r.number+' 房租今天到期！', body:tenant+'房租 ¥'+fmt(r.rent)+' 今天（每月'+day+'号）到期，请尽快催收', schedule:{at:atDue}, extra:{roomId:r.id,type:'due'}});
-            }
-            if(atOver){
-              notifs.push({id:nid++, title:'🚨 '+r.number+' 房租已逾期', body:tenant+'房租 ¥'+fmt(r.rent)+' 已逾期2天，请确认是否已收取', schedule:{at:atOver}, extra:{roomId:r.id,type:'over'}});
-            }
-          }
-        }
-        if(notifs.length){
-          var imm=0;
-          for(var k=0;k<notifs.length;k++){var at=new Date(notifs[k].schedule.at).getTime();if(Math.abs(at-Date.now())<60000)imm++;}
-          LN.schedule({notifications:notifs}).then(function(){if(IS_NATIVE){console.log('已排程 '+notifs.length+' 条房租提醒');if(imm>0)toast('已排程 '+notifs.length+' 条提醒，其中 '+imm+' 条将在1分钟内弹出');}}).catch(function(e){console.error('schedule 失败',e);if(IS_NATIVE)toast('通知排程失败：'+e.message)})
-        }else if(IS_NATIVE)console.log('无待排程的房租提醒')
-      }
-      // cancelAll 在「当前没有任何已排程通知」时某些插件版本会 reject；
-      // 若只 .catch 打印而不继续，buildAndSchedule 永不执行，房租提醒就排不上。
-      // 故 .then 与 .catch 都走 buildAndSchedule，确保无论 cancelAll 成功与否都排程。
-      LN.cancelAll().then(buildAndSchedule).catch(buildAndSchedule);
-    }).catch(function(e){console.error('请求通知权限失败',e)});
-  }catch(e){console.error('scheduleRentReminders 异常',e)}
-}
-
-// ========== MAINTENANCE ==========
 function showAddMaintModal(record){
   try{
     $('maintId').value=record?record.id:'';
@@ -2278,7 +2168,7 @@ function renderBackupStat(){
 }
 
 // ========== DASHBOARD ==========
-function renderAll(){try{updateRunModeBox();renderAllRooms();renderDashStats();renderQuickActions()}catch(e){reportError(e,'renderAll')}}
+function renderAll(){try{renderAllRooms();renderDashStats();renderQuickActions()}catch(e){reportError(e,'renderAll')}}
 
 function renderDashStats(){
   try{
@@ -2327,24 +2217,8 @@ function initData(){
   }
 }
 
-function updateRunModeBox(){
-  try{
-    var box=document.getElementById('runModeBox'); if(!box) return;
-    var capOK=!!(window.Capacitor);
-    var isNative=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
-    var platform=(window.Capacitor&&Capacitor.getPlatform)?Capacitor.getPlatform():'n/a';
-    var hasPlugin=!!(window.Capacitor&&Capacitor.Plugins&&Capacitor.Plugins.LocalNotifications);
-    var mode=isNative?('原生APK（'+platform+'）'):('网页预览（'+platform+'）');
-    var color=isNative?'#1B873F':'#B26A00';
-    box.style.background=isNative?'#E8F5EC':'#FFF4E5';
-    box.innerHTML='<b style="color:'+color+'">运行模式：'+mode+'</b><br>'+
-      'Capacitor全局：'+(capOK?'有':'无')+'　系统通知插件：'+(hasPlugin?'已加载 ✅':'未加载 ❌')+'<br>'+
-      (isNative?(hasPlugin?'✅ 可发送系统通知（关App也能弹）':'⚠️ 需重装含本地通知插件的APK'):'⚠️ 网页模式无法发系统通知，请安装原生APK');
-  }catch(e){}
-}
 function detectPlatform(){
   IS_NATIVE=!!(window.Capacitor&&Capacitor.isNativePlatform&&Capacitor.isNativePlatform());
-  updateRunModeBox();
   if(!IS_NATIVE){
     try{
       if(!document.getElementById('previewBar')){
@@ -2360,8 +2234,7 @@ function detectPlatform(){
 
 // ===== BOOTSTRAP ===== //
 function startApp(){try{detectPlatform();
-  document.addEventListener('visibilitychange',function(){if(!document.hidden){try{scheduleRentReminders()}catch(e){}}});
-  DB.load().then(function(){try{initData();renderAll();scheduleRentReminders();setTimeout(function(){try{scheduleRentReminders()}catch(e){}},2000);}catch(e){console.error('Init error:',e);reportError(e,'initData/renderAll')}})}catch(e){reportError(e,'startApp')}}
+  DB.load().then(function(){try{initData();renderAll();}catch(e){console.error('Init error:',e);reportError(e,'initData/renderAll')}})}catch(e){reportError(e,'startApp')}}
 try{
   if(initSupabase()){
     sbClient.auth.getSession().then(function(r){
